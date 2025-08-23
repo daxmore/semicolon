@@ -1,18 +1,20 @@
 <?php
-function get_distinct_values($column, $table = 'books') {
+function get_distinct_values($column, $table = 'books')
+{
     global $conn;
     $sql = "SELECT DISTINCT $column FROM $table";
     $result = $conn->query($sql);
     $values = [];
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             $values[] = $row[$column];
         }
     }
     return $values;
 }
 
-function get_books($subject = null, $semester = null) {
+function get_books($subject = null, $semester = null)
+{
     global $conn;
     $sql = "SELECT * FROM books WHERE 1=1";
     if ($subject) {
@@ -21,7 +23,7 @@ function get_books($subject = null, $semester = null) {
     if ($semester) {
         $sql .= " AND semester = ?";
     }
-    
+
     $stmt = $conn->prepare($sql);
 
     $types = '';
@@ -34,7 +36,7 @@ function get_books($subject = null, $semester = null) {
         $types .= 's';
         $params[] = &$semester;
     }
-    
+
 
     if ($types) {
         $stmt->bind_param($types, ...$params);
@@ -44,14 +46,15 @@ function get_books($subject = null, $semester = null) {
     $result = $stmt->get_result();
     $books = [];
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             $books[] = $row;
         }
     }
     return $books;
 }
 
-function get_papers($subject = null, $year = null) {
+function get_papers($subject = null, $year = null)
+{
     global $conn;
     $sql = "SELECT * FROM papers WHERE 1=1";
     if ($subject) {
@@ -81,7 +84,7 @@ function get_papers($subject = null, $year = null) {
     $result = $stmt->get_result();
     $papers = [];
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             $papers[] = $row;
         }
     }
@@ -100,7 +103,8 @@ function get_youtube_id($url)
     }
     return $video_id;
 }
-function getUserByUsername($username) {
+function getUserByUsername($username)
+{
     global $conn;
     $sql = "SELECT * FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
@@ -110,7 +114,8 @@ function getUserByUsername($username) {
     return $result->fetch_assoc();
 }
 
-function createUser($username, $password) {
+function createUser($username, $password)
+{
     global $conn;
     $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
     $stmt = $conn->prepare($sql);
@@ -118,7 +123,8 @@ function createUser($username, $password) {
     return $stmt->execute();
 }
 
-function get_count($table) {
+function get_count($table)
+{
     global $conn;
     $sql = "SELECT COUNT(*) FROM " . $table;
     $result = $conn->query($sql);

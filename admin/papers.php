@@ -2,6 +2,12 @@
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
+// session_start();
+// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+//     header('Location: login.php');
+//     exit();
+// }
+
 // Handle form submissions for CRUD operations
 $action = $_POST['action'] ?? '';
 
@@ -28,6 +34,7 @@ $papers = get_papers();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,6 +42,7 @@ $papers = get_papers();
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../assets/css/index.css">
 </head>
+
 <body>
     <?php include 'header.php'; ?>
 
@@ -48,23 +56,33 @@ $papers = get_papers();
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
-                        <input type="text" name="title" id="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                        <input type="text" name="title" id="title"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            required>
                     </div>
                     <div>
                         <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
-                        <input type="text" name="subject" id="subject" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                        <input type="text" name="subject" id="subject"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            required>
                     </div>
                     <div>
                         <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
-                        <input type="number" name="year" id="year" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                        <input type="number" name="year" id="year"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            required>
                     </div>
                     <div>
                         <label for="file_path" class="block text-sm font-medium text-gray-700">File Path</label>
-                        <input type="text" name="file_path" id="file_path" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                        <input type="text" name="file_path" id="file_path"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            required>
                     </div>
                 </div>
                 <div class="mt-4">
-                    <button type="submit" class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">Add Paper</button>
+                    <button type="submit"
+                        class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">Add
+                        Paper</button>
                 </div>
             </form>
         </div>
@@ -85,14 +103,27 @@ $papers = get_papers();
                     <tbody class="divide-y divide-gray-200">
                         <?php foreach ($papers as $paper): ?>
                             <tr>
-                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900"><?php echo htmlspecialchars($paper['title']); ?></td>
-                                <td class="whitespace-nowrap px-4 py-2 text-gray-700"><?php echo htmlspecialchars($paper['subject']); ?></td>
-                                <td class="whitespace-nowrap px-4 py-2 text-gray-700"><?php echo htmlspecialchars($paper['year']); ?></td>
-                                <td class="whitespace-nowrap px-4 py-2">
+                                <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                    <?php echo htmlspecialchars($paper['title']); ?>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    <?php echo htmlspecialchars($paper['subject']); ?>
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    <?php echo htmlspecialchars($paper['year']); ?>
+                                </td>
+                                <td class="gap-1">
                                     <form action="papers.php" method="post" class="inline-block js-confirm-delete">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $paper['id']; ?>">
-                                        <button type="submit" class="inline-block rounded bg-red-600 px-4 py-2 text-xs font-medium text-white hover:bg-red-700">Delete</button>
+                                        <button type="submit"
+                                            class="inline-block rounded bg-red-600 px-4 py-2 text-xs font-medium text-white hover:bg-red-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
@@ -105,4 +136,5 @@ $papers = get_papers();
 
     <?php include '../includes/footer.php'; ?>
 </body>
+
 </html>

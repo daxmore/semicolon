@@ -15,6 +15,7 @@ $books = get_books($subject, $semester);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,6 +23,7 @@ $books = get_books($subject, $semester);
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/index.css">
 </head>
+
 <body>
     <?php include 'includes/header.php'; ?>
 
@@ -32,7 +34,8 @@ $books = get_books($subject, $semester);
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
-                    <select name="subject" id="subject" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <select name="subject" id="subject"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         <option value="">All</option>
                         <?php foreach ($subjects as $s): ?>
                             <option value="<?php echo htmlspecialchars($s); ?>" <?php echo ($subject === $s) ? 'selected' : ''; ?>><?php echo htmlspecialchars($s); ?></option>
@@ -41,24 +44,26 @@ $books = get_books($subject, $semester);
                 </div>
                 <div>
                     <label for="semester" class="block text-sm font-medium text-gray-700">Semester</label>
-                    <select name="semester" id="semester" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <select name="semester" id="semester"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         <option value="">All</option>
                         <?php foreach ($semesters as $s): ?>
                             <option value="<?php echo htmlspecialchars($s); ?>" <?php echo ($semester === $s) ? 'selected' : ''; ?>><?php echo htmlspecialchars($s); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                
+
             </div>
             <div class="mt-4">
-                <button type="submit" class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">Filter</button>
+                <button type="submit"
+                    class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">Filter</button>
             </div>
         </form>
 
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <?php foreach ($books as $book): ?>
                 <div class="block rounded-lg p-4 shadow-lg">
-                    
+
 
                     <div class="mt-2">
                         <dl>
@@ -87,10 +92,12 @@ $books = get_books($subject, $semester);
                                 </div>
                             </div>
 
-                            
+
                         </div>
                         <div class="mt-4">
-                            <a href="<?php echo htmlspecialchars($book['file_path']); ?>" class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow" download>Download</a>
+                            <a href="<?php echo htmlspecialchars($book['file_path']); ?>"
+                                class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow"
+                                download>Download</a>
                         </div>
                     </div>
                 </div>
@@ -100,4 +107,5 @@ $books = get_books($subject, $semester);
 
     <?php include 'includes/footer.php'; ?>
 </body>
+
 </html>

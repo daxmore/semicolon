@@ -33,12 +33,12 @@ include 'includes/functions.php';
                             src="https://www.youtube.com/embed/<?php echo htmlspecialchars(get_youtube_id($video['youtube_url'])); ?>"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen></iframe>
+                            allowfullscreen></iframe>x  
                     </div>
                     <div class="p-6">
                         <h2 class="text-2xl font-bold mb-2"><?php echo htmlspecialchars($video['title']); ?></h2>
                         <p class="text-gray-700 mb-4"><?php echo htmlspecialchars($video['description']); ?></p>
-                        
+
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -47,4 +47,5 @@ include 'includes/functions.php';
 
     <?php include 'includes/footer.php'; ?>
 </body>
+
 </html>
