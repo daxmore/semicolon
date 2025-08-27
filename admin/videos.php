@@ -1,12 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: index.php');
+    exit();
+}
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
-
-// session_start();
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit();
-// }
 
 // Handle Create and Delete operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,6 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $conn->prepare("INSERT INTO videos (title, description, youtube_url) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $title, $description, $youtube_url);
+        $stmt->execute();
+    } elseif ($action === 'update') {
+        $id = $_POST['id'];
+        $title = $_POST['title'];
+        $description = $_POST['description'];
+        $youtube_url = $_POST['youtube_url'];
+
+        $stmt = $conn->prepare("UPDATE videos SET title = ?, description = ?, youtube_url = ? WHERE id = ?");
+        $stmt->bind_param("sssi", $title, $description, $youtube_url, $id);
         $stmt->execute();
     } elseif ($action === 'delete') {
         $id = $_POST['id'];
@@ -45,8 +53,9 @@ include 'header.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Videos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -67,10 +76,10 @@ include 'header.php';
                             required>
                     </div>
                     <div class="col-span-1">
-                        <label for="youtube_url" class="block text-sm font-medium text-gray-700">YouTube URL</label>
-                        <input type="url" id="youtube_url" name="youtube_url"
+                        <label for="youtube_url" class="block text-sm font-medium text-gray-700">YouTube Embed Code</label>
+                        <textarea id="youtube_url" name="youtube_url" rows="4"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            required>
+                            required></textarea>
                     </div>
                     <div class="col-span-2">
                         <label for="description" class="block text-sm font-medium text-gray-700">Description</label>

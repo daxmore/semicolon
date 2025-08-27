@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+// Redirect admin users to the admin dashboard if logged in
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    header('Location: admin/index.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +14,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Semicolon</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/index.css">
 </head>
 

@@ -1,4 +1,15 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: auth/login.php');
+    exit();
+}
+
+// Redirect admin users to the admin dashboard
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    header('Location: admin/index.php');
+    exit();
+}
 require_once 'includes/db.php';
 include 'includes/functions.php';
 ?>
@@ -9,8 +20,9 @@ include 'includes/functions.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Videos - Semicolon</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
@@ -29,15 +41,20 @@ include 'includes/functions.php';
             <?php foreach ($videos as $video): ?>
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                     <div class="aspect-w-16 aspect-h-9">
-                        <iframe
-                            src="https://www.youtube.com/embed/<?php echo htmlspecialchars(get_youtube_id($video['youtube_url'])); ?>"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen></iframe>x  
+                        <?php echo $video['youtube_url']; ?>
                     </div>
                     <div class="p-6">
                         <h2 class="text-2xl font-bold mb-2"><?php echo htmlspecialchars($video['title']); ?></h2>
-                        <p class="text-gray-700 mb-4"><?php echo htmlspecialchars($video['description']); ?></p>
+                                                <p class="text-gray-700 mb-4">
+                            <?php
+                            $description = htmlspecialchars($video['description']);
+                            if (strlen($description) > 120) {
+                                echo substr($description, 0, 120) . '...';
+                            } else {
+                                echo $description;
+                            }
+                            ?>
+                        </p>
 
                     </div>
                 </div>

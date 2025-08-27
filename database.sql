@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS videos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    youtube_url VARCHAR(255) NOT NULL,
+    youtube_url TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -73,9 +74,12 @@ CREATE TABLE IF NOT EXISTS material_requests (
 
 -- Sample Data
 
--- Users (password is 'password')
-INSERT INTO `users` (`id`, `username`, `password`, `created_at`) VALUES
-(1, 'testuser', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2025-08-05 10:00:00');
+
+
+-- Add admin user with role 'admin'
+INSERT INTO `users` (`username`, `password`, `role`) VALUES
+('daxmore', 'password', 'admin');
+
 
 -- Books
 INSERT INTO `books` (`id`, `title`, `author`, `description`, `subject`, `semester`, `difficulty`, `file_path`, `cover_image`, `created_at`) VALUES

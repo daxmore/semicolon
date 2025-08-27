@@ -1,16 +1,10 @@
 // Mobile menu toggle
-const mobileMenuButton = document.querySelector('.block.md\:hidden button');
-const globalNav = document.querySelector('header nav[aria-label="Global"]');
+const mobileMenuButton = document.getElementById('mobile-menu-button');
+const mobileMenu = document.getElementById('mobile-menu');
 
-if (mobileMenuButton && globalNav) {
+if (mobileMenuButton && mobileMenu) {
     mobileMenuButton.addEventListener('click', () => {
-        globalNav.classList.toggle('hidden');
-        // For mobile, ensure it's displayed as block when not hidden
-        if (!globalNav.classList.contains('hidden')) {
-            globalNav.style.display = 'block';
-        } else {
-            globalNav.style.display = ''; // Reset to default (which will be hidden by Tailwind's md:block)
-        }
+        mobileMenu.classList.toggle('hidden');
     });
 }
 

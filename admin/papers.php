@@ -1,12 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: index.php');
+    exit();
+}
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
-
-// session_start();
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit();
-// }
 
 // Handle form submissions for CRUD operations
 $action = $_POST['action'] ?? '';
@@ -21,6 +20,19 @@ if ($action === 'add') {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ssis', $title, $subject, $year, $file_path);
     $stmt->execute();
+} elseif ($action === 'update') {
+    $id = $_POST['id'];
+    $title = $_POST['title'];
+    $subject = $_POST['subject'];
+    $year = $_POST['year'];
+    $file_path = $_POST['file_path'];
+
+    $sql = "UPDATE papers SET title = ?, subject = ?, year = ?, file_path = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('ssisi', $title, $subject, $year, $file_path, $id);
+    $stmt->execute();
+    header('Location: papers.php');
+    exit();
 } elseif ($action === 'delete') {
     $id = $_POST['id'];
     $sql = "DELETE FROM papers WHERE id = ?";
@@ -39,8 +51,9 @@ $papers = get_papers();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Papers</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
@@ -57,25 +70,25 @@ $papers = get_papers();
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
                         <input type="text" name="title" id="title"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required>
                     </div>
                     <div>
                         <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
                         <input type="text" name="subject" id="subject"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required>
                     </div>
                     <div>
                         <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
                         <input type="number" name="year" id="year"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required>
                     </div>
                     <div>
                         <label for="file_path" class="block text-sm font-medium text-gray-700">File Path</label>
                         <input type="text" name="file_path" id="file_path"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2"
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required>
                     </div>
                 </div>
@@ -96,7 +109,7 @@ $papers = get_papers();
                             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Title</th>
                             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Subject</th>
                             <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Year</th>
-                            <th class="px-4 py-2"></th>
+                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900 text-center">Actions</th>
                         </tr>
                     </thead>
 
@@ -112,7 +125,12 @@ $papers = get_papers();
                                 <td class="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <?php echo htmlspecialchars($paper['year']); ?>
                                 </td>
-                                <td class="gap-1">
+                                <td class="gap-1 flex justify-center">
+                                    <a href="edit_paper.php?id=<?php echo $paper['id']; ?>" title="Edit" class="inline-block rounded bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </a>
                                     <form action="papers.php" method="post" class="inline-block js-confirm-delete">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $paper['id']; ?>">

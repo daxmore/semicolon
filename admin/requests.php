@@ -1,12 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: index.php');
+    exit();
+}
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
-
-// session_start();
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit();
-// }
 
 $message = '';
 $message_type = '';
@@ -52,8 +51,9 @@ $requests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Material Requests</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body class="bg-gray-100">

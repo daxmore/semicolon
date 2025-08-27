@@ -9,6 +9,12 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Redirect admin users to the admin dashboard
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    header('Location: admin/index.php');
+    exit();
+}
+
 // Fetch some data for the dashboard
 $total_papers = get_count('papers');
 $total_books = get_count('books');
@@ -25,8 +31,9 @@ $total_videos = get_count('videos');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Semicolon</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>

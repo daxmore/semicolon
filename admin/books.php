@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: index.php');
+    exit();
+}
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
@@ -16,9 +21,25 @@ if ($action === 'add') {
 
     $sql = "INSERT INTO books (title, author, description, subject, semester, difficulty, file_path) VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssssssss', $title, $author, $description, $subject, $semester, $difficulty, $file_path);
+    $stmt->bind_param('sssssss', $title, $author, $description, $subject, $semester, $difficulty, $file_path);
     $stmt->execute();
     header("Location: books.php");
+    exit();
+} elseif ($action === 'update') {
+    $id = $_POST['id'];
+    $title = $_POST['title'];
+    $author = $_POST['author'];
+    $description = $_POST['description'];
+    $subject = $_POST['subject'];
+    $semester = $_POST['semester'];
+    $difficulty = $_POST['difficulty'];
+    $file_path = $_POST['file_path'];
+
+    $sql = "UPDATE books SET title = ?, author = ?, description = ?, subject = ?, semester = ?, difficulty = ?, file_path = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('sssssssi', $title, $author, $description, $subject, $semester, $difficulty, $file_path, $id);
+    $stmt->execute();
+    header('Location: books.php');
     exit();
 } elseif ($action === 'delete') {
     $id = $_POST['id'];
@@ -40,8 +61,9 @@ $books = get_books();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Books</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body class="bg-gray-100">

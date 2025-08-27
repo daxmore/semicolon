@@ -47,6 +47,40 @@ if (session_status() === PHP_SESSION_NONE) {
         </nav>
       </div>
 
+      <div id="mobile-menu" class="md:hidden hidden absolute top-16 left-0 w-full bg-white shadow-lg py-4 z-50">
+        <nav aria-label="Mobile Global">
+          <ul class="flex flex-col items-center gap-4 text-lg">
+            <li>
+              <a class="text-gray-500 transition hover:text-gray-500/75" href="home.php"> Home </a>
+            </li>
+        
+            <li>
+              <a class="text-gray-500 transition hover:text-gray-500/75" href="about.php"> About </a>
+            </li>
+
+            <li>
+              <a class="text-gray-500 transition hover:text-gray-500/75" href="books.php"> Books </a>
+            </li>
+
+            <li>
+              <a class="text-gray-500 transition hover:text-gray-500/75" href="papers.php"> Papers </a>
+            </li>
+
+            <li>
+              <a class="text-gray-500 transition hover:text-gray-500/75" href="videos.php"> Videos </a>
+            </li>
+
+            <li>
+              <a class="text-gray-500 transition hover:text-gray-500/75" href="contact.php"> Contact </a>
+            </li>
+
+            <li>
+              <a class="text-gray-500 transition hover:text-gray-500/75" href="request.php"> Request Material </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
       <div class="flex items-center gap-4">
         <div class="sm:flex sm:gap-4">
           <?php if (isset($_SESSION['user_id'])): ?>
@@ -70,7 +104,7 @@ if (session_status() === PHP_SESSION_NONE) {
         </div>
 
         <div class="block md:hidden">
-          <button class="rounded bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75">
+          <button id="mobile-menu-button" class="rounded bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />

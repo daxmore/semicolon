@@ -19,10 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $user = getUserByUsername($username);
 
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user && $password === $user['password']) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            header('Location: /Semicolon/dashboard.php'); // Redirect to a dashboard or home page
+            $_SESSION['role'] = $user['role'];
+
+            if ($user['role'] === 'admin') {
+                header('Location: /Semicolon/admin/index.php');
+            } else {
+                header('Location: /Semicolon/dashboard.php');
+            }
             exit();
         } else {
             $errors[] = 'Invalid username or password.';
@@ -38,19 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <!-- TailwindCSS v4 CDN (placeholder - replace with actual build if needed) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../assets/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
 
-        <?php if (!empty($errors)): ?>
+        <?php if (!empty($errors)):
+        ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <strong class="font-bold">Error!</strong>
                 <span class="block sm:inline">
-                    <?php foreach ($errors as $error): ?>
+                    <?php foreach ($errors as $error):
+                    ?>
                         <p><?php echo htmlspecialchars($error); ?></p>
                     <?php endforeach; ?>
                 </span>
@@ -80,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 up</a>
         </p>
         <p class="mt-4 text-center text-sm text-gray-600">
-            <a href="../home.php" class="font-medium text-gray-600 hover:text-gray-500 capitalize">← go back to home</a>
+            <a href="../index.php" class="font-medium text-gray-600 hover:text-gray-500 capitalize">← go back to home</a>
         </p>
     </div>
 </body>

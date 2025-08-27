@@ -1,4 +1,16 @@
 <?php
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+        header('Location: admin/index.php');
+        exit();
+    } else {
+        header('Location: dashboard.php');
+        exit();
+    }
+}
+
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
@@ -14,8 +26,8 @@ $featured_videos = $conn->query("SELECT * FROM videos ORDER BY id DESC LIMIT 2")
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Semicolon - Educational Resources for BCA Students</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="assets/css/index.css">
+    <link href="assets/css/index.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Add FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -50,7 +62,7 @@ $featured_videos = $conn->query("SELECT * FROM videos ORDER BY id DESC LIMIT 2")
                 </div>
             </div>
             <div class="hidden lg:block">
-                <img src="assets/images/hero-image.svg" alt="Education Illustration" class="w-full max-w-md">
+                <img src="assets/images/hero-image.png" alt="Education Illustration" class="w-full max-w-md">
             </div>
         </div>
     </section>
@@ -161,23 +173,24 @@ $featured_videos = $conn->query("SELECT * FROM videos ORDER BY id DESC LIMIT 2")
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <?php foreach ($featured_videos as $video):
-                            $youtube_id = get_youtube_id($video['youtube_url']);
-                            ?>
+                        <?php foreach ($featured_videos as $video): ?>
                             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                                 <div class="aspect-w-16 aspect-h-9">
-                                    <iframe src="https://www.youtube.com/embed/<?php echo $youtube_id; ?>" frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen class="w-full h-64">
-                                    </iframe>
+                                    <?php echo htmlspecialchars_decode($video['youtube_url']); ?>
                                 </div>
                                 <div class="p-4">
                                     <h4 class="font-semibold"><?php echo htmlspecialchars($video['title']); ?></h4>
-                                    <p class="text-sm text-gray-600 mt-2">
-                                        <?php echo htmlspecialchars(substr($video['description'], 0, 100)) . '...'; ?>
+                                    <p class="text-sm text-gray-600">
+                                        <?php
+                                        $description = htmlspecialchars($video['description']);
+                                        if (strlen($description) > 100) {
+                                            echo substr($description, 0, 100) . '...';
+                                        } else {
+                                            echo $description;
+                                        }
+                                        ?>
                                     </p>
-                                    <a href="videos.php" class="mt-3 inline-block text-teal-600 hover:underline">Watch Video
-                                        →</a>
+                                    <a href="<?php echo htmlspecialchars($video['youtube_url']); ?>" target="_blank" class="mt-4 inline-block px-4 py-2 bg-teal-600 text-white text-sm rounded hover:bg-teal-700 transition">Watch Video</a>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -202,7 +215,7 @@ $featured_videos = $conn->query("SELECT * FROM videos ORDER BY id DESC LIMIT 2")
     <?php include 'includes/footer.php'; ?>
 
     <!-- Optional: Add a simple scroll-to-top button -->
-    <button id="scrollToTop" class="fixed bottom-8 right-8 bg-teal-600 text-white p-3 rounded-full shadow-lg hidden">
+    <button id="scrollToTop" class="fixed bottom-8 right-8 bg-teal-600 text-white py-3 px-5 rounded-full shadow-lg hidden">
         <i class="fas fa-arrow-up"></i>
     </button>
 

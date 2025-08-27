@@ -1,8 +1,18 @@
 <?php
+session_start();
+
+// Redirect admin users to the admin dashboard if logged in
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    header('Location: admin/index.php');
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: auth/login.php');
+    exit();
+}
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
-
-session_start();
 
 $paper_id = $_GET['id'] ?? null;
 $user_id = $_SESSION['user_id'] ?? null;
