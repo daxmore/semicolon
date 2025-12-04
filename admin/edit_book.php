@@ -1,13 +1,13 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Location: index.php');
-    exit();
-}
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
-$id = $_GET['id'];
+$id = $_GET['id'] ?? null;
+if (!$id) {
+    header('Location: books.php');
+    exit();
+}
+
 $sql = "SELECT * FROM books WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('i', $id);
@@ -15,88 +15,83 @@ $stmt->execute();
 $result = $stmt->get_result();
 $book = $result->fetch_assoc();
 
+if (!$book) {
+    header('Location: books.php');
+    exit();
+}
+
+include 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Edit Book</title>
-    <link href="../assets/css/index.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/index.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
+<!-- Back Link -->
+<div class="mb-6">
+    <a href="books.php" class="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-700 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Books
+    </a>
+</div>
 
-<body>
-    <?php include 'header.php'; ?>
-
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold">Edit Book</h1>
-
-        <div class="mt-8">
-            <form action="books.php" method="post" class="mt-4">
-                <input type="hidden" name="action" value="update">
-                <input type="hidden" name="id" value="<?php echo $book['id']; ?>">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
-                        <input type="text" name="title" id="title"
-                            value="<?php echo htmlspecialchars($book['title']); ?>"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                            required>
-                    </div>
-                    <div>
-                        <label for="author" class="block text-sm font-medium text-gray-700">Author</label>
-                        <input type="text" name="author" id="author"
-                            value="<?php echo htmlspecialchars($book['author']); ?>"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                            required>
-                    </div>
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea name="description" id="description" rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"><?php echo htmlspecialchars($book['description']); ?></textarea>
-                    </div>
-                    <div>
-                        <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
-                        <input type="text" name="subject" id="subject"
-                            value="<?php echo htmlspecialchars($book['subject']); ?>"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    </div>
-                    <div>
-                        <label for="semester" class="block text-sm font-medium text-gray-700">Semester</label>
-                        <input type="text" name="semester" id="semester"
-                            value="<?php echo htmlspecialchars($book['semester']); ?>"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    </div>
-                    <div>
-                        <label for="difficulty" class="block text-sm font-medium text-gray-700">Difficulty</label>
-                        <select name="difficulty" id="difficulty"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            <option value="Easy" <?php if ($book['difficulty'] === 'Easy') echo 'selected'; ?>>Easy</option>
-                            <option value="Medium" <?php if ($book['difficulty'] === 'Medium') echo 'selected'; ?>>Medium</option>
-                            <option value="Hard" <?php if ($book['difficulty'] === 'Hard') echo 'selected'; ?>>Hard</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="file_path" class="block text-sm font-medium text-gray-700">File Path</label>
-                        <input type="text" name="file_path" id="file_path"
-                            value="<?php echo htmlspecialchars($book['file_path']); ?>"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                            required>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <button type="submit"
-                        class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow">Update
-                        Book</button>
-                </div>
-            </form>
+<!-- Edit Form -->
+<div class="bg-white rounded-2xl border border-zinc-200 p-6">
+    <h2 class="text-lg font-bold text-zinc-900 mb-6">Edit Book Details</h2>
+    
+    <form action="books.php" method="post" class="space-y-6">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="id" value="<?php echo $book['id']; ?>">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-2">Title</label>
+                <input type="text" name="title" value="<?php echo htmlspecialchars($book['title']); ?>" required
+                    class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-2">Author</label>
+                <input type="text" name="author" value="<?php echo htmlspecialchars($book['author']); ?>" required
+                    class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+            </div>
         </div>
-    </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-2">Description</label>
+            <textarea name="description" rows="4" required
+                class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"><?php echo htmlspecialchars($book['description']); ?></textarea>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-2">Subject</label>
+                <input type="text" name="subject" value="<?php echo htmlspecialchars($book['subject']); ?>" required
+                    class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-2">Difficulty</label>
+                <select name="difficulty" required
+                    class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                    <option value="Easy" <?php echo $book['difficulty'] === 'Easy' ? 'selected' : ''; ?>>Easy</option>
+                    <option value="Medium" <?php echo $book['difficulty'] === 'Medium' ? 'selected' : ''; ?>>Medium</option>
+                    <option value="Hard" <?php echo $book['difficulty'] === 'Hard' ? 'selected' : ''; ?>>Hard</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Current File Info -->
+        <div class="bg-zinc-50 rounded-xl p-4">
+            <p class="text-sm font-medium text-zinc-700 mb-1">Current Resource</p>
+            <p class="text-sm text-zinc-500 break-all"><?php echo htmlspecialchars($book['private_path']); ?></p>
+        </div>
+        
+        <div class="flex items-center justify-end gap-4 pt-4 border-t border-zinc-100">
+            <a href="books.php" class="px-6 py-2.5 text-zinc-600 hover:text-zinc-800 font-medium transition">
+                Cancel
+            </a>
+            <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition">
+                Update Book
+            </button>
+        </div>
+    </form>
+</div>
 
-    <?php include '../includes/footer.php'; ?>
-</body>
-
-</html>
+<?php include 'footer.php'; ?>

@@ -1,9 +1,4 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Location: index.php');
-    exit();
-}
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
@@ -15,18 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = $_POST['title'];
         $description = $_POST['description'];
         $youtube_url = $_POST['youtube_url'];
+        
+        $slug = generate_slug($title);
+        $slug .= '-' . substr(md5(uniqid()), 0, 5);
 
-        $stmt = $conn->prepare("INSERT INTO videos (title, description, youtube_url) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $title, $description, $youtube_url);
-        $stmt->execute();
-    } elseif ($action === 'update') {
-        $id = $_POST['id'];
-        $title = $_POST['title'];
-        $description = $_POST['description'];
-        $youtube_url = $_POST['youtube_url'];
-
-        $stmt = $conn->prepare("UPDATE videos SET title = ?, description = ?, youtube_url = ? WHERE id = ?");
-        $stmt->bind_param("sssi", $title, $description, $youtube_url, $id);
+        $stmt = $conn->prepare("INSERT INTO videos (title, description, youtube_url, slug) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $title, $description, $youtube_url, $slug);
         $stmt->execute();
     } elseif ($action === 'delete') {
         $id = $_POST['id'];
@@ -43,120 +32,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $result = $conn->query("SELECT * FROM videos ORDER BY created_at DESC");
 $videos = $result->fetch_all(MYSQLI_ASSOC);
 
+$showForm = isset($_GET['add']);
+
 include 'header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
+<!-- Header with Add Button -->
+<div class="flex justify-between items-center mb-6">
+    <p class="text-zinc-500">Manage your video tutorials</p>
+    <?php if (!$showForm): ?>
+        <a href="videos.php?add=1" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-xl font-medium hover:bg-rose-700 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add New Video
+        </a>
+    <?php else: ?>
+        <a href="videos.php" class="inline-flex items-center gap-2 px-4 py-2 border border-zinc-200 text-zinc-700 rounded-xl font-medium hover:bg-zinc-50 transition">
+            Cancel
+        </a>
+    <?php endif; ?>
+</div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Manage Videos</title>
-    <link href="../assets/css/index.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/index.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-
-<body class="bg-gray-100">
-
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-8 text-gray-800">Manage Videos</h1>
-
-        <!-- Add Video Form -->
-        <div class="bg-white p-8 rounded-lg shadow-md mb-8">
-            <h2 class="text-2xl font-bold mb-6 text-gray-700">Add New Video</h2>
-            <form method="POST" action="videos.php">
-                <input type="hidden" name="action" value="add">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="col-span-1">
-                        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
-                        <input type="text" id="title" name="title"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            required>
-                    </div>
-                    <div class="col-span-1">
-                        <label for="youtube_url" class="block text-sm font-medium text-gray-700">YouTube Embed Code</label>
-                        <textarea id="youtube_url" name="youtube_url" rows="4"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            required></textarea>
-                    </div>
-                    <div class="col-span-2">
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea id="description" name="description" rows="4"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
-                    </div>
-                </div>
-                <div class="text-right mt-6">
-                    <button type="submit"
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Add Video
-                    </button>
-                </div>
-            </form>
+<?php if ($showForm): ?>
+<!-- Add Form -->
+<div class="bg-white p-6 rounded-2xl border border-zinc-200 mb-8">
+    <h2 class="text-lg font-bold text-zinc-900 mb-6">Add New Video</h2>
+    <form action="videos.php" method="post" class="space-y-4">
+        <input type="hidden" name="action" value="add">
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">Title</label>
+            <input type="text" name="title" required class="w-full px-4 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-transparent">
         </div>
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">Description</label>
+            <textarea name="description" rows="3" class="w-full px-4 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-transparent"></textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">YouTube URL</label>
+            <input type="url" name="youtube_url" required placeholder="https://www.youtube.com/watch?v=..." class="w-full px-4 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-transparent">
+            <p class="text-xs text-zinc-500 mt-1">Supports: youtube.com/watch?v=, youtu.be/, youtube.com/embed/</p>
+        </div>
+        <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2 bg-rose-600 text-white rounded-xl font-medium hover:bg-rose-700 transition">
+                Add Video
+            </button>
+        </div>
+    </form>
+</div>
+<?php endif; ?>
 
-        <!-- Video Table -->
-        <div class="bg-white p-8 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold mb-6 text-gray-700">Existing Videos</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="whitespace-nowrap px-4 py-3 font-medium text-gray-900 text-left">Title</th>
-                            <th class="px-4 py-3 font-medium text-gray-900 text-left">Description</th>
-                            <th class="whitespace-nowrap px-4 py-3 font-medium text-gray-900 text-left">Link</th>
-                            <th class="whitespace-nowrap px-4 py-3 font-medium text-gray-900 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <?php if (empty($videos)): ?>
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-gray-500">No videos found.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($videos as $video): ?>
-                                <tr>
-                                    <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                                        <?php echo htmlspecialchars($video['title']); ?></td>
-                                    <td class="px-4 py-2 text-gray-700 max-w-xs truncate">
-                                        <?php echo htmlspecialchars($video['description']); ?></td>
-                                    <td class="whitespace-nowrap px-4 py-2 text-gray-700">
-                                        <a href="<?php echo htmlspecialchars($video['youtube_url']); ?>" target="_blank"
-                                            class="text-indigo-600 hover:text-indigo-900 hover:underline">
-                                            Watch Video
-                                        </a>
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-2 text-center flex items-center justify-center gap-1">
-                                        <a href="edit_video.php?id=<?php echo $video['id']; ?>" title="Edit" class="inline-block p-2 rounded bg-indigo-600 text-white hover:bg-indigo-700">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </a>
-                                        <form action="videos.php" method="post" class="inline-block m-0"
-                                            onsubmit="return confirm('Are you sure you want to delete this video?');">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="id" value="<?php echo $video['id']; ?>">
-                                            <button type="submit"
-                                                class="inline-block rounded bg-red-600 p-2 text-white hover:bg-red-700">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+<!-- Videos Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <?php if (empty($videos)): ?>
+        <div class="col-span-full bg-white rounded-2xl border border-zinc-200 p-12 text-center text-zinc-500">
+            No videos found. Add your first video!
+        </div>
+    <?php else: ?>
+        <?php foreach ($videos as $video): 
+            $youtube_id = get_youtube_id($video['youtube_url']);
+        ?>
+            <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden group">
+                <div class="aspect-video bg-zinc-900">
+                    <?php if ($youtube_id): ?>
+                        <iframe 
+                            src="https://www.youtube.com/embed/<?php echo htmlspecialchars($youtube_id); ?>" 
+                            title="<?php echo htmlspecialchars($video['title']); ?>"
+                            class="w-full h-full"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    <?php else: ?>
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-500 to-pink-600 text-white/50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="p-4">
+                    <h3 class="font-bold text-zinc-900 mb-1 line-clamp-1"><?php echo htmlspecialchars($video['title']); ?></h3>
+                    <p class="text-sm text-zinc-500 line-clamp-2 mb-4"><?php echo htmlspecialchars($video['description']); ?></p>
+                    <form action="videos.php" method="post" onsubmit="return confirm('Delete this video?');">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="id" value="<?php echo $video['id']; ?>">
+                        <button type="submit" class="w-full py-2 bg-red-100 text-red-600 rounded-xl font-medium hover:bg-red-200 transition">
+                            Delete
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
-    </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
 
-    <?php include '../includes/footer.php'; ?>
-</body>
-
-</html>
+<?php include 'footer.php'; ?>
