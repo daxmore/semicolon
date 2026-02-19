@@ -11,9 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($username)) {
         $errors[] = 'Username is required.';
+    } elseif (!preg_match('/^[a-zA-Z0-9_]{3,20}$/', $username)) {
+        $errors[] = 'Invalid username format.';
     }
+
     if (empty($password)) {
         $errors[] = 'Password is required.';
+    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/', $password)) {
+        $errors[] = 'Invalid password format.';
     }
 
     if (empty($errors)) {
@@ -127,6 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="username" 
                             name="username" 
                             required
+                            pattern="^[a-zA-Z0-9_]{3,20}$"
+                            title="Username must be 3-20 characters and can only contain letters, numbers, and underscores."
                             class="input-underline w-full text-zinc-900"
                             placeholder="Enter your username"
                         >
@@ -142,6 +149,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="password" 
                             name="password" 
                             required
+                            minlength="6"
+                            pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
+                            title="Password must be 6+ chars with at least one uppercase letter, one number, and one symbol."
                             class="input-underline w-full text-zinc-900"
                             placeholder="Enter your password"
                         >

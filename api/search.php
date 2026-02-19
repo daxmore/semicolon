@@ -17,7 +17,7 @@ if (strlen($query) < 2) {
 $results = [];
 
 // Books
-$sql = "SELECT id, title, 'book' as type, slug, token FROM books WHERE title LIKE ? OR author LIKE ? OR subject LIKE ? LIMIT 5";
+$sql = "SELECT id, title, author as description, subject, 'book' as type, slug, token FROM books WHERE title LIKE ? OR author LIKE ? OR subject LIKE ? LIMIT 5";
 $searchTerm = "%" . $query . "%";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('sss', $searchTerm, $searchTerm, $searchTerm);
@@ -27,8 +27,8 @@ while ($row = $res->fetch_assoc()) {
     $results[] = $row;
 }
 
-// Papers
-$sql = "SELECT id, title, 'paper' as type, slug, token FROM papers WHERE title LIKE ? OR subject LIKE ? LIMIT 5";
+// Papers  
+$sql = "SELECT id, title, subject as description, subject, 'paper' as type, slug, token FROM papers WHERE title LIKE ? OR subject LIKE ? LIMIT 5";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('ss', $searchTerm, $searchTerm);
 $stmt->execute();
@@ -38,7 +38,7 @@ while ($row = $res->fetch_assoc()) {
 }
 
 // Videos
-$sql = "SELECT id, title, 'video' as type, slug, token FROM videos WHERE title LIKE ? OR description LIKE ? LIMIT 5";
+$sql = "SELECT id, title, description, '' as subject, 'video' as type, slug as token, slug FROM videos WHERE title LIKE ? OR description LIKE ? LIMIT 5";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('ss', $searchTerm, $searchTerm);
 $stmt->execute();

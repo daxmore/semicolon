@@ -117,12 +117,18 @@ $videos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <?php else: ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <?php foreach ($videos as $video): 
-                        $youtube_id = get_youtube_id($video['youtube_url']);
+                        $video_content = $video['youtube_url'];
+                        $is_iframe = (strpos(trim($video_content), '<iframe') === 0);
+                        $youtube_id = $is_iframe ? false : get_youtube_id($video_content);
                     ?>
                         <div class="bg-white rounded-2xl border border-zinc-100 hover:border-rose-200 hover:shadow-xl transition-all duration-300 overflow-hidden">
                             <!-- YouTube Embed -->
-                            <div class="aspect-video bg-zinc-900">
-                                <?php if ($youtube_id): ?>
+                            <div class="aspect-video bg-zinc-900 flex items-center justify-center overflow-hidden">
+                                <?php if ($is_iframe): ?>
+                                    <div class="w-full h-full [&_iframe]:w-full [&_iframe]:h-full">
+                                        <?php echo $video_content; ?>
+                                    </div>
+                                <?php elseif ($youtube_id): ?>
                                     <iframe 
                                         src="https://www.youtube.com/embed/<?php echo htmlspecialchars($youtube_id); ?>" 
                                         title="<?php echo htmlspecialchars($video['title']); ?>"

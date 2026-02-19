@@ -147,9 +147,16 @@ $is_helpful = $user_reaction ? $user_reaction['is_helpful'] : null;
         <!-- Content -->
         <div class="bg-black relative w-full h-full">
             <?php if ($type === 'video'): 
-                $video_id = get_youtube_id($resource['youtube_url']);
+                $video_url = $resource['youtube_url'];
+                $is_iframe = (strpos(trim($video_url), '<iframe') === 0);
+                
+                if ($is_iframe):
+                    echo $video_url;
+                else:
+                    $video_id = get_youtube_id($video_url);
             ?>
                 <iframe src="https://www.youtube.com/embed/<?php echo $video_id; ?>?autoplay=1" allowfullscreen></iframe>
+            <?php endif; ?>
             <?php else: ?>
                 <iframe src="view.php?token=<?php echo $token; ?>&raw=true"></iframe>
             <?php endif; ?>

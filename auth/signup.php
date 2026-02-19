@@ -12,10 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($username)) {
         $errors[] = 'Username is required.';
+    } elseif (!preg_match('/^[a-zA-Z0-9_]{3,20}$/', $username)) {
+        $errors[] = 'Username must be 3-20 characters and can only contain letters, numbers, and underscores.';
     }
+    
     if (empty($password)) {
         $errors[] = 'Password is required.';
+    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/', $password)) {
+        $errors[] = 'Password must be 6+ chars with at least one uppercase letter, one number, and one symbol.';
     }
+    
     if ($password !== $confirm_password) {
         $errors[] = 'Passwords do not match.';
     }
@@ -120,6 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="username" 
                             name="username" 
                             required
+                            pattern="^[a-zA-Z0-9_]{3,20}$"
+                            title="Username must be 3-20 characters and can only contain letters, numbers, and underscores."
                             class="input-underline w-full text-zinc-900"
                             placeholder="Choose a username"
                         >
@@ -132,6 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="password" 
                             name="password" 
                             required
+                            minlength="6"
+                            pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
+                            title="Password must be 6+ chars with at least one uppercase letter, one number, and one symbol."
                             class="input-underline w-full text-zinc-900"
                             placeholder="Create a password"
                         >
@@ -144,6 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="confirm_password" 
                             name="confirm_password" 
                             required
+                            minlength="6"
+                            pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
                             class="input-underline w-full text-zinc-900"
                             placeholder="Confirm your password"
                         >
