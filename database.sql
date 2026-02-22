@@ -1,157 +1,226 @@
-CREATE DATABASE IF NOT EXISTS semicolon_db;
-USE semicolon_db;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- Host: 127.0.0.1
+-- Generation Time: Feb 22, 2026
 
--- 1. Users Table (Updated)
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL DEFAULT 'user',
-    status ENUM('active', 'banned') DEFAULT 'active',
-    last_login TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- 2. Books Table (Updated)
-CREATE TABLE IF NOT EXISTS books (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    author VARCHAR(255) NOT NULL,
-    description TEXT,
-    subject VARCHAR(255),
-    -- semester removed
-    difficulty VARCHAR(255),
-    private_path VARCHAR(255) NOT NULL, -- Renamed from file_path
-    cover_image VARCHAR(255),
-    slug VARCHAR(255) UNIQUE,
-    token VARCHAR(255) UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- 3. Papers Table (Updated)
-CREATE TABLE IF NOT EXISTS papers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    subject VARCHAR(255) NOT NULL,
-    year INT NOT NULL,
-    -- semester removed
-    private_path VARCHAR(255) NOT NULL, -- Renamed from file_path
-    slug VARCHAR(255) UNIQUE,
-    token VARCHAR(255) UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+--
+-- Database: `semicolon_db`
+--
+CREATE DATABASE IF NOT EXISTS `semicolon_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `semicolon_db`;
 
--- 4. Videos Table (Unchanged mostly, maybe add slug/token for consistency if needed, but not strictly required by prompt unless we want to track views same way)
-CREATE TABLE IF NOT EXISTS videos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    youtube_url TEXT NOT NULL,
-    slug VARCHAR(255) UNIQUE, -- Added for consistency
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- --------------------------------------------------------
+-- Existing Tables from semicolon_db.sql
+-- --------------------------------------------------------
 
--- 5. Requests Table (General Contact/Requests)
-CREATE TABLE IF NOT EXISTS requests (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    subject VARCHAR(255) NOT NULL,
-    message TEXT NOT NULL,
-    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending', 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TABLE `books` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `author` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `difficulty` varchar(255) DEFAULT NULL,
+  `private_path` varchar(255) NOT NULL,
+  `cover_image` varchar(255) DEFAULT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  UNIQUE KEY `token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 6. Material Requests Table (Specific Resource Requests)
-CREATE TABLE IF NOT EXISTS material_requests (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    material_type VARCHAR(255) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    author_publisher VARCHAR(255),
-    details TEXT,
-    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-);
+INSERT INTO `books` (`id`, `title`, `author`, `description`, `subject`, `difficulty`, `private_path`, `cover_image`, `slug`, `token`, `created_at`) VALUES
+(1, 'How to Code in React.js', 'DigitalOcean', 'A comprehensive guide to React.js.', 'Web Development', 'Beginner', 'http://assets.digitalocean.com/books/how-to-code-in-reactjs.pdf', 'uploads/covers/react-js.jpg', 'how-to-code-in-react-js', 'tok_react123', '2025-12-04 06:30:29'),
+(2, 'Introduction to Algorithms', 'Thomas H. Cormen', 'The bible of algorithms.', 'Data Structures and Algorithms', 'Advanced', 'http://assets.digitalocean.com/books/how-to-code-in-reactjs.pdf', 'uploads/covers/introduction-to-algorithms.jpg', 'introduction-to-algorithms', 'tok_algo456', '2025-12-04 06:30:29'),
+(4, 'PHP book', 'none', 'some description', 'Web Development', 'Easy', 'private/books/6933bd83570d8.pdf', NULL, 'php-book-4d90e', '4cac8a3ea5b7dbf7923a2625bf751fb0', '2025-12-06 05:22:11');
 
--- 7. Secure Files Table (New - For mapping tokens to real paths if we want a separate layer, but books/papers have token/path columns now. 
--- The prompt mentions "Create secure_files table" AND "Books/Papers viewer pages use /view.php?token=RANDOM_STRING".
--- It also says "Books... Add token". 
--- If we have token in books table, we might not strictly need secure_files for *those* items, but the prompt explicitly asks for `secure_files` table.
--- Let's create it as a unified index or for additional attachments.)
-CREATE TABLE IF NOT EXISTS secure_files (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    resource_type ENUM('book','paper') NOT NULL,
-    resource_id INT NOT NULL,
-    random_token VARCHAR(255) UNIQUE NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Users Table
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(50) NOT NULL DEFAULT 'user',
+  `status` enum('active','banned') DEFAULT 'active',
+  `last_login` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 8. User History Table (New)
-CREATE TABLE IF NOT EXISTS user_history (
-    history_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    resource_type ENUM('book','paper','video') NOT NULL,
-    resource_id INT NOT NULL,
-    viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+INSERT INTO `users` (`id`, `username`, `password`, `role`, `status`, `last_login`, `created_at`) VALUES
+(1, 'admin', 'Admin@123', 'admin', 'active', NULL, '2025-12-04 06:30:29'),
+(2, 'testuser', 'Password@123', 'user', 'active', NULL, '2025-12-04 06:47:34'),
+(4, 'dax', 'Pass@123', 'user', 'active', NULL, '2025-12-05 07:18:59'),
+(5, 'daxmore', 'Password@123', 'user', 'active', NULL, '2025-12-05 20:35:28'),
+(7, 'divya', 'password1', 'user', 'active', NULL, '2025-12-05 20:56:34'),
+(8, 'sahil', 'Password@1', 'user', 'active', NULL, '2025-12-05 20:59:17');
 
--- 9. Pro Plans Table (New - Optional but requested)
-CREATE TABLE IF NOT EXISTS pro_plans (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    features TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Material Requests
+CREATE TABLE `material_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `material_type` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `author_publisher` varchar(255) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `requested_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `material_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 10. Notifications Table (New - Feature 3)
-CREATE TABLE IF NOT EXISTS notifications (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL, -- or NULL for system-wide? Let's assume targeted for now, or 0 for all.
-    title VARCHAR(255) NOT NULL,
-    message TEXT NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+-- Existing Notifications Table (Modified slightly to support type)
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `type` varchar(50) DEFAULT 'system',
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `is_read` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 11. Reactions Table (New - Feature 6)
-CREATE TABLE IF NOT EXISTS reactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    resource_type ENUM('book','paper','video') NOT NULL,
-    resource_id INT NOT NULL,
-    is_helpful BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_reaction (user_id, resource_type, resource_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `link`, `is_read`, `created_at`) VALUES
+(1, 2, 'system', 'Request Approved!', 'Great news! Your request for \"last year maths paper of bca\" (Paper) has been approved. We\'ll add it to our library within 24-48 hours. Thank you for your patience!', NULL, 0, '2025-12-04 17:03:58'),
+(2, 2, 'system', 'Request Update', 'Unfortunately, we couldn\'t fulfill your request for \"rust launguage book\" (Book) at this time. This could be due to availability or licensing restrictions. Please try requesting something else.', NULL, 0, '2025-12-04 17:08:46');
 
--- Sample Data (Updated)
+-- Papers Table
+CREATE TABLE `papers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `year` int(11) NOT NULL,
+  `private_path` varchar(255) NOT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  UNIQUE KEY `token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Admin
-INSERT INTO `users` (`username`, `password`, `role`, `status`) VALUES
-('daxmore', 'password', 'admin', 'active');
+-- Videos Table
+CREATE TABLE `videos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `youtube_url` text NOT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Books (Updated columns)
-INSERT INTO `books` (`title`, `author`, `description`, `subject`, `difficulty`, `private_path`, `cover_image`, `slug`, `token`) VALUES
-('How to Code in React.js', 'DigitalOcean', 'A comprehensive guide to React.js.', 'Web Development', 'Beginner', 'http://assets.digitalocean.com/books/how-to-code-in-reactjs.pdf', 'uploads/covers/react-js.jpg', 'how-to-code-in-react-js', 'tok_react123'),
-('Introduction to Algorithms', 'Thomas H. Cormen', 'The bible of algorithms.', 'Data Structures and Algorithms', 'Advanced', 'http://assets.digitalocean.com/books/how-to-code-in-reactjs.pdf', 'uploads/covers/introduction-to-algorithms.jpg', 'introduction-to-algorithms', 'tok_algo456');
+-- Reactions Table (Library)
+CREATE TABLE `reactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `resource_type` enum('book','paper','video') NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `is_helpful` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_reaction` (`user_id`,`resource_type`,`resource_id`),
+  CONSTRAINT `reactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Papers (Updated columns)
-INSERT INTO `papers` (`title`, `subject`, `year`, `private_path`, `slug`, `token`) VALUES
-('Mid-Term Exam 2024', 'Database Management Systems', 2024, 'http://assets.digitalocean.com/books/how-to-code-in-reactjs.pdf', 'dbms-mid-2024', 'tok_dbms24'),
-('Final Exam 2023', 'Operating Systems', 2023, 'http://assets.digitalocean.com/books/how-to-code-in-reactjs.pdf', 'os-final-2023', 'tok_os23');
+-- User History Table
+CREATE TABLE `user_history` (
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `resource_type` enum('book','paper','video','post') NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `viewed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`history_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `user_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Videos
-INSERT INTO `videos` (`title`, `description`, `youtube_url`, `slug`) VALUES
-('PHP for Beginners', 'A comprehensive tutorial for getting started with PHP.', 'https://youtu.be/jmpUP1MaQ9Q?si=ZjcC863awapqv1Gk', 'php-for-beginners'),
-('Tailwind CSS Crash Course', 'Learn the basics of Tailwind CSS in this crash course.', 'https://youtu.be/jmpUP1MaQ9Q?si=ZjcC863awapqv1Gk', 'tailwind-css-crash-course');
+-- Secure Files Table
+CREATE TABLE `secure_files` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_type` enum('book','paper') NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `random_token` varchar(255) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `random_token` (`random_token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Requests
-INSERT INTO `requests` (`name`, `email`, `subject`, `message`, `status`) VALUES
-('John Doe', 'john.doe@example.com', 'Request for a new book', 'Please add the book "The Pragmatic Programmer".', 'pending');
+-- Pro Plans Table
+CREATE TABLE `pro_plans` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `features` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+-- NEW: Semicolon Community Tables
+-- --------------------------------------------------------
+
+-- Community Posts
+CREATE TABLE `community_posts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `image_url` LONGTEXT DEFAULT NULL,
+  `category` enum('Frontend', 'Backend', 'Full Stack', 'App Dev', 'Game Dev', 'UI/UX Design', 'Graphic Design', 'Video Editing', 'Motion Graphics', 'Data Science', 'AI & ML', 'Cybersecurity', 'DevOps', 'Cloud Computing', 'General Tech') NOT NULL,
+  `upvotes` int(11) DEFAULT 0,
+  `downvotes` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `cp_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Community Comments
+CREATE TABLE `community_comments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `post_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `content` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `post_id` (`post_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `cc_post_fk` FOREIGN KEY (`post_id`) REFERENCES `community_posts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `cc_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Community Reactions (Voting Tracking)
+CREATE TABLE `community_reactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `reaction_type` enum('upvote','downvote') NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_comm_reaction` (`user_id`,`post_id`),
+  CONSTRAINT `cr_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `cr_post_fk` FOREIGN KEY (`post_id`) REFERENCES `community_posts` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

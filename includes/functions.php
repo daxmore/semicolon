@@ -142,12 +142,12 @@ function get_user_by_id($user_id)
     return $result->fetch_assoc();
 }
 
-function createUser($username, $password)
+function createUser($username, $password, $avatar_url = null)
 {
     global $conn;
-    $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+    $sql = "INSERT INTO users (username, password, avatar_url) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ss', $username, $password);
+    $stmt->bind_param('sss', $username, $password, $avatar_url);
     return $stmt->execute();
 }
 
@@ -185,13 +185,25 @@ function record_view($user_id, $resource_type, $resource_id)
         return false; // User doesn't exist
     }
 
-    $sql = "INSERT INTO user_history (user_id, resource_type, resource_id) VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('isi', $user_id, $resource_type, $resource_id);
+    // Check if the history entry already exists
+    $check_hist = $conn->prepare("SELECT id FROM user_history WHERE user_id = ? AND resource_type = ? AND resource_id = ?");
+    $check_hist->bind_param('isi', $user_id, $resource_type, $resource_id);
+    $check_hist->execute();
+    $hist_res = $check_hist->get_result();
+
+    if ($hist_res->num_rows > 0) {
+        $sql = "UPDATE user_history SET viewed_at = CURRENT_TIMESTAMP WHERE user_id = ? AND resource_type = ? AND resource_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('isi', $user_id, $resource_type, $resource_id);
+    } else {
+        $sql = "INSERT INTO user_history (user_id, resource_type, resource_id) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('isi', $user_id, $resource_type, $resource_id);
+    }
     return $stmt->execute();
 }
 
-function get_user_history($user_id)
+function get_user_history($user_id, $limit = null, $offset = null)
 {
     global $conn;
     $sql = "SELECT h.*, 
@@ -199,22 +211,48 @@ function get_user_history($user_id)
                 WHEN h.resource_type = 'book' THEN b.title 
                 WHEN h.resource_type = 'paper' THEN p.title 
                 WHEN h.resource_type = 'video' THEN v.title 
+                WHEN h.resource_type = 'post' THEN cp.title 
             END as title,
             CASE 
                 WHEN h.resource_type = 'book' THEN b.token 
                 WHEN h.resource_type = 'paper' THEN p.token 
                 WHEN h.resource_type = 'video' THEN v.slug 
+                WHEN h.resource_type = 'post' THEN cp.id 
             END as token
             FROM user_history h
             LEFT JOIN books b ON h.resource_type = 'book' AND h.resource_id = b.id
             LEFT JOIN papers p ON h.resource_type = 'paper' AND h.resource_id = p.id
             LEFT JOIN videos v ON h.resource_type = 'video' AND h.resource_id = v.id
+            LEFT JOIN community_posts cp ON h.resource_type = 'post' AND h.resource_id = cp.id
             WHERE h.user_id = ? 
             ORDER BY h.viewed_at DESC";
+    
+    if ($limit !== null && $offset !== null) {
+        $sql .= " LIMIT ? OFFSET ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('iii', $user_id, $limit, $offset);
+    } elseif ($limit !== null) {
+        $sql .= " LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ii', $user_id, $limit);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $user_id);
+    }
+    
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+function get_user_history_count($user_id)
+{
+    global $conn;
+    $sql = "SELECT COUNT(*) as count FROM user_history WHERE user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $user_id);
     $stmt->execute();
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $result = $stmt->get_result()->fetch_assoc();
+    return $result['count'] ?? 0;
 }
 
 function get_notifications($user_id)
@@ -303,8 +341,38 @@ function get_latest_unread_notification_type($user_id)
     $sql = "SELECT notification_type FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $user_id);
-    $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
     return $result['notification_type'] ?? null;
+}
+
+/**
+ * Validates an uploaded image file.
+ * Returns an array with ['ext' => extension] on success, or false on failure.
+ */
+function validate_image_upload($file_tmp, $file_size, $max_size = 2097152) {
+    // Check size
+    if ($file_size > $max_size) {
+        return false;
+    }
+
+    // Check MIME type using finfo
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime_type = finfo_file($finfo, $file_tmp);
+    finfo_close($finfo);
+
+    $allowed_mimes = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif'
+    ];
+
+    if (!array_key_exists($mime_type, $allowed_mimes)) {
+        return false;
+    }
+
+    return [
+        'ext' => $allowed_mimes[$mime_type],
+        'mime' => $mime_type
+    ];
 }
 ?>

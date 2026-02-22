@@ -29,6 +29,12 @@ $total_papers = get_count('papers');
 $total_books = get_count('books');
 $total_videos = get_count('videos');
 $history = get_user_history($user_id, 5);
+
+// Fetch user's community posts for dashboard "My Discussions" widget
+$posts_stmt = $conn->prepare("SELECT cp.*, (SELECT COUNT(*) FROM community_comments cc WHERE cc.post_id = cp.id) as comment_count FROM community_posts cp WHERE cp.user_id = ? ORDER BY cp.created_at DESC LIMIT 5");
+$posts_stmt->bind_param('i', $user_id);
+$posts_stmt->execute();
+$user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,7 +71,7 @@ $history = get_user_history($user_id, 5);
             <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-teal-200/30 rounded-full blur-3xl"></div>
         </div>
 
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto px-28">
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="flex flex-col md:flex-row items-center gap-5 text-center md:text-left">
                     <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-indigo-500/25">
@@ -93,7 +99,7 @@ $history = get_user_history($user_id, 5);
 
     <!-- Stats Section -->
     <section class="py-8">
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto px-28">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Total Books -->
                 <div class="bg-white rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:border-indigo-200 transition-all duration-300">
@@ -164,7 +170,7 @@ $history = get_user_history($user_id, 5);
 
     <!-- Main Content -->
     <section class="py-8 pb-20">
-        <div class="container mx-auto px-6">
+        <div class="container mx-auto px-28">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 <!-- Recent Activity -->
@@ -192,10 +198,16 @@ $history = get_user_history($user_id, 5);
                         <?php else: ?>
                             <div class="divide-y divide-zinc-100">
                                 <?php foreach ($history as $item): ?>
-                                    <a href="view.php?token=<?php echo $item['token'] ?? ''; ?>" class="flex items-center gap-4 p-4 hover:bg-zinc-50 transition">
+                                    <?php 
+                                    $link = $item['resource_type'] === 'post' 
+                                        ? "community_post_detail.php?id=" . urlencode($item['token'] ?? '') 
+                                        : "view.php?token=" . urlencode($item['token'] ?? ''); 
+                                    ?>
+                                    <a href="<?php echo htmlspecialchars($link); ?>" class="flex items-center gap-4 p-4 hover:bg-zinc-50 transition">
                                         <?php 
                                         $iconBg = $item['resource_type'] === 'book' ? 'bg-indigo-100 text-indigo-600' : 
-                                                  ($item['resource_type'] === 'paper' ? 'bg-teal-100 text-teal-600' : 'bg-rose-100 text-rose-600');
+                                                  ($item['resource_type'] === 'paper' ? 'bg-teal-100 text-teal-600' : 
+                                                  ($item['resource_type'] === 'post' ? 'bg-amber-100 text-amber-600' : 'bg-rose-100 text-rose-600'));
                                         ?>
                                         <div class="w-10 h-10 <?php echo $iconBg; ?> rounded-xl flex items-center justify-center flex-shrink-0">
                                             <?php if ($item['resource_type'] === 'book'): ?>
@@ -205,6 +217,10 @@ $history = get_user_history($user_id, 5);
                                             <?php elseif ($item['resource_type'] === 'paper'): ?>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            <?php elseif ($item['resource_type'] === 'post'): ?>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                                                 </svg>
                                             <?php else: ?>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -268,6 +284,47 @@ $history = get_user_history($user_id, 5);
                                 </div>
                             </a>
                         </div>
+                    </div>
+
+                    <!-- My Discussions (Community) -->
+                    <div class="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
+                        <div class="p-6 border-b border-zinc-100 flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                                </svg>
+                                My Discussions
+                            </h3>
+                            <a href="community_create.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition">Start New &rarr;</a>
+                        </div>
+                        
+                        <?php if (empty($user_posts)): ?>
+                            <div class="p-6 text-center">
+                                <p class="text-zinc-500 mb-2 text-sm">You haven't started any discussions yet.</p>
+                                <a href="community.php" class="text-amber-600 hover:text-amber-700 font-medium text-sm">Browse the community →</a>
+                            </div>
+                        <?php else: ?>
+                            <div class="divide-y divide-zinc-100">
+                                <?php foreach ($user_posts as $post): ?>
+                                    <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="block p-5 hover:bg-zinc-50 transition">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
+                                                <?php echo htmlspecialchars($post['category']); ?>
+                                            </span>
+                                            <span class="text-xs text-zinc-400"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></span>
+                                        </div>
+                                        <h4 class="font-bold text-zinc-900 mb-1 truncate text-sm"><?php echo htmlspecialchars($post['title']); ?></h4>
+                                        <div class="flex items-center gap-4 text-xs text-zinc-500 font-medium mt-2">
+                                            <span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg> <?php echo $post['upvotes']; ?></span>
+                                            <span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg> <?php echo $post['comment_count']; ?></span>
+                                        </div>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="p-4 border-t border-zinc-100 text-center bg-zinc-50">
+                                <a href="community.php" class="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition">View community</a>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Account Status -->

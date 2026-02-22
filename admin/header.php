@@ -87,6 +87,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </svg>
                     Videos
                 </a>
+
+                <a href="community.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'community.php' ? 'bg-amber-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    Community
+                </a>
                 
                 <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-6 mb-3 px-3 pt-6">Management</p>
                 
@@ -135,6 +142,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 'books.php' => 'Manage Books',
                                 'papers.php' => 'Manage Papers',
                                 'videos.php' => 'Manage Videos',
+                                'community.php' => 'Community Moderation',
                                 'requests.php' => 'User Requests',
                                 'users.php' => 'Manage Users'
                             ];

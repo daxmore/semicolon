@@ -3,6 +3,23 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 require_once __DIR__ . '/functions.php';
+
+$header_user_avatar = null;
+$unread_notifs = 0;
+if (isset($_SESSION['user_id'])) {
+    $header_user_data = get_user_by_id($_SESSION['user_id']);
+    $header_user_avatar = $header_user_data['avatar_url'] ?? null;
+    
+    // Fetch unread notifications count
+    if (isset($conn)) {
+        $stmt_notif = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+        $stmt_notif->bind_param('i', $_SESSION['user_id']);
+        $stmt_notif->execute();
+        $stmt_notif->bind_result($unread_notifs);
+        $stmt_notif->fetch();
+        $stmt_notif->close();
+    }
+}
 ?>
 <header class="glass sticky top-0 z-50 transition-all duration-300 border-b border-zinc-200/80">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -10,7 +27,7 @@ require_once __DIR__ . '/functions.php';
       
       <!-- Section 1: Logo -->
       <div class="flex items-center">
-        <a class="block text-indigo-600 font-bold text-2xl tracking-tighter md:mr-48" href="index.php">
+        <a class="block text-indigo-600 font-bold text-2xl tracking-tighter md:mr-48" href="<?php echo isset($_SESSION['user_id']) ? 'dashboard.php' : 'index.php'; ?>">
           <?php echo file_get_contents('assets/images/logo.svg'); ?>
         </a>
       </div>
@@ -20,9 +37,26 @@ require_once __DIR__ . '/functions.php';
           <nav aria-label="Global">
             <ul class="flex items-center gap-8 text-sm font-medium">
               <li><a class="text-zinc-600 transition hover:text-indigo-600" href="<?php echo isset($_SESSION['user_id']) ? 'dashboard.php' : 'index.php'; ?>">Home</a></li>
-              <li><a class="text-zinc-600 transition hover:text-indigo-600" href="books.php">Books</a></li>
-              <li><a class="text-zinc-600 transition hover:text-indigo-600" href="papers.php">Papers</a></li>
-              <li><a class="text-zinc-600 transition hover:text-indigo-600" href="videos.php">Videos</a></li>
+              
+              <!-- Community Link -->
+              <li><a class="text-zinc-600 transition hover:text-indigo-600" href="community.php">Community</a></li>
+              
+              <!-- Resources Dropdown -->
+              <li class="relative group">
+                  <button class="flex items-center gap-1 text-zinc-600 transition hover:text-indigo-600 focus:outline-none">
+                      Resources
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400 group-hover:text-indigo-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                  </button>
+                  <div class="absolute left-0 top-full pt-4 w-48 origin-top-left opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div class="flex flex-col rounded-xl bg-white shadow-lg ring-1 ring-zinc-200 overflow-hidden py-2">
+                          <a href="books.php" class="px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 hover:text-indigo-600 transition">Books</a>
+                          <a href="papers.php" class="px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 hover:text-indigo-600 transition">Papers</a>
+                          <a href="videos.php" class="px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 hover:text-indigo-600 transition">Videos</a>
+                      </div>
+                  </div>
+              </li>
               <?php if (isset($_SESSION['user_id'])): ?>
               <li><a class="text-zinc-600 transition hover:text-indigo-600" href="request.php">Request</a></li>
               <?php endif; ?>
@@ -45,17 +79,26 @@ require_once __DIR__ . '/functions.php';
 
         <?php if (isset($_SESSION['user_id'])): ?>
             <!-- Notifications -->
-            <a href="profile.php#notifications" class="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 transition flex items-center justify-center text-zinc-500 hover:text-zinc-700 relative">
+            <a href="notifications.php" class="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 transition flex items-center justify-center text-zinc-500 hover:text-zinc-700 relative">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
+                <?php if ($unread_notifs > 0): ?>
+                    <span class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full shadow-sm ring-2 ring-white">
+                        <?php echo $unread_notifs > 99 ? '99+' : $unread_notifs; ?>
+                    </span>
+                <?php endif; ?>
             </a>
 
             <!-- User Dropdown -->
             <div class="relative group">
                 <button class="flex items-center gap-2 rounded-full bg-zinc-100 hover:bg-zinc-200 pl-1 pr-3 py-1 text-sm font-medium text-zinc-700 transition">
-                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-sm">
-                        <?php echo strtoupper(substr($_SESSION['username'] ?? 'U', 0, 1)); ?>
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-sm overflow-hidden">
+                        <?php if ($header_user_avatar): ?>
+                            <img src="/Semicolon/<?php echo htmlspecialchars($header_user_avatar); ?>" alt="Avatar" class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <?php echo strtoupper(substr($_SESSION['username'] ?? 'U', 0, 1)); ?>
+                        <?php endif; ?>
                     </div>
                     <span class="hidden sm:inline"><?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?></span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,6 +112,18 @@ require_once __DIR__ . '/functions.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             Profile
+                        </a>
+                        <a href="notifications.php" class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            Notifications
+                        </a>
+                        <a href="history.php" class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            History
                         </a>
                         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                         <a href="admin/index.php" class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 transition">
@@ -115,9 +170,25 @@ require_once __DIR__ . '/functions.php';
       <nav aria-label="Mobile Global">
           <ul class="flex flex-col items-center gap-4 text-base font-medium">
               <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="index.php">Home</a></li>
-              <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="books.php">Books</a></li>
-              <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="papers.php">Papers</a></li>
-              <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="videos.php">Videos</a></li>
+              
+              <!-- Community Link (Mobile) -->
+              <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="community.php">Community</a></li>
+              
+              <li class="w-full px-6">
+                  <details class="group/mobile-resources w-full cursor-pointer">
+                      <summary class="flex items-center justify-center gap-1 text-zinc-600 hover:text-indigo-600 transition list-none font-medium text-base [&::-webkit-details-marker]:hidden">
+                          Resources
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-open/mobile-resources:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                      </summary>
+                      <div class="mt-3 flex flex-col items-center gap-3 bg-zinc-50 rounded-xl py-3 border border-zinc-100">
+                          <a class="text-zinc-600 hover:text-indigo-600 transition text-sm" href="books.php">Books</a>
+                          <a class="text-zinc-600 hover:text-indigo-600 transition text-sm" href="papers.php">Papers</a>
+                          <a class="text-zinc-600 hover:text-indigo-600 transition text-sm" href="videos.php">Videos</a>
+                      </div>
+                  </details>
+              </li>
               <?php if (isset($_SESSION['user_id'])): ?>
               <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="request.php">Request</a></li>
               <?php endif; ?>

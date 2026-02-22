@@ -43,10 +43,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $message = 'Username is already taken.';
             $message_type = 'error';
         } else {
-            // Update username
-            $update_sql = "UPDATE users SET username = ?";
-            $params = [$new_username];
-            $types = "s";
+            // Handle Avatar Update
+            $new_avatar_url = null;
+            if (isset($_FILES['avatar_upload']) && $_FILES['avatar_upload']['error'] === UPLOAD_ERR_OK) {
+                $file_tmp = $_FILES['avatar_upload']['tmp_name'];
+                $file_size = $_FILES['avatar_upload']['size'];
+                
+                // Manually validate due to missing validate_image_upload function locally
+                $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $file_tmp);
+                finfo_close($finfo);
+                
+                if (!in_array($mime, $allowed_types) || $file_size > 1048576) {
+                    $message = "Invalid image type or exceeds 1MB max size.";
+                    $message_type = 'error';
+                } else {
+                    $ext = explode('/', $mime)[1];
+                    $ext = $ext === 'jpeg' ? 'jpg' : $ext;
+                    $filename = 'avatar_' . uniqid() . '.' . $ext;
+                    $upload_path = 'assets/images/avatars/' . $filename;
+                    
+                    if (move_uploaded_file($file_tmp, $upload_path)) {
+                        $new_avatar_url = $upload_path;
+                    } else {
+                        $message = "Failed to upload file.";
+                        $message_type = 'error';
+                    }
+                }
+            } elseif (!empty($_POST['avatar_url'])) {
+                $url = filter_var($_POST['avatar_url'], FILTER_SANITIZE_URL);
+                if (filter_var($url, FILTER_VALIDATE_URL)) {
+                    $new_avatar_url = $url;
+                } else {
+                    $message = "Invalid avatar URL provided.";
+                    $message_type = 'error';
+                }
+            }
+
+            // If no avatar upload errors, proceed to update
+            if (empty($message)) {
+                // Update username
+                $update_sql = "UPDATE users SET username = ?";
+                $params = [$new_username];
+                $types = "s";
+                
+                // Check if avatar updated
+                if ($new_avatar_url) {
+                    $update_sql .= ", avatar_url = ?";
+                    $params[] = $new_avatar_url;
+                    $types .= "s";
+                }
 
             // Update password if provided
             if (!empty($new_password)) {
@@ -84,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
 }
+}
 
 $user = get_user_by_id($user_id); 
 if (!$user) {
@@ -93,8 +141,20 @@ if (!$user) {
     $user = $stmt->get_result()->fetch_assoc();
 }
 
-$history = get_user_history($user_id, 5);
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+$total_history = get_user_history_count($user_id);
+$total_pages = ceil($total_history / $limit);
+
+$history = get_user_history($user_id, $limit, $offset);
 $notifications = get_notifications($user_id);
+
+// Fetch user's community posts
+$posts_stmt = $conn->prepare("SELECT * FROM community_posts WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
+$posts_stmt->bind_param('i', $user_id);
+$posts_stmt->execute();
+$user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -150,8 +210,12 @@ $notifications = get_notifications($user_id);
             <div class="bg-white rounded-2xl border border-zinc-100 p-8">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="flex flex-col md:flex-row items-center gap-5 text-center md:text-left">
-                        <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-indigo-500/25">
-                            <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                        <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-indigo-500/25 overflow-hidden">
+                            <?php if (!empty($user['avatar_url'])): ?>
+                                <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>" alt="Avatar" class="w-full h-full object-cover">
+                            <?php else: ?>
+                                <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                            <?php endif; ?>
                         </div>
                         <div>
                             <h1 class="text-3xl font-bold text-zinc-900"><?php echo htmlspecialchars($user['username']); ?></h1>
@@ -220,7 +284,9 @@ $notifications = get_notifications($user_id);
                         </a>
                     </div>
 
-                    <!-- Recently Viewed -->
+                    <!-- Side-by-Side Activity Grid: Recently Viewed & My Discussions -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <!-- Recently Viewed -->
                     <div class="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
                         <div class="p-6 border-b border-zinc-100">
                             <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
@@ -275,8 +341,69 @@ $notifications = get_notifications($user_id);
                                     </a>
                                 <?php endforeach; ?>
                             </div>
+
+                            <!-- Pagination -->
+                            <?php if ($total_pages > 1): ?>
+                            <div class="px-6 py-4 border-t border-zinc-100 flex items-center justify-between">
+                                <?php if ($page > 1): ?>
+                                    <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">Previous</a>
+                                <?php else: ?>
+                                    <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-lg cursor-not-allowed">Previous</span>
+                                <?php endif; ?>
+                                
+                                <span class="text-sm text-zinc-500 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
+                                
+                                <?php if ($page < $total_pages): ?>
+                                    <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">Next</a>
+                                <?php else: ?>
+                                    <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-lg cursor-not-allowed">Next</span>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
+                    
+                    <!-- My Discussions (Community) -->
+                    <div class="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
+                        <div class="p-6 border-b border-zinc-100 flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                                </svg>
+                                My Discussions
+                            </h3>
+                            <a href="community_create.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition">Start New &rarr;</a>
+                        </div>
+                        
+                        <?php if (empty($user_posts)): ?>
+                            <div class="p-10 text-center">
+                                <p class="text-zinc-500 mb-2">You haven't started any discussions yet.</p>
+                                <a href="community.php" class="text-amber-600 hover:text-amber-700 font-medium text-sm">Browse the community →</a>
+                            </div>
+                        <?php else: ?>
+                            <div class="divide-y divide-zinc-100">
+                                <?php foreach ($user_posts as $post): ?>
+                                    <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="block p-5 hover:bg-zinc-50 transition">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
+                                                <?php echo htmlspecialchars($post['category']); ?>
+                                            </span>
+                                            <span class="text-xs text-zinc-400"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></span>
+                                        </div>
+                                        <h4 class="font-bold text-zinc-900 mb-1 truncate"><?php echo htmlspecialchars($post['title']); ?></h4>
+                                        <div class="flex items-center gap-4 text-xs text-zinc-500 font-medium mt-2">
+                                            <span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg> <?php echo $post['upvotes']; ?></span>
+                                        </div>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="p-4 border-t border-zinc-100 text-center">
+                                <a href="community.php" class="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition">View all community posts</a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    </div> <!-- End Side-by-Side Activity Grid -->
+
                 </div>
 
                 <!-- Sidebar -->
@@ -294,13 +421,16 @@ $notifications = get_notifications($user_id);
                             <p class="text-zinc-500 text-sm">No new notifications.</p>
                         <?php else: ?>
                             <ul class="space-y-3">
-                                <?php foreach ($notifications as $notif): ?>
+                                <?php foreach (array_slice($notifications, 0, 5) as $notif): ?>
                                     <li class="p-3 rounded-xl bg-zinc-50 <?php echo !$notif['is_read'] ? 'border-l-2 border-l-indigo-500' : ''; ?>">
                                         <p class="text-sm font-medium text-zinc-900"><?php echo htmlspecialchars($notif['title']); ?></p>
-                                        <p class="text-xs text-zinc-500 mt-1"><?php echo htmlspecialchars($notif['message']); ?></p>
+                                        <p class="text-xs text-zinc-500 mt-1 line-clamp-1"><?php echo htmlspecialchars($notif['message']); ?></p>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
+                            <div class="mt-4 pt-4 border-t border-zinc-100 text-center">
+                                <a href="notifications.php" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">View all activity &rarr;</a>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -345,7 +475,7 @@ $notifications = get_notifications($user_id);
                 </div>
                 
                 <!-- Modal Body -->
-                <form action="profile.php" method="POST" class="p-6 space-y-5">
+                <form action="profile.php" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
                     <input type="hidden" name="action" value="update_profile">
                     
                     <!-- Username -->
@@ -359,6 +489,30 @@ $notifications = get_notifications($user_id);
                             required 
                             minlength="3"
                             class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        >
+                    </div>
+
+                    <!-- Avatar Upload -->
+                    <div>
+                        <label for="avatar_upload" class="block text-sm font-semibold text-zinc-700 mb-2">Profile Image (Upload, max 1MB)</label>
+                        <input 
+                            type="file" 
+                            id="avatar_upload" 
+                            name="avatar_upload" 
+                            accept="image/*"
+                            class="w-full px-4 py-2 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 transition file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        >
+                    </div>
+
+                    <!-- Avatar URL -->
+                    <div>
+                        <label for="avatar_url" class="block text-sm font-semibold text-zinc-700 mb-2">Or Image URL</label>
+                        <input 
+                            type="url" 
+                            id="avatar_url" 
+                            name="avatar_url" 
+                            placeholder="https://example.com/avatar.jpg"
+                            class="w-full px-4 py-2 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                     </div>
                     

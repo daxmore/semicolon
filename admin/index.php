@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once '../includes/db.php';
 
 // Fetch statistics
@@ -6,6 +9,8 @@ $total_users = $conn->query("SELECT COUNT(*) as count FROM users")->fetch_assoc(
 $total_books = $conn->query("SELECT COUNT(*) as count FROM books")->fetch_assoc()['count'];
 $total_papers = $conn->query("SELECT COUNT(*) as count FROM papers")->fetch_assoc()['count'];
 $total_videos = $conn->query("SELECT COUNT(*) as count FROM videos")->fetch_assoc()['count'];
+$total_posts = $conn->query("SELECT COUNT(*) as count FROM community_posts")->fetch_assoc()['count'];
+
 $pending_requests = 0;
 $result = $conn->query("SELECT COUNT(*) as count FROM material_requests WHERE status = 'pending'");
 if ($result) {
@@ -16,7 +21,8 @@ if ($result) {
 $recent_books = $conn->query("SELECT id, title, author, created_at FROM books ORDER BY created_at DESC LIMIT 5")->fetch_all(MYSQLI_ASSOC);
 $recent_papers = $conn->query("SELECT id, title, subject, year, created_at FROM papers ORDER BY created_at DESC LIMIT 5")->fetch_all(MYSQLI_ASSOC);
 $recent_videos = $conn->query("SELECT id, title, created_at FROM videos ORDER BY created_at DESC LIMIT 5")->fetch_all(MYSQLI_ASSOC);
-$recent_users = $conn->query("SELECT id, username, role, created_at FROM users ORDER BY created_at DESC LIMIT 5")->fetch_all(MYSQLI_ASSOC);
+$recent_users = $conn->query("SELECT id, username, role, avatar_url, created_at FROM users ORDER BY created_at DESC LIMIT 5")->fetch_all(MYSQLI_ASSOC);
+$recent_posts = $conn->query("SELECT cp.id, cp.title, cp.created_at, u.username FROM community_posts cp LEFT JOIN users u ON cp.user_id = u.id ORDER BY cp.created_at DESC LIMIT 5")->fetch_all(MYSQLI_ASSOC);
 
 include 'header.php';
 ?>
@@ -75,6 +81,18 @@ include 'header.php';
     <div class="bg-white p-6 rounded-2xl border border-zinc-200 hover:shadow-lg transition">
         <div class="flex items-center gap-4 mb-4">
             <div class="p-3 bg-amber-100 rounded-xl text-amber-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                </svg>
+            </div>
+            <span class="text-sm font-medium text-zinc-500">Discussions</span>
+        </div>
+        <p class="text-3xl font-bold text-zinc-900"><?php echo $total_posts; ?></p>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-zinc-200 hover:shadow-lg transition">
+        <div class="flex items-center gap-4 mb-4">
+            <div class="p-3 bg-yellow-100 rounded-xl text-yellow-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -234,8 +252,12 @@ include 'header.php';
                 <?php foreach ($recent_users as $user): ?>
                     <div class="px-6 py-4 flex items-center justify-between hover:bg-zinc-50 transition">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-sm">
-                                <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-sm overflow-hidden">
+                                <?php if (!empty($user['avatar_url'])): ?>
+                                    <img src="../<?php echo htmlspecialchars($user['avatar_url']); ?>" alt="Avatar" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                                <?php endif; ?>
                             </div>
                             <div>
                                 <p class="font-medium text-zinc-900 text-sm"><?php echo htmlspecialchars($user['username']); ?></p>
@@ -245,6 +267,38 @@ include 'header.php';
                             </div>
                         </div>
                         <span class="text-xs text-zinc-400"><?php echo date('M d', strtotime($user['created_at'])); ?></span>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Discussions Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden lg:col-span-2">
+        <div class="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
+            <h3 class="font-bold text-zinc-900">Recent Community Discussions</h3>
+            <a href="community.php" class="text-sm text-amber-600 hover:text-amber-700">Go to Moderation →</a>
+        </div>
+        <div class="divide-y divide-zinc-100">
+            <?php if (empty($recent_posts)): ?>
+                <div class="p-6 text-center text-zinc-500">No discussions yet</div>
+            <?php else: ?>
+                <?php foreach ($recent_posts as $post): ?>
+                    <div class="px-6 py-4 flex items-center justify-between hover:bg-zinc-50 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <a href="../community_post_detail.php?id=<?php echo $post['id']; ?>" target="_blank" class="font-medium text-zinc-900 text-sm hover:text-amber-600 transition"><?php echo htmlspecialchars($post['title']); ?></a>
+                                <p class="text-xs text-zinc-500">Posted by <?php echo htmlspecialchars($post['username'] ?? 'Anonymous'); ?></p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-zinc-400"><?php echo date('M d, h:ia', strtotime($post['created_at'])); ?></span>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>

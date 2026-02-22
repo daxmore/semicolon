@@ -55,75 +55,84 @@ $papers = get_papers($subject, $year);
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
-                        <span class="text-sm font-medium text-teal-600"><?php echo count($papers); ?> Papers Available</span>
-                    </div>
                     <h1 class="text-4xl font-bold text-zinc-900">Research <span class="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">Papers</span></h1>
                     <p class="text-zinc-500 mt-2">Access exam papers and research documents</p>
-                </div>
-            </div>
-            
-            <!-- Filter Bar -->
-            <div class="mt-8 bg-white rounded-2xl border border-zinc-100 p-4">
-                <div class="flex flex-col md:flex-row md:items-center gap-4">
-                    <!-- Subject Filters -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="flex items-center gap-2 text-sm text-zinc-500 mr-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            Subject:
-                        </div>
-                        <a href="papers.php<?php echo $year ? '?year='.$year : ''; ?>" 
-                           class="px-4 py-2 rounded-full text-sm font-medium transition <?php echo !$subject ? 'bg-teal-600 text-white' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'; ?>">
-                            All
-                        </a>
-                        <?php foreach ($subjects as $s): ?>
-                            <a href="papers.php?subject=<?php echo urlencode($s); ?><?php echo $year ? '&year='.$year : ''; ?>" 
-                               class="px-4 py-2 rounded-full text-sm font-medium transition <?php echo ($subject === $s) ? 'bg-teal-600 text-white' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'; ?>">
-                                <?php echo htmlspecialchars($s); ?>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                    
-                    <!-- Year Filter -->
-                    <?php if (!empty($years)): ?>
-                    <div class="flex items-center gap-3 md:ml-auto md:border-l md:border-zinc-200 md:pl-4">
-                        <span class="text-sm text-zinc-500">Year:</span>
-                        <select onchange="window.location.href='papers.php?<?php echo $subject ? 'subject='.urlencode($subject).'&' : ''; ?>year='+this.value"
-                                class="px-3 py-2 bg-zinc-100 border-0 rounded-lg text-sm text-zinc-700 focus:ring-2 focus:ring-teal-500">
-                            <option value="">All Years</option>
-                            <?php foreach ($years as $y): ?>
-                                <option value="<?php echo $y; ?>" <?php echo ($year == $y) ? 'selected' : ''; ?>><?php echo $y; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Papers Grid -->
+    <!-- Main Content -->
     <section class="pb-20">
         <div class="container mx-auto px-6">
-            <?php if (empty($papers)): ?>
-                <div class="text-center py-20">
-                    <div class="w-20 h-20 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Filters -->
+                <div class="w-full lg:w-64 flex-shrink-0">
+                    <div class="sticky top-24 space-y-6">
+                        <!-- Subject Filter -->
+                        <div class="bg-white rounded-2xl border border-zinc-100 p-6 shadow-sm">
+                            <h3 class="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                Filter by Subject
+                            </h3>
+                            <div class="space-y-2">
+                                <a href="papers.php<?php echo $year ? '?year='.$year : ''; ?>" 
+                                   class="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition <?php echo !$subject ? 'bg-teal-50 text-teal-700' : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'; ?>">
+                                    All Subjects
+                                </a>
+                                <?php foreach ($subjects as $s): ?>
+                                    <a href="papers.php?subject=<?php echo urlencode($s); ?><?php echo $year ? '&year='.$year : ''; ?>" 
+                                       class="block w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition <?php echo ($subject === $s) ? 'bg-teal-50 text-teal-700' : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'; ?>">
+                                        <?php echo htmlspecialchars($s); ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                        <!-- Year Filter -->
+                        <?php if (!empty($years)): ?>
+                        <div class="bg-white rounded-2xl border border-zinc-100 p-6 shadow-sm">
+                            <h3 class="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Filter by Year
+                            </h3>
+                            <select onchange="window.location.href='papers.php?<?php echo $subject ? 'subject='.urlencode($subject).'&' : ''; ?>year='+this.value"
+                                    class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium text-zinc-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition">
+                                <option value="">All Years</option>
+                                <?php foreach ($years as $y): ?>
+                                    <option value="<?php echo $y; ?>" <?php echo ($year == $y) ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
+
+                        <div class="bg-white rounded-2xl border border-zinc-100 p-6 shadow-sm">
+                            <div class="flex items-center justify-between text-sm text-zinc-500">
+                                <span>Results</span>
+                                <span class="font-medium text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded-md"><?php echo count($papers); ?></span>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-xl text-zinc-500 mb-2">No papers found</p>
-                    <p class="text-zinc-400">Try selecting a different filter</p>
                 </div>
-            <?php else: ?>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Papers Grid -->
+                <div class="flex-1">
+                    <?php if (empty($papers)): ?>
+                        <div class="text-center py-20 bg-white rounded-2xl border border-zinc-100 shadow-sm">
+                            <div class="w-20 h-20 bg-zinc-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <p class="text-xl text-zinc-500 mb-2">No papers found</p>
+                            <p class="text-zinc-400">Try selecting a different filter</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <?php foreach ($papers as $paper): ?>
                         <div class="bg-white rounded-2xl border border-zinc-100 hover:border-teal-200 hover:shadow-xl transition-all duration-300 overflow-hidden group">
                             <!-- Header -->
@@ -160,6 +169,8 @@ $papers = get_papers($subject, $year);
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+                </div>
+            </div>
         </div>
     </section>
 

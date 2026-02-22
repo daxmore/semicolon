@@ -30,11 +30,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (getUserByUsername($username)) {
             $errors[] = 'Username already taken.';
         } else {
-            if (createUser($username, $password)) {
-                header('Location: /Semicolon/auth/login.php');
-                exit();
-            } else {
-                $errors[] = 'Error creating user. Please try again.';
+            // Handle Avatar Update
+            $new_avatar_url = null;
+            if (isset($_FILES['avatar_upload']) && $_FILES['avatar_upload']['error'] === UPLOAD_ERR_OK) {
+                $file_tmp = $_FILES['avatar_upload']['tmp_name'];
+                $file_size = $_FILES['avatar_upload']['size'];
+                
+                $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $file_tmp);
+                finfo_close($finfo);
+                
+                if (!in_array($mime, $allowed_types) || $file_size > 1048576) {
+                    $errors[] = "Invalid image type or exceeds 1MB max size.";
+                } else {
+                    $ext = explode('/', $mime)[1];
+                    $ext = $ext === 'jpeg' ? 'jpg' : $ext;
+                    $filename = 'avatar_' . uniqid() . '.' . $ext;
+                    // We are inside auth/ folder so go up one level
+                    $upload_path = '../assets/images/avatars/' . $filename;
+                    
+                    if (move_uploaded_file($file_tmp, $upload_path)) {
+                        $new_avatar_url = 'assets/images/avatars/' . $filename;
+                    } else {
+                        $errors[] = "Failed to upload avatar.";
+                    }
+                }
+            } elseif (!empty($_POST['avatar_url'])) {
+                $url = filter_var($_POST['avatar_url'], FILTER_SANITIZE_URL);
+                if (filter_var($url, FILTER_VALIDATE_URL)) {
+                    $new_avatar_url = $url;
+                } else {
+                    $errors[] = "Invalid avatar URL provided.";
+                }
+            }
+
+            if (empty($errors)) {
+                if (createUser($username, $password, $new_avatar_url)) {
+                    header('Location: /Semicolon/auth/login.php');
+                    exit();
+                } else {
+                    $errors[] = 'Error creating user. Please try again.';
+                }
             }
         }
     }
@@ -118,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="w-12 h-px bg-zinc-200 mb-6"></div>
                 
                 <!-- Form -->
-                <form action="signup.php" method="POST" class="space-y-5">
+                <form action="signup.php" method="POST" enctype="multipart/form-data" class="space-y-5">
                     <div>
                         <label for="username" class="block text-sm text-zinc-600 mb-1">Username</label>
                         <input 
@@ -130,6 +167,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             title="Username must be 3-20 characters and can only contain letters, numbers, and underscores."
                             class="input-underline w-full text-zinc-900"
                             placeholder="Choose a username"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="avatar_upload" class="block text-sm text-zinc-600 mb-1">Profile Image (Upload, max 1MB)</label>
+                        <input 
+                            type="file" 
+                            id="avatar_upload" 
+                            name="avatar_upload" 
+                            accept="image/*"
+                            class="input-underline w-full text-zinc-900 border-none file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="avatar_url" class="block text-sm text-zinc-600 mb-1">Or Image URL</label>
+                        <input 
+                            type="url" 
+                            id="avatar_url" 
+                            name="avatar_url" 
+                            placeholder="https://example.com/avatar.jpg"
+                            class="input-underline w-full text-zinc-900"
                         >
                     </div>
                     

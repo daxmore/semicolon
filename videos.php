@@ -11,18 +11,23 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
-// Fetch videos with optional search
-$search = $_GET['search'] ?? '';
+// Fetch distinctive years
+$years = [];
+$year_result = $conn->query("SELECT DISTINCT YEAR(created_at) as year FROM videos ORDER BY year DESC");
+while ($row = $year_result->fetch_assoc()) {
+    if ($row['year']) $years[] = $row['year'];
+}
+
+$year = $_GET['year'] ?? null;
 $sql = "SELECT * FROM videos WHERE 1=1";
-if ($search) {
-    $sql .= " AND (title LIKE ? OR description LIKE ?)";
+if ($year) {
+    $sql .= " AND YEAR(created_at) = ?";
 }
 $sql .= " ORDER BY created_at DESC";
 
 $stmt = $conn->prepare($sql);
-if ($search) {
-    $searchParam = '%' . $search . '%';
-    $stmt->bind_param('ss', $searchParam, $searchParam);
+if ($year) {
+    $stmt->bind_param('i', $year);
 }
 $stmt->execute();
 $videos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -60,62 +65,67 @@ $videos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <span class="text-sm font-medium text-rose-600"><?php echo count($videos); ?> Videos Available</span>
-                    </div>
                     <h1 class="text-4xl font-bold text-zinc-900">Video <span class="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">Tutorials</span></h1>
                     <p class="text-zinc-500 mt-2">Learn with our curated video tutorials</p>
                 </div>
             </div>
-            
-            <!-- Search Bar -->
-            <div class="mt-8 bg-white rounded-2xl border border-zinc-100 p-4">
-                <form action="videos.php" method="get" class="flex items-center gap-4">
-                    <div class="flex items-center gap-2 text-sm text-zinc-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                    <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" 
-                           placeholder="Search videos by title or description..."
-                           class="flex-1 px-4 py-2 bg-zinc-50 border-0 rounded-xl text-zinc-700 placeholder-zinc-400 focus:ring-2 focus:ring-rose-500 focus:bg-white transition">
-                    <button type="submit" class="px-6 py-2 bg-rose-600 text-white rounded-xl font-medium hover:bg-rose-700 transition">
-                        Search
-                    </button>
-                    <?php if ($search): ?>
-                        <a href="videos.php" class="px-4 py-2 text-zinc-500 hover:text-zinc-700 transition">Clear</a>
-                    <?php endif; ?>
-                </form>
-            </div>
         </div>
     </section>
 
-    <!-- Videos Grid -->
+    <!-- Main Content -->
     <section class="pb-20">
         <div class="container mx-auto px-6">
-            <?php if (empty($videos)): ?>
-                <div class="text-center py-20">
-                    <div class="w-20 h-20 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Filters -->
+                <div class="w-full lg:w-64 flex-shrink-0">
+                    <div class="sticky top-24 space-y-6">
+                        <!-- Year Filter -->
+                        <?php if (!empty($years)): ?>
+                        <div class="bg-white rounded-2xl border border-zinc-100 p-6 shadow-sm">
+                            <h3 class="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Filter by Year
+                            </h3>
+                            <select onchange="window.location.href='videos.php?year='+this.value"
+                                    class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium text-zinc-700 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition">
+                                <option value="">All Years</option>
+                                <?php foreach ($years as $y): ?>
+                                    <option value="<?php echo htmlspecialchars($y); ?>" <?php echo ($year == $y) ? 'selected' : ''; ?>><?php echo htmlspecialchars($y); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
+
+                        <div class="bg-white rounded-2xl border border-zinc-100 p-6 shadow-sm">
+                            <div class="flex items-center justify-between text-sm text-zinc-500">
+                                <span>Results</span>
+                                <span class="font-medium text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded-md"><?php echo count($videos); ?></span>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-xl text-zinc-500 mb-2">No videos found</p>
-                    <?php if ($search): ?>
-                        <p class="text-zinc-400">Try a different search term</p>
-                    <?php else: ?>
-                        <p class="text-zinc-400">Check back later for new content</p>
-                    <?php endif; ?>
                 </div>
-            <?php else: ?>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Videos Grid -->
+                <div class="flex-1">
+                    <?php if (empty($videos)): ?>
+                        <div class="text-center py-20 bg-white rounded-2xl border border-zinc-100 shadow-sm">
+                            <div class="w-20 h-20 bg-zinc-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <p class="text-xl text-zinc-500 mb-2">No videos found</p>
+                            <?php if ($year): ?>
+                                <p class="text-zinc-400">Try selecting a different year</p>
+                            <?php else: ?>
+                                <p class="text-zinc-400">Check back later for new content</p>
+                            <?php endif; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <?php foreach ($videos as $video): 
                         $video_content = $video['youtube_url'];
                         $is_iframe = (strpos(trim($video_content), '<iframe') === 0);
@@ -159,6 +169,8 @@ $videos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+                </div>
+            </div>
         </div>
     </section>
 
