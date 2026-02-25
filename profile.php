@@ -24,25 +24,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $stmt->execute();
     $current_user = $stmt->get_result()->fetch_assoc();
 
-    // Validate current password
-    if (!password_verify($current_password, $current_user['password'])) {
-        $message = 'Current password is incorrect.';
-        $message_type = 'error';
-    } elseif (empty($new_username)) {
-        $message = 'Username cannot be empty.';
-        $message_type = 'error';
-    } elseif (strlen($new_username) < 3) {
-        $message = 'Username must be at least 3 characters.';
-        $message_type = 'error';
-    } else {
-        // Check if username is taken by another user
-        $check_stmt = $conn->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
-        $check_stmt->bind_param("si", $new_username, $user_id);
-        $check_stmt->execute();
-        if ($check_stmt->get_result()->num_rows > 0) {
-            $message = 'Username is already taken.';
+    // Validate current password ONLY if trying to change password
+    if (!empty($new_password)) {
+        if (empty($current_password) || $current_password !== $current_user['password']) {
+            $message = 'Current password is required and must be correct to change your password.';
+            $message_type = 'error';
+        }
+    }
+
+    if (empty($message)) {
+        if (empty($new_username)) {
+            $message = 'Username cannot be empty.';
+            $message_type = 'error';
+        } elseif (strlen($new_username) < 3) {
+            $message = 'Username must be at least 3 characters.';
             $message_type = 'error';
         } else {
+            // Check if username is taken by another user
+            $check_stmt = $conn->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
+            $check_stmt->bind_param("si", $new_username, $user_id);
+            $check_stmt->execute();
+            if ($check_stmt->get_result()->num_rows > 0) {
+                $message = 'Username is already taken.';
+                $message_type = 'error';
+            }
+        }
+    }
+
+    if (empty($message)) {
             // Handle Avatar Update
             $new_avatar_url = null;
             if (isset($_FILES['avatar_upload']) && $_FILES['avatar_upload']['error'] === UPLOAD_ERR_OK) {
@@ -95,21 +104,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $types .= "s";
                 }
 
-            // Update password if provided
-            if (!empty($new_password)) {
-                if (strlen($new_password) < 6) {
-                    $message = 'New password must be at least 6 characters.';
-                    $message_type = 'error';
-                } elseif ($new_password !== $confirm_password) {
-                    $message = 'New passwords do not match.';
-                    $message_type = 'error';
-                } else {
-                    $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-                    $update_sql .= ", password = ?";
-                    $params[] = $hashed_password;
+                // Update security question if provided
+                $sec_question = trim($_POST['security_question'] ?? '');
+                $sec_answer = trim($_POST['security_answer'] ?? '');
+                
+                if (!empty($sec_question)) {
+                    $update_sql .= ", security_question = ?";
+                    $params[] = $sec_question;
                     $types .= "s";
                 }
-            }
+                
+                if (!empty($sec_answer)) {
+                    $update_sql .= ", security_answer = ?";
+                    $params[] = $sec_answer;
+                    $types .= "s";
+                }
+
+                // Update password if provided
+                if (!empty($new_password)) {
+                    if (strlen($new_password) < 6) {
+                        $message = 'New password must be at least 6 characters.';
+                        $message_type = 'error';
+                    } elseif ($new_password !== $confirm_password) {
+                        $message = 'New passwords do not match.';
+                        $message_type = 'error';
+                    } else {
+                        $hashed_password = $new_password;
+                        $update_sql .= ", password = ?";
+                        $params[] = $hashed_password;
+                        $types .= "s";
+                    }
+                }
 
             if (empty($message)) {
                 $update_sql .= " WHERE id = ?";
@@ -130,7 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         }
     }
-}
 }
 
 $user = get_user_by_id($user_id); 
@@ -372,7 +396,10 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                 </svg>
                                 My Discussions
                             </h3>
-                            <a href="community_create.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition">Start New &rarr;</a>
+                            <div class="flex gap-4">
+                                <a href="manage_posts.php" class="text-sm font-medium text-zinc-500 hover:text-zinc-800 transition">Manage</a>
+                                <a href="community_create.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition">Start New &rarr;</a>
+                            </div>
                         </div>
                         
                         <?php if (empty($user_posts)): ?>
@@ -461,9 +488,9 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <div id="editModal" class="fixed inset-0 z-50 hidden">
         <div class="modal-backdrop absolute inset-0" onclick="closeEditModal()"></div>
         <div class="relative flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md lg:max-w-lg relative z-10 overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md lg:max-w-lg relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
                 <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5 flex-shrink-0">
                     <div class="flex items-center justify-between">
                         <h2 class="text-xl font-bold text-white">Edit Profile</h2>
                         <button onclick="closeEditModal()" class="text-white/70 hover:text-white transition">
@@ -475,7 +502,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 </div>
                 
                 <!-- Modal Body -->
-                <form action="profile.php" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
+                <form action="profile.php" method="POST" enctype="multipart/form-data" class="p-6 space-y-5 overflow-y-auto flex-1">
                     <input type="hidden" name="action" value="update_profile">
                     
                     <!-- Username -->
@@ -522,6 +549,44 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                             <div class="w-full border-t border-zinc-200"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
+                            <span class="bg-white px-3 text-zinc-500">Recovery Settings</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Question -->
+                    <div>
+                        <label for="security_question" class="block text-sm font-semibold text-zinc-700 mb-2">Security Question</label>
+                        <select 
+                            id="security_question" 
+                            name="security_question" 
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        >
+                            <option value="">Select a security question</option>
+                            <option value="What was the name of your first pet?" <?php echo ($user['security_question'] ?? '') === 'What was the name of your first pet?' ? 'selected' : ''; ?>>What was the name of your first pet?</option>
+                            <option value="What is your mother's maiden name?" <?php echo ($user['security_question'] ?? '') === 'What is your mother\'s maiden name?' ? 'selected' : ''; ?>>What is your mother's maiden name?</option>
+                            <option value="In what city were you born?" <?php echo ($user['security_question'] ?? '') === 'In what city were you born?' ? 'selected' : ''; ?>>In what city were you born?</option>
+                            <option value="What was the name of your elementary school?" <?php echo ($user['security_question'] ?? '') === 'What was the name of your elementary school?' ? 'selected' : ''; ?>>What was the name of your elementary school?</option>
+                        </select>
+                    </div>
+
+                    <!-- Security Answer -->
+                    <div>
+                        <label for="security_answer" class="block text-sm font-semibold text-zinc-700 mb-2">Security Answer</label>
+                        <input 
+                            type="text" 
+                            id="security_answer" 
+                            name="security_answer" 
+                            placeholder="<?php echo !empty($user['security_answer']) ? '•••••••• (Hidden for security)' : 'Enter your answer'; ?>"
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                        >
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-zinc-200"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
                             <span class="bg-white px-3 text-zinc-500">Change Password (optional)</span>
                         </div>
                     </div>
@@ -529,17 +594,16 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     <!-- Current Password -->
                     <div>
                         <label for="current_password" class="block text-sm font-semibold text-zinc-700 mb-2">
-                            Current Password <span class="text-red-500">*</span>
+                            Current Password
                         </label>
                         <input 
                             type="password" 
                             id="current_password" 
                             name="current_password" 
-                            required
                             placeholder="Enter your current password"
                             class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
-                        <p class="text-xs text-zinc-500 mt-1">Required to confirm changes</p>
+                        <p class="text-xs text-zinc-500 mt-1">Only required if you are changing your password</p>
                     </div>
                     
                     <!-- New Password -->

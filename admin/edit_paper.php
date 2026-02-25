@@ -20,19 +20,7 @@ if (!$paper) {
     exit();
 }
 
-// Handle update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update') {
-    $title = $_POST['title'];
-    $subject = $_POST['subject'];
-    $year = $_POST['year'];
-    
-    $sql = "UPDATE papers SET title = ?, subject = ?, year = ? WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssii', $title, $subject, $year, $id);
-    $stmt->execute();
-    header('Location: papers.php');
-    exit();
-}
+// Note: Update logic is handled in papers.php
 
 include 'header.php';
 ?>
@@ -51,8 +39,9 @@ include 'header.php';
 <div class="bg-white rounded-2xl border border-zinc-200 p-6">
     <h2 class="text-lg font-bold text-zinc-900 mb-6">Edit Paper Details</h2>
     
-    <form action="" method="post" class="space-y-6">
+    <form action="papers.php" method="post" enctype="multipart/form-data" class="space-y-6">
         <input type="hidden" name="action" value="update">
+        <input type="hidden" name="id" value="<?php echo $paper['id']; ?>">
         
         <div>
             <label class="block text-sm font-medium text-zinc-700 mb-2">Title</label>
@@ -74,9 +63,34 @@ include 'header.php';
         </div>
         
         <!-- Current File Info -->
-        <div class="bg-zinc-50 rounded-xl p-4">
+        <div class="bg-zinc-50 rounded-xl p-4 border border-zinc-100">
             <p class="text-sm font-medium text-zinc-700 mb-1">Current Resource</p>
             <p class="text-sm text-zinc-500 break-all"><?php echo htmlspecialchars($paper['private_path']); ?></p>
+        </div>
+
+        <!-- Update Resource -->
+        <div class="border-t border-zinc-100 pt-6">
+            <p class="text-sm font-medium text-zinc-700 mb-3">Update Resource (Optional)</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm text-zinc-600 mb-2">New PDF Upload</label>
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-300 rounded-xl cursor-pointer bg-zinc-50 hover:bg-zinc-100 transition">
+                        <div class="flex flex-col items-center justify-center">
+                            <svg class="w-8 h-8 mb-2 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <p class="text-sm text-zinc-500"><span id="file-name-display" class="font-medium text-teal-600">Click to upload new</span></p>
+                            <p class="text-xs text-zinc-400">PDF only</p>
+                        </div>
+                        <input type="file" id="fileUploadInput" name="file_upload" accept=".pdf" class="hidden">
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-sm text-zinc-600 mb-2">Or New External URL</label>
+                    <input type="url" id="fileUrlInput" name="file_url" placeholder="https://example.com/paper.pdf" class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition">
+                    <p class="text-xs text-zinc-400 mt-2">Will replace the current resource link</p>
+                </div>
+            </div>
         </div>
         
         <div class="flex items-center justify-end gap-4 pt-4 border-t border-zinc-100">
@@ -89,5 +103,46 @@ include 'header.php';
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileUploadInput');
+    const urlInput = document.getElementById('fileUrlInput');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    const uploadArea = fileInput ? fileInput.closest('label') : null;
+
+    if (fileInput && urlInput && fileNameDisplay) {
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                fileNameDisplay.innerHTML = `<span class="text-teal-600 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                    ${fileName}
+                </span>`;
+                urlInput.value = '';
+                urlInput.disabled = true;
+                urlInput.classList.add('bg-zinc-100', 'cursor-not-allowed', 'opacity-50');
+            } else {
+                fileNameDisplay.textContent = 'Click to upload new';
+                urlInput.disabled = false;
+                urlInput.classList.remove('bg-zinc-100', 'cursor-not-allowed', 'opacity-50');
+            }
+        });
+
+        urlInput.addEventListener('input', function(e) {
+            if (e.target.value.trim() !== '') {
+                fileInput.value = '';
+                uploadArea.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                fileNameDisplay.textContent = 'Upload disabled';
+            } else {
+                uploadArea.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                fileNameDisplay.textContent = 'Click to upload new';
+            }
+        });
+    }
+});
+</script>
 
 <?php include 'footer.php'; ?>

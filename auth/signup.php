@@ -3,17 +3,26 @@ session_start();
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
+$username = '';
+$email = '';
+$password = '';
+$errors = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
+    $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-
-    $errors = [];
 
     if (empty($username)) {
         $errors[] = 'Username is required.';
     } elseif (!preg_match('/^[a-zA-Z0-9_]{3,20}$/', $username)) {
         $errors[] = 'Username must be 3-20 characters and can only contain letters, numbers, and underscores.';
+    }
+
+    if (empty($email)) {
+        $errors[] = 'Email is required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Invalid email format.';
     }
     
     if (empty($password)) {
@@ -21,52 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/', $password)) {
         $errors[] = 'Password must be 6+ chars with at least one uppercase letter, one number, and one symbol.';
     }
-    
-    if ($password !== $confirm_password) {
-        $errors[] = 'Passwords do not match.';
-    }
 
     if (empty($errors)) {
         if (getUserByUsername($username)) {
             $errors[] = 'Username already taken.';
         } else {
-            // Handle Avatar Update
-            $new_avatar_url = null;
-            if (isset($_FILES['avatar_upload']) && $_FILES['avatar_upload']['error'] === UPLOAD_ERR_OK) {
-                $file_tmp = $_FILES['avatar_upload']['tmp_name'];
-                $file_size = $_FILES['avatar_upload']['size'];
-                
-                $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mime = finfo_file($finfo, $file_tmp);
-                finfo_close($finfo);
-                
-                if (!in_array($mime, $allowed_types) || $file_size > 1048576) {
-                    $errors[] = "Invalid image type or exceeds 1MB max size.";
-                } else {
-                    $ext = explode('/', $mime)[1];
-                    $ext = $ext === 'jpeg' ? 'jpg' : $ext;
-                    $filename = 'avatar_' . uniqid() . '.' . $ext;
-                    // We are inside auth/ folder so go up one level
-                    $upload_path = '../assets/images/avatars/' . $filename;
-                    
-                    if (move_uploaded_file($file_tmp, $upload_path)) {
-                        $new_avatar_url = 'assets/images/avatars/' . $filename;
-                    } else {
-                        $errors[] = "Failed to upload avatar.";
-                    }
-                }
-            } elseif (!empty($_POST['avatar_url'])) {
-                $url = filter_var($_POST['avatar_url'], FILTER_SANITIZE_URL);
-                if (filter_var($url, FILTER_VALIDATE_URL)) {
-                    $new_avatar_url = $url;
-                } else {
-                    $errors[] = "Invalid avatar URL provided.";
-                }
-            }
+            $new_avatar_url = null; // System default or null as requested
 
             if (empty($errors)) {
-                if (createUser($username, $password, $new_avatar_url)) {
+                $security_question = $_POST['security_question'] ?? null;
+                $security_answer = $_POST['security_answer'] ?? null;
+                
+                if (createUser($username, $email, $password, $new_avatar_url, $security_question, $security_answer)) {
                     header('Location: /Semicolon/auth/login.php');
                     exit();
                 } else {
@@ -112,7 +87,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
         }
+        .step-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hidden-step {
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
+        }
     </style>
+    <script>
+        function nextStep() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !email || !password) {
+                alert('Please fill in all required fields in Step 1.');
+                return;
+            }
+
+            // Simple regex for email
+            if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters.');
+                return;
+            }
+
+            document.getElementById('step1').classList.add('hidden-step');
+            document.getElementById('step2').classList.remove('hidden-step');
+            setTimeout(() => {
+                document.getElementById('step2').style.opacity = '1';
+                document.getElementById('step2').style.transform = 'translateX(0)';
+            }, 50);
+            
+            document.getElementById('step-title').innerText = "Security Question";
+            document.getElementById('step-subtitle').innerText = "Step 2 of 2";
+        }
+
+        function prevStep() {
+            document.getElementById('step2').classList.add('hidden-step');
+            document.getElementById('step1').classList.remove('hidden-step');
+            
+            document.getElementById('step-title').innerText = "Get Started";
+            document.getElementById('step-subtitle').innerText = "Step 1 of 2";
+        }
+    </script>
 </head>
 <body class="antialiased bg-zinc-100 min-h-screen flex items-center justify-center p-4">
     
@@ -137,8 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-semibold text-zinc-900">Get Started</h1>
-                        <p class="text-zinc-500 text-sm">Create your account</p>
+                        <h1 id="step-title" class="text-2xl font-semibold text-zinc-900">Get Started</h1>
+                        <p id="step-subtitle" class="text-zinc-500 text-sm">Step 1 of 2</p>
                     </div>
                 </div>
                 
@@ -155,78 +179,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="w-12 h-px bg-zinc-200 mb-6"></div>
                 
                 <!-- Form -->
-                <form action="signup.php" method="POST" enctype="multipart/form-data" class="space-y-5">
-                    <div>
-                        <label for="username" class="block text-sm text-zinc-600 mb-1">Username</label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            name="username" 
-                            required
-                            pattern="^[a-zA-Z0-9_]{3,20}$"
-                            title="Username must be 3-20 characters and can only contain letters, numbers, and underscores."
-                            class="input-underline w-full text-zinc-900"
-                            placeholder="Choose a username"
-                        >
-                    </div>
+                <form action="signup.php" method="POST" enctype="multipart/form-data" class="space-y-4">
                     
-                    <div>
-                        <label for="avatar_upload" class="block text-sm text-zinc-600 mb-1">Profile Image (Upload, max 1MB)</label>
-                        <input 
-                            type="file" 
-                            id="avatar_upload" 
-                            name="avatar_upload" 
-                            accept="image/*"
-                            class="input-underline w-full text-zinc-900 border-none file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                    <!-- Step 1 -->
+                    <div id="step1" class="step-transition space-y-4">
+                        <div>
+                            <label for="username" class="block text-sm text-zinc-600 mb-1">Username</label>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                required
+                                pattern="^[a-zA-Z0-9_]{3,20}$"
+                                title="Username must be 3-20 characters and can only contain letters, numbers, and underscores."
+                                class="input-underline w-full text-zinc-900"
+                                placeholder="Choose a username"
+                                value="<?php echo htmlspecialchars($username); ?>"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm text-zinc-600 mb-1">Email ID</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required
+                                class="input-underline w-full text-zinc-900"
+                                placeholder="Enter your email"
+                                value="<?php echo htmlspecialchars($email); ?>"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm text-zinc-600 mb-1">Password</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                required
+                                minlength="6"
+                                pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
+                                title="Password must be 6+ chars with at least one uppercase letter, one number, and one symbol."
+                                class="input-underline w-full text-zinc-900"
+                                placeholder="Create a password"
+                            >
+                        </div>
+
+                        <button 
+                            type="button"
+                            onclick="nextStep()"
+                            class="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-full transition-colors mt-6 flex items-center justify-center gap-2"
                         >
+                            Next Step 
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
                     </div>
 
-                    <div>
-                        <label for="avatar_url" class="block text-sm text-zinc-600 mb-1">Or Image URL</label>
-                        <input 
-                            type="url" 
-                            id="avatar_url" 
-                            name="avatar_url" 
-                            placeholder="https://example.com/avatar.jpg"
-                            class="input-underline w-full text-zinc-900"
-                        >
+                    <!-- Step 2 -->
+                    <div id="step2" class="step-transition hidden-step space-y-4">
+                        <div>
+                            <label for="security_question" class="block text-sm text-zinc-600 mb-1">Security Question</label>
+                            <select 
+                                id="security_question" 
+                                name="security_question" 
+                                required
+                                class="input-underline w-full text-zinc-900"
+                            >
+                                <option value="">Select a security question</option>
+                                <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                                <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                                <option value="In what city were you born?">In what city were you born?</option>
+                            <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
+                        </select>
                     </div>
-                    
-                    <div>
-                        <label for="password" class="block text-sm text-zinc-600 mb-1">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            required
-                            minlength="6"
-                            pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
-                            title="Password must be 6+ chars with at least one uppercase letter, one number, and one symbol."
-                            class="input-underline w-full text-zinc-900"
-                            placeholder="Create a password"
-                        >
+
+                        <div>
+                            <label for="security_answer" class="block text-sm text-zinc-600 mb-1">Security Answer</label>
+                            <input 
+                                type="text" 
+                                id="security_answer" 
+                                name="security_answer" 
+                                required
+                                class="input-underline w-full text-zinc-900"
+                                placeholder="Your answer"
+                            >
+                        </div>
+
+                        <div class="flex gap-3 mt-6">
+                            <button 
+                                type="button"
+                                onclick="prevStep()"
+                                class="flex-1 py-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium rounded-full transition-colors"
+                            >
+                                Back
+                            </button>
+                            <button 
+                                type="submit"
+                                class="flex-[2] py-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-full transition-colors"
+                            >
+                                Complete Sign up
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div>
-                        <label for="confirm_password" class="block text-sm text-zinc-600 mb-1">Confirm Password</label>
-                        <input 
-                            type="password" 
-                            id="confirm_password" 
-                            name="confirm_password" 
-                            required
-                            minlength="6"
-                            pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
-                            class="input-underline w-full text-zinc-900"
-                            placeholder="Confirm your password"
-                        >
-                    </div>
-                    
-                    <button 
-                        type="submit"
-                        class="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-full transition-colors mt-4"
-                    >
-                        Sign up
-                    </button>
                 </form>
                 
                 <p class="mt-6 text-center text-zinc-500 text-sm">

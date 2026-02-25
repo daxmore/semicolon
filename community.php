@@ -180,6 +180,14 @@ if (!empty($post_ids)) {
                                 </div>
                                 All Posts
                             </a>
+                            <a href="manage_posts.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900 transition group">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-zinc-400 group-hover:text-zinc-500 bg-zinc-50 border border-zinc-100">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </div>
+                                <span class="truncate">My Posts</span>
+                            </a>
                             <?php foreach ($categories as $cat): ?>
                                 <a href="community.php?category=<?php echo urlencode($cat); ?>" 
                                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition group <?php echo ($selected_category === $cat) ? 'bg-amber-50 text-amber-700' : 'text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900'; ?>">
@@ -227,12 +235,6 @@ if (!empty($post_ids)) {
                             </svg>
                             <input type="text" name="q" placeholder="Search community posts..." value="<?php echo htmlspecialchars($search_query); ?>" class="w-full bg-zinc-50 border border-zinc-200 rounded-full pl-10 pr-4 py-2.5 text-sm text-zinc-900 focus:outline-none focus:border-indigo-500 transition">
                         </form>
-
-                        <a href="community_create.php<?php echo $selected_category ? '?category='.urlencode($selected_category) : ''; ?>" class="p-2 border border-dashed border-zinc-300 text-zinc-500 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition flex items-center justify-center" title="Create Post">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
-                        </a>
                     </div>
                     
                     <!-- Feed Sorting Options -->
@@ -270,7 +272,6 @@ if (!empty($post_ids)) {
                             </div>
                             <p class="text-lg font-bold text-zinc-900 mb-1">No posts found</p>
                             <p class="text-sm text-zinc-500 mb-6">Looks like it's quiet here. Be the first to post!</p>
-                            <a href="community_create.php<?php echo $selected_category ? '?category='.urlencode($selected_category) : ''; ?>" class="inline-block px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-full text-sm transition shadow-sm">Start a Conversation</a>
                         </div>
                     <?php else: ?>
                         <div class="space-y-4">
@@ -319,7 +320,9 @@ if (!empty($post_ids)) {
                                         <!-- Attached Image (if any) -->
                                         <?php if (!empty($post['image_url'])): ?>
                                             <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="block mb-3 bg-zinc-50 overflow-hidden sm:rounded-lg border-y sm:border border-zinc-200/60 max-h-[500px] flex items-center justify-center -mx-2 sm:mx-0">
-                                                <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post attached media" class="w-full h-full object-contain max-h-[500px]">
+                                                <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Post attached media" 
+                                                     onerror="this.parentElement.style.display='none'; console.log('Image failed to load:', this.src);"
+                                                     class="w-full h-full object-contain max-h-[500px]">
                                             </a>
                                         <?php endif; ?>
                                         
@@ -348,7 +351,7 @@ if (!empty($post_ids)) {
                                                 </svg>
                                                 <?php echo $comment_count; ?> Comments
                                             </a>
-                                            <button class="flex items-center gap-1.5 px-2 py-1.5 text-xs font-semibold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 rounded-md transition">
+                                            <button onclick="sharePost(<?php echo $post['id']; ?>, '<?php echo htmlspecialchars(addslashes($post['title'])); ?>')" class="flex items-center gap-1.5 px-2 py-1.5 text-xs font-semibold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 rounded-md transition">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                                                 </svg>
@@ -431,6 +434,46 @@ if (!empty($post_ids)) {
     </style>
 
     <script>
+    function sharePost(postId, title) {
+        const url = `${window.location.origin}/semicolon/community_post_detail.php?id=${postId}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                url: url
+            }).catch(err => {
+                console.error('Error sharing:', err);
+            });
+        } else {
+            // Fallback to clipboard
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-5 right-5 bg-zinc-900 text-white px-6 py-3 rounded-xl shadow-2xl z-50 transform translate-y-20 transition-transform duration-300 font-medium text-sm flex items-center gap-2';
+        toast.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            ${message}
+        `;
+        document.body.appendChild(toast);
+        
+        // Trigger animation
+        setTimeout(() => toast.classList.remove('translate-y-20'), 10);
+        
+        // Fade out and remove
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-2');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
     function handleListVote(postId, type) {
         fetch('api_reaction.php', {
             method: 'POST',

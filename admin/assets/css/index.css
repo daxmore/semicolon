@@ -25,3 +25,11 @@
     width: 100%;
     height: 100%;
 }
+
+/* ===================================
+   CUSTOM CLASSES
+   =================================== */
+.semicolon_sidebar_logo {
+    width: 60% !important;
+    filter: invert(1);
+}

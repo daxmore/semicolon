@@ -26,23 +26,22 @@ if (!$post) {
 }
 
 // Track User History
-$stmt_history = $conn->prepare("INSERT INTO user_history (user_id, resource_type, resource_id) VALUES (?, 'post', ?)");
-$stmt_history->bind_param('ii', $_SESSION['user_id'], $post_id);
-$stmt_history->execute();
+record_view($_SESSION['user_id'], 'post', $post_id);
+
+// Check Permissions
+$is_admin = false;
+$stmt_role = $conn->prepare("SELECT role FROM users WHERE id = ?");
+$stmt_role->bind_param("i", $_SESSION['user_id']);
+$stmt_role->execute();
+$role_res = $stmt_role->get_result()->fetch_assoc();
+if ($role_res && $role_res['role'] === 'admin') {
+    $is_admin = true;
+}
+$can_edit_post = $is_admin || ($post['user_id'] == $_SESSION['user_id']);
 
 // Handle Actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
-    
-    // Check Admin powers
-    $is_admin = false;
-    $stmt_role = $conn->prepare("SELECT role FROM users WHERE id = ?");
-    $stmt_role->bind_param("i", $_SESSION['user_id']);
-    $stmt_role->execute();
-    $role_res = $stmt_role->get_result()->fetch_assoc();
-    if ($role_res && $role_res['role'] === 'admin') {
-        $is_admin = true;
-    }
 
     if ($action === 'post_comment' && isset($_POST['comment_content'])) {
         $content = trim($_POST['comment_content']);
@@ -85,19 +84,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
         }
     } 
-    elseif ($action === 'delete_post' && $is_admin) {
+    elseif ($action === 'delete_post' && $can_edit_post) {
         $stmt_del = $conn->prepare("DELETE FROM community_posts WHERE id = ?");
         $stmt_del->bind_param("i", $post_id);
         $stmt_del->execute();
         header('Location: community.php');
         exit();
     }
-    elseif ($action === 'delete_comment' && $is_admin && isset($_POST['comment_id'])) {
+    elseif ($action === 'delete_comment' && isset($_POST['comment_id'])) {
         $comment_id_to_del = (int)$_POST['comment_id'];
-        $stmt_del = $conn->prepare("DELETE FROM community_comments WHERE id = ? AND post_id = ?");
-        $stmt_del->bind_param("ii", $comment_id_to_del, $post_id);
-        $stmt_del->execute();
+        $stmt_chk = $conn->prepare("SELECT user_id FROM community_comments WHERE id = ?");
+        $stmt_chk->bind_param("i", $comment_id_to_del);
+        $stmt_chk->execute();
+        $chk_res = $stmt_chk->get_result()->fetch_assoc();
+        if ($chk_res && ($is_admin || $chk_res['user_id'] == $_SESSION['user_id'])) {
+            $stmt_del = $conn->prepare("DELETE FROM community_comments WHERE id = ? AND post_id = ?");
+            $stmt_del->bind_param("ii", $comment_id_to_del, $post_id);
+            $stmt_del->execute();
+        }
         header("Location: community_post_detail.php?id=" . $post_id . "#comments");
+        exit();
+    }
+    elseif ($action === 'edit_post' && $can_edit_post) {
+        $new_title = trim($_POST['title'] ?? '');
+        $new_description = trim($_POST['description'] ?? '');
+        if (!empty($new_title) && !empty($new_description)) {
+            $stmt_update = $conn->prepare("UPDATE community_posts SET title = ?, description = ? WHERE id = ?");
+            $stmt_update->bind_param("ssi", $new_title, $new_description, $post_id);
+            $stmt_update->execute();
+        }
+        header("Location: community_post_detail.php?id=" . $post_id);
+        exit();
+    }
+    elseif ($action === 'edit_comment' && isset($_POST['comment_id'])) {
+        $comment_id = (int)$_POST['comment_id'];
+        $new_content = trim($_POST['content'] ?? '');
+        $stmt_chk = $conn->prepare("SELECT user_id FROM community_comments WHERE id = ?");
+        $stmt_chk->bind_param("i", $comment_id);
+        $stmt_chk->execute();
+        $chk_res = $stmt_chk->get_result()->fetch_assoc();
+        if ($chk_res && ($is_admin || $chk_res['user_id'] == $_SESSION['user_id']) && !empty($new_content)) {
+            $stmt_update = $conn->prepare("UPDATE community_comments SET content = ? WHERE id = ?");
+            $stmt_update->bind_param("si", $new_content, $comment_id);
+            $stmt_update->execute();
+        }
+        header("Location: community_post_detail.php?id=" . $post_id . "#comment-" . $comment_id);
         exit();
     }
 }
@@ -151,7 +182,7 @@ foreach ($all_comments as $cmt) {
 }
 
 // Recursive function to render comments
-function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth = 0, $comment_reactions, $is_admin, $post_id) {
+function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth = 0, $comment_reactions, $is_admin, $post_id, $logged_in_user_id) {
     if (!isset($comments_by_parent[$parent_id])) {
         return;
     }
@@ -161,15 +192,20 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
         
         $has_upvoted = isset($comment_reactions[$comment['id']]) && $comment_reactions[$comment['id']] === 'upvote';
         $has_downvoted = isset($comment_reactions[$comment['id']]) && $comment_reactions[$comment['id']] === 'downvote';
+        
+        $can_edit_comment = $is_admin || ($comment['user_id'] == $logged_in_user_id);
         ?>
         <div class="<?php echo $margin_class; ?> relative group" id="comment-<?php echo $comment['id']; ?>">
             
-            <?php if ($is_admin): ?>
-                <form action="" method="POST" class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <input type="hidden" name="action" value="delete_comment">
-                    <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
-                    <button type="submit" onclick="return confirm('Delete this comment permanently?')" class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 hover:bg-red-100 px-2 py-1 rounded">Delete</button>
-                </form>
+            <?php if ($can_edit_comment): ?>
+                <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <button onclick="toggleCommentEdit(<?php echo $comment['id']; ?>)" class="text-xs text-amber-600 hover:text-amber-700 font-bold bg-amber-50 hover:bg-amber-100 px-2 py-1 rounded">Edit</button>
+                    <form action="" method="POST" class="inline">
+                        <input type="hidden" name="action" value="delete_comment">
+                        <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
+                        <button type="submit" onclick="return confirm('Delete this comment permanently?')" class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 hover:bg-red-100 px-2 py-1 rounded">Delete</button>
+                    </form>
+                </div>
             <?php endif; ?>
 
             <div class="flex gap-4">
@@ -189,9 +225,26 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                         <span class="text-xs text-zinc-400"><?php echo date('M j, Y, g:i a', strtotime($comment['created_at'])); ?></span>
                     </div>
                     
-                    <p class="text-zinc-700 text-sm md:text-base whitespace-pre-line leading-relaxed mb-3">
-                        <?php echo htmlspecialchars($comment['content']); ?>
-                    </p>
+                    <div id="comment-display-<?php echo $comment['id']; ?>">
+                        <p class="text-zinc-700 text-sm md:text-base whitespace-pre-line leading-relaxed mb-3">
+                            <?php echo htmlspecialchars($comment['content']); ?>
+                        </p>
+                    </div>
+
+                    <?php if ($can_edit_comment): ?>
+                    <!-- Edit Comment Form -->
+                    <div id="comment-edit-form-<?php echo $comment['id']; ?>" class="hidden mb-4">
+                        <form action="" method="POST">
+                            <input type="hidden" name="action" value="edit_comment">
+                            <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
+                            <textarea name="content" rows="3" required class="w-full px-4 py-2 text-sm bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 outline-none mb-2"><?php echo htmlspecialchars($comment['content']); ?></textarea>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" onclick="toggleCommentEdit(<?php echo $comment['id']; ?>)" class="px-3 py-1 text-xs text-zinc-500 hover:text-zinc-900">Cancel</button>
+                                <button type="submit" class="px-3 py-1 bg-amber-500 text-white rounded text-xs font-bold transition">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                    <?php endif; ?>
                     
                     <!-- Comment Actions (Vote & Reply) -->
                     <div class="flex items-center gap-4">
@@ -229,7 +282,7 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
             </div>
 
             <!-- Recursively render children -->
-            <?php render_comments($comment['id'], $comments_by_parent, $post_user_id, $depth + 1, $comment_reactions, $is_admin, $post_id); ?>
+            <?php render_comments($comment['id'], $comments_by_parent, $post_user_id, $depth + 1, $comment_reactions, $is_admin, $post_id, $logged_in_user_id); ?>
             
         </div>
         <?php
@@ -309,27 +362,57 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                     <?php echo htmlspecialchars($post['title']); ?>
                 </h1>
 
-                <div class="prose prose-zinc max-w-none mb-6">
+                <div id="post-display" class="prose prose-zinc max-w-none mb-6">
                     <p class="text-lg text-zinc-700 whitespace-pre-line leading-relaxed"><?php echo htmlspecialchars($post['description']); ?></p>
                 </div>
 
+                <?php if ($can_edit_post): ?>
+                <div id="post-edit-form" class="hidden mb-8 bg-zinc-50 p-6 rounded-2xl border border-zinc-200">
+                    <form action="" method="POST">
+                        <input type="hidden" name="action" value="edit_post">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-zinc-500 uppercase mb-1">Title</label>
+                            <input type="text" name="title" value="<?php echo htmlspecialchars($post['title']); ?>" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 outline-none">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-zinc-500 uppercase mb-1">Content</label>
+                            <textarea name="description" rows="6" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 outline-none"><?php echo htmlspecialchars($post['description']); ?></textarea>
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" onclick="togglePostEdit()" class="px-4 py-2 text-sm text-zinc-500 hover:text-zinc-900 font-medium tracking-wide">Cancel</button>
+                            <button type="submit" class="px-6 py-2 bg-zinc-900 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition">Save Post</button>
+                        </div>
+                    </form>
+                </div>
+                <?php endif; ?>
+
                 <?php if (!empty($post['image_url'])): ?>
                     <div class="rounded-xl overflow-hidden border border-zinc-100 mb-6 bg-zinc-50">
-                        <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Attached media" class="w-full h-auto object-contain max-h-[500px]">
+                        <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Attached media" 
+                             onerror="this.parentElement.style.display='none'; console.log('Image failed to load:', this.src);"
+                             class="w-full h-auto object-contain max-h-[500px]">
                     </div>
                 <?php endif; ?>
             </div>
             
-            <?php if ($is_admin): ?>
-                <form action="" method="POST" class="absolute top-4 right-4">
-                    <input type="hidden" name="action" value="delete_post">
-                    <button type="submit" onclick="return confirm('Delete this entire post? This will destroy all comments too.')" class="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-lg text-sm font-bold transition flex items-center gap-1">
+            <?php if ($can_edit_post): ?>
+                <div class="absolute top-4 right-4 flex gap-2">
+                    <button onclick="togglePostEdit()" class="px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 rounded-lg text-sm font-bold transition flex items-center gap-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        Delete Post
+                        Edit
                     </button>
-                </form>
+                    <form action="" method="POST" class="inline">
+                        <input type="hidden" name="action" value="delete_post">
+                        <button type="submit" onclick="return confirm('Delete this entire post? This will destroy all comments too.')" class="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-lg text-sm font-bold transition flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Delete
+                        </button>
+                    </form>
+                </div>
             <?php endif; ?>
         </div>
 
@@ -357,7 +440,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             </div>
         <?php else: ?>
             <div class="space-y-2 mb-12">
-                <?php render_comments(0, $comments_by_parent, $post['user_id'], 0, $comment_reactions, $is_admin, $post_id); ?>
+                <?php render_comments(0, $comments_by_parent, $post['user_id'], 0, $comment_reactions, $is_admin, $post_id, $_SESSION['user_id']); ?>
             </div>
         <?php endif; ?>
 
@@ -372,6 +455,34 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             form.querySelector('textarea').focus();
         } else {
             form.classList.add('hidden');
+        }
+    }
+
+    function toggleCommentEdit(commentId) {
+        const display = document.getElementById(`comment-display-${commentId}`);
+        const form = document.getElementById(`comment-edit-form-${commentId}`);
+        if (form.classList.contains('hidden')) {
+            form.classList.remove('hidden');
+            display.classList.add('hidden');
+        } else {
+            form.classList.add('hidden');
+            display.classList.remove('hidden');
+        }
+    }
+
+    function togglePostEdit() {
+        const display = document.getElementById('post-display');
+        const form = document.getElementById('post-edit-form');
+        const titleH1 = document.querySelector('h1');
+        
+        if (form.classList.contains('hidden')) {
+            form.classList.remove('hidden');
+            display.classList.add('hidden');
+            if (titleH1) titleH1.classList.add('hidden');
+        } else {
+            form.classList.add('hidden');
+            display.classList.remove('hidden');
+            if (titleH1) titleH1.classList.remove('hidden');
         }
     }
 

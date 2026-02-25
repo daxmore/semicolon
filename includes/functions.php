@@ -142,12 +142,12 @@ function get_user_by_id($user_id)
     return $result->fetch_assoc();
 }
 
-function createUser($username, $password, $avatar_url = null)
+function createUser($username, $email, $password, $avatar_url = null, $security_question = null, $security_answer = null)
 {
     global $conn;
-    $sql = "INSERT INTO users (username, password, avatar_url) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO users (username, email, password, avatar_url, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('sss', $username, $password, $avatar_url);
+    $stmt->bind_param('ssssss', $username, $email, $password, $avatar_url, $security_question, $security_answer);
     return $stmt->execute();
 }
 
@@ -186,7 +186,7 @@ function record_view($user_id, $resource_type, $resource_id)
     }
 
     // Check if the history entry already exists
-    $check_hist = $conn->prepare("SELECT id FROM user_history WHERE user_id = ? AND resource_type = ? AND resource_id = ?");
+    $check_hist = $conn->prepare("SELECT history_id FROM user_history WHERE user_id = ? AND resource_type = ? AND resource_id = ?");
     $check_hist->bind_param('isi', $user_id, $resource_type, $resource_id);
     $check_hist->execute();
     $hist_res = $check_hist->get_result();
@@ -319,9 +319,9 @@ function is_pro_user($user_id) {
 function create_notification($user_id, $title, $message, $type = 'system')
 {
     global $conn;
-    $sql = "INSERT INTO notifications (user_id, title, message, notification_type) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('iss', $user_id, $title, $message);
+    $stmt->bind_param('isss', $user_id, $title, $message, $type);
     return $stmt->execute();
 }
 function get_unread_notification_count($user_id)
@@ -338,11 +338,12 @@ function get_unread_notification_count($user_id)
 function get_latest_unread_notification_type($user_id)
 {
     global $conn;
-    $sql = "SELECT notification_type FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC LIMIT 1";
+    $sql = "SELECT type FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $user_id);
+    $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
-    return $result['notification_type'] ?? null;
+    return $result['type'] ?? null;
 }
 
 /**

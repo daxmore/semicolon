@@ -67,10 +67,46 @@ if ($action === 'add') {
     $title = $_POST['title'];
     $subject = $_POST['subject'];
     $year = $_POST['year'];
-    
-    $sql = "UPDATE papers SET title = ?, subject = ?, year = ? WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssii', $title, $subject, $year, $id);
+
+    $file_url = $_POST['file_url'] ?? '';
+    $file_upload = $_FILES['file_upload'] ?? null;
+    $private_path = null;
+
+    if (!empty($file_url) && !empty($file_upload['name'])) {
+        die("Error: Please provide EITHER a file OR a URL, not both.");
+    }
+
+    if (!empty($file_upload['name'])) {
+        $target_dir = "../private/papers/";
+        if (!is_dir($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
+        $file_extension = pathinfo($file_upload['name'], PATHINFO_EXTENSION);
+        if (strtolower($file_extension) !== 'pdf') {
+             die("Error: Only PDF files are allowed.");
+        }
+        $new_filename = uniqid() . '.' . $file_extension;
+        $target_file = $target_dir . $new_filename;
+        
+        if (move_uploaded_file($file_upload['tmp_name'], $target_file)) {
+            $private_path = "private/papers/" . $new_filename;
+        } else {
+            die("Error uploading file.");
+        }
+    } elseif (!empty($file_url)) {
+        $private_path = $file_url;
+    }
+
+    if ($private_path) {
+        $sql = "UPDATE papers SET title = ?, subject = ?, year = ?, private_path = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ssisi', $title, $subject, $year, $private_path, $id);
+    } else {
+        $sql = "UPDATE papers SET title = ?, subject = ?, year = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ssii', $title, $subject, $year, $id);
+    }
+
     $stmt->execute();
     header("Location: papers.php");
     exit();
@@ -128,15 +164,15 @@ include 'header.php';
                             <svg class="w-8 h-8 mb-2 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                             </svg>
-                            <p class="text-sm text-zinc-500"><span class="font-medium text-teal-600">Click to upload</span></p>
+                            <p class="text-sm text-zinc-500"><span id="file-name-display" class="font-medium text-teal-600">Click to upload</span></p>
                             <p class="text-xs text-zinc-400">PDF only</p>
                         </div>
-                        <input type="file" name="file_upload" accept=".pdf" class="hidden">
+                        <input type="file" id="fileUploadInput" name="file_upload" accept=".pdf" class="hidden">
                     </label>
                 </div>
                 <div>
                     <label class="block text-sm text-zinc-600 mb-2">Or External URL</label>
-                    <input type="url" name="file_url" placeholder="https://example.com/paper.pdf" class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                    <input type="url" id="fileUrlInput" name="file_url" placeholder="https://example.com/paper.pdf" class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition">
                     <p class="text-xs text-zinc-400 mt-2">Link to an external PDF file</p>
                 </div>
             </div>
@@ -184,6 +220,11 @@ include 'header.php';
                             <td class="px-6 py-4 text-zinc-600"><?php echo htmlspecialchars($paper['year']); ?></td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-2">
+                                    <a href="edit_paper.php?id=<?php echo $paper['id']; ?>" class="p-2 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </a>
                                     <form action="papers.php" method="post" class="inline" onsubmit="return confirm('Delete this paper?');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $paper['id']; ?>">
@@ -218,6 +259,45 @@ function searchPapers() {
         }
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileUploadInput');
+    const urlInput = document.getElementById('fileUrlInput');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    const uploadArea = fileInput ? fileInput.closest('label') : null;
+
+    if (fileInput && urlInput && fileNameDisplay) {
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                fileNameDisplay.innerHTML = `<span class="text-teal-600 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                    ${fileName}
+                </span>`;
+                urlInput.value = '';
+                urlInput.disabled = true;
+                urlInput.classList.add('bg-zinc-100', 'cursor-not-allowed', 'opacity-50');
+            } else {
+                fileNameDisplay.textContent = 'Click to upload';
+                urlInput.disabled = false;
+                urlInput.classList.remove('bg-zinc-100', 'cursor-not-allowed', 'opacity-50');
+            }
+        });
+
+        urlInput.addEventListener('input', function(e) {
+            if (e.target.value.trim() !== '') {
+                fileInput.value = '';
+                uploadArea.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                fileNameDisplay.textContent = 'Upload disabled';
+            } else {
+                uploadArea.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                fileNameDisplay.textContent = 'Click to upload';
+            }
+        });
+    }
+});
 </script>
 
 <?php include 'footer.php'; ?>

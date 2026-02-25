@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($stmt->execute()) {
                 $new_post_id = $conn->insert_id;
-                header("Location: community_post_detail.php?id=" . $new_post_id);
+                echo "<script>window.location.href = 'community_post_detail.php?id=" . $new_post_id . "';</script>";
                 exit();
             } else {
                 $error = "Something went wrong saving to the database. " . $conn->error;
@@ -114,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form action="" method="POST" id="postForm" class="bg-white rounded-2xl border border-zinc-100 p-8 shadow-sm">
+                
                 <!-- Hidden input to hold the compressed Base64 string -->
                 <input type="hidden" id="compressed_image_b64" name="compressed_image_b64" value="">
                     <div>
@@ -124,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div>
-                        <label for="category" class="block text-sm font-bold text-zinc-900 mb-2">Topic Category</label>
+                        <label for="category" class="block text-sm font-bold text-zinc-900 mt-4 mb-2">Topic Category</label>
                         <select id="category" name="category" required 
                                 class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
                             <option value="">Select a specific topic...</option>
@@ -137,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     
-                    <div class="bg-zinc-50 p-6 rounded-xl border border-zinc-100">
+                    <div class="bg-zinc-50 p-6 mb-2 mt-4 rounded-xl border border-zinc-100">
                         <label class="block text-sm font-bold text-zinc-900 mb-1">Attach Media <span class="text-zinc-400 font-normal">(Optional)</span></label>
                         <p class="text-xs text-zinc-500 mb-4">Upload an image from your device, or paste a public URL.</p>
                         
@@ -148,11 +149,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                        class="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
                             </div>
                             
-                            <div>
+                             <div>
                                 <label for="image_url" class="block text-xs font-semibold text-zinc-600 mb-2 uppercase tracking-wide">Or Image URL</label>
                                 <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg" 
+                                       oninput="handleUrlPreview(this.value)"
                                        class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition" 
                                        value="<?php echo htmlspecialchars($_POST['image_url'] ?? ''); ?>">
+                            </div>
+                        </div>
+
+                        <!-- Image Preview Area -->
+                        <div id="preview-container" class="hidden mt-6 pt-6 border-t border-zinc-200">
+                            <label class="block text-xs font-bold text-zinc-500 uppercase mb-2">Attachment Preview</label>
+                            <div class="relative rounded-xl overflow-hidden bg-white border border-zinc-200 max-h-[300px] flex items-center justify-center group">
+                                <img id="image-preview" src="#" alt="Preview" class="max-w-full max-h-[300px] object-contain">
+                                <button type="button" onclick="clearPreview()" class="absolute top-2 right-2 p-1.5 bg-zinc-900/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm hover:bg-zinc-900">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -163,13 +178,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                   class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y"><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
                     </div>
 
+                    <div class="mt-8 pt-6 border-t border-zinc-100 flex justify-end gap-4 pb-4">
+                        <a href="community.php" class="px-6 py-3 border border-zinc-200 text-zinc-600 font-medium rounded-xl hover:bg-zinc-50 transition-all hover:scale-[1.02] active:scale-[0.98]">Cancel</a>
+                        <button type="button" id="submitBtn" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]">Post Discussion</button>
+                    </div>
                 </div>
-
-                <div class="mt-8 pt-6 border-t border-zinc-100 flex justify-end gap-4">
-                    <a href="community.php" class="px-6 py-3 border border-zinc-200 text-zinc-600 font-medium rounded-xl hover:bg-zinc-50 transition">Cancel</a>
-                    <button type="button" id="submitBtn" class="px-8 py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition shadow-sm hover:shadow-md">Post Discussion</button>
-                </div>
-
             </form>
 
         </div>
@@ -177,6 +190,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Client Side Image Compression Script -->
     <script>
+    document.getElementById('image_upload').addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                showPreview(e.target.result);
+                document.getElementById('image_url').value = ''; // Clear URL if file uploaded
+                document.getElementById('compressed_image_b64').value = '';
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    function handleUrlPreview(url) {
+        if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+            showPreview(url);
+            document.getElementById('image_upload').value = ''; // Clear file if URL entered
+            document.getElementById('compressed_image_b64').value = '';
+        } else {
+            document.getElementById('preview-container').classList.add('hidden');
+        }
+    }
+
+    function showPreview(src) {
+        const preview = document.getElementById('image-preview');
+        const container = document.getElementById('preview-container');
+        preview.src = src;
+        container.classList.remove('hidden');
+        
+        preview.onerror = function() {
+            container.classList.add('hidden');
+            console.log('Preview failed to load for:', src);
+        };
+    }
+
+    function clearPreview() {
+        document.getElementById('image_upload').value = '';
+        document.getElementById('image_url').value = '';
+        document.getElementById('preview-container').classList.add('hidden');
+        document.getElementById('compressed_image_b64').value = '';
+    }
+
     document.getElementById('submitBtn').addEventListener('click', function(e) {
         const fileInput = document.getElementById('image_upload');
         const form = document.getElementById('postForm');

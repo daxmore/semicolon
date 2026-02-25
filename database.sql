@@ -147,6 +147,7 @@ CREATE TABLE `user_history` (
   `resource_id` int(11) NOT NULL,
   `viewed_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`history_id`),
+  UNIQUE KEY `unique_history_entry` (`user_id`, `resource_type`, `resource_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `user_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
