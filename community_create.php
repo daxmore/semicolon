@@ -60,6 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($stmt->execute()) {
                 $new_post_id = $conn->insert_id;
+                
+                // Award 10 XP for creating a post
+                add_user_xp($_SESSION['user_id'], 10);
+                
                 echo "<script>window.location.href = 'community_post_detail.php?id=" . $new_post_id . "';</script>";
                 exit();
             } else {
@@ -88,6 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA]">
     <?php include 'includes/header.php'; ?>
@@ -188,8 +194,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </section>
 
-    <!-- Client Side Image Compression Script -->
+    <!-- Client Side Image Compression & Markdown Script -->
     <script>
+    const easyMDE = new EasyMDE({ 
+        element: document.getElementById('description'),
+        spellChecker: false,
+        placeholder: "Add more details to your discussion (Markdown supported)...",
+        styleSelectedText: false,
+        toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link", "image", "|", "preview", "guide"]
+    });
+
     document.getElementById('image_upload').addEventListener('change', function(e) {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
@@ -236,6 +250,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const form = document.getElementById('postForm');
         const btn = document.getElementById('submitBtn');
         
+        // Ensure Markdown content is synced
+        document.getElementById('description').value = easyMDE.value();
+
         // If no file, just submit the form normally
         if (!fileInput.files || fileInput.files.length === 0) {
             form.submit();

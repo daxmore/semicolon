@@ -38,7 +38,7 @@ while ($row = $res->fetch_assoc()) {
 }
 
 // Videos
-$sql = "SELECT id, title, description, '' as subject, 'video' as type, slug as token, slug FROM videos WHERE title LIKE ? OR description LIKE ? LIMIT 5";
+$sql = "SELECT id, title, description, '' as subject, 'video' as type, slug, token FROM videos WHERE title LIKE ? OR description LIKE ? LIMIT 5";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('ss', $searchTerm, $searchTerm);
 $stmt->execute();

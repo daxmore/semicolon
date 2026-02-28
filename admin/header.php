@@ -51,7 +51,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
             
             <!-- Navigation -->
-            <nav class="flex-1 p-4 space-y-1">
+            <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
                 <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">Main</p>
                 
                 <a href="index.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'index.php' ? 'bg-indigo-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
@@ -94,6 +94,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 
                 <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-6 mb-3 px-3 pt-6">Management</p>
                 
+                <a href="manage_reports.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'manage_reports.php' ? 'bg-indigo-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                    </svg>
+                    Manage Reports
+                </a>
+
                 <a href="requests.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'requests.php' ? 'bg-indigo-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -106,6 +113,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     Users
+                </a>
+                
+                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-6 mb-3 px-3 pt-6">Gamification</p>
+                
+                <a href="manage_quiz.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'manage_quiz.php' ? 'bg-amber-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Manage Quizzes
+                </a>
+                
+                <a href="manage_users.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'manage_users.php' ? 'bg-amber-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    User Progress (XP)
                 </a>
             </nav>
             
@@ -141,7 +164,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 'videos.php' => 'Manage Videos',
                                 'community.php' => 'Community Moderation',
                                 'requests.php' => 'User Requests',
-                                'users.php' => 'Manage Users'
+                                'users.php' => 'Manage Users',
+                                'manage_users.php' => 'User Progress (XP)',
+                                'manage_quiz.php' => 'Manage Quizzes',
+                                'manage_reports.php' => 'Manage Reports'
                             ];
                             echo $titles[$current_page] ?? 'Admin Panel';
                             ?>

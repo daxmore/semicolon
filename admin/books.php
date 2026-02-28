@@ -55,6 +55,8 @@ if ($action === 'add') {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ssssssss', $title, $author, $description, $subject, $difficulty, $private_path, $slug, $token);
     $stmt->execute();
+    if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+    $_SESSION['toasts'][] = ['type' => 'success', 'title' => 'Book Added', 'message' => "Successfully added: {$title}"];
     header("Location: books.php");
     exit();
 } elseif ($action === 'delete') {
@@ -63,6 +65,8 @@ if ($action === 'add') {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $id);
     $stmt->execute();
+    if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+    $_SESSION['toasts'][] = ['type' => 'info', 'title' => 'Book Deleted', 'message' => "The book was removed."];
     header("Location: books.php");
     exit();
 } elseif ($action === 'update') {
@@ -113,6 +117,8 @@ if ($action === 'add') {
     }
     
     $stmt->execute();
+    if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+    $_SESSION['toasts'][] = ['type' => 'success', 'title' => 'Book Updated', 'message' => "Successfully updated: {$title}"];
     header("Location: books.php");
     exit();
 }

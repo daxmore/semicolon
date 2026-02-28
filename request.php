@@ -14,6 +14,7 @@ $message_type = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'] ?? null;
     $material_type = $_POST['material_type'] ?? '';
+    $community_category = $_POST['community_category'] ?? null;
     $title = $_POST['title'] ?? '';
     $author_publisher = $_POST['author_publisher'] ?? '';
     $details = $_POST['details'] ?? '';
@@ -22,17 +23,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = 'Material type and title are required.';
         $message_type = 'error';
     } else {
-        // Fixed: Changed from 'requests' to 'material_requests' table
-        $stmt = $conn->prepare("INSERT INTO material_requests (user_id, material_type, title, author_publisher, details) VALUES (?, ?, ?, ?, ?)");
-        if ($stmt && $stmt->bind_param("issss", $user_id, $material_type, $title, $author_publisher, $details) && $stmt->execute()) {
+        $stmt = $conn->prepare("INSERT INTO material_requests (user_id, material_type, community_category, title, author_publisher, details) VALUES (?, ?, ?, ?, ?, ?)");
+        if ($stmt && $stmt->bind_param("isssss", $user_id, $material_type, $community_category, $title, $author_publisher, $details) && $stmt->execute()) {
             $message = 'Your request has been submitted successfully! We\'ll review it soon.';
             $message_type = 'success';
         } else {
-            $message = 'Failed to submit your request. Please try again.';
-            $message_type = 'error';
+            // Fallback in case column doesn't match
+            $stmt_fallback = $conn->prepare("INSERT INTO material_requests (user_id, material_type, title, author_publisher, details) VALUES (?, ?, ?, ?, ?)");
+            if ($stmt_fallback && $stmt_fallback->bind_param("issss", $user_id, $material_type, $title, $author_publisher, $details) && $stmt_fallback->execute()) {
+                 $message = 'Your request has been submitted successfully! We\'ll review it soon. (Legacy save)';
+                 $message_type = 'success';
+            } else {
+                 $message = 'Failed to submit your request. Please try again.';
+                 $message_type = 'error';
+            }
         }
     }
 }
+
+// Define categories specifically for the dropdown
+$categories = [
+    'Frontend', 'Backend', 'Full Stack', 'App Dev', 'Game Dev', 
+    'UI/UX Design', 'Graphic Design', 'Video Editing', 'Motion Graphics', 
+    'Data Science', 'AI & ML', 'Cybersecurity', 'DevOps', 
+    'Cloud Computing', 'General Tech'
+];
 
 ?>
 <!DOCTYPE html>
@@ -277,6 +292,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                     
+                    <!-- Community Category Field -->
+                    <div class="space-y-2">
+                        <label for="community_category" class="block text-sm font-semibold text-zinc-700">
+                            Community Category <span class="text-zinc-400 font-normal">(Optional)</span>
+                        </label>
+                        <select 
+                            name="community_category" 
+                            id="community_category" 
+                            class="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 appearance-none"
+                            style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231f2937%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1.25rem top 50%; background-size: 0.85rem auto;"
+                        >
+                            <option value="">Select a community to target...</option>
+                            <?php foreach ($categories as $cat): ?>
+                                <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                     <!-- Title Field -->
                     <div class="space-y-2">
                         <label for="title" class="block text-sm font-semibold text-zinc-700">

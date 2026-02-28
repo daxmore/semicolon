@@ -52,6 +52,8 @@ if ($action === 'add') {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ssisss', $title, $subject, $year, $private_path, $slug, $token);
     $stmt->execute();
+    if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+    $_SESSION['toasts'][] = ['type' => 'success', 'title' => 'Paper Added', 'message' => "Successfully added: {$title}"];
     header("Location: papers.php");
     exit();
 } elseif ($action === 'delete') {
@@ -60,6 +62,8 @@ if ($action === 'add') {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $id);
     $stmt->execute();
+    if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+    $_SESSION['toasts'][] = ['type' => 'info', 'title' => 'Paper Deleted', 'message' => "The paper was removed."];
     header("Location: papers.php");
     exit();
 } elseif ($action === 'update') {
@@ -108,6 +112,8 @@ if ($action === 'add') {
     }
 
     $stmt->execute();
+    if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+    $_SESSION['toasts'][] = ['type' => 'success', 'title' => 'Paper Updated', 'message' => "Successfully updated: {$title}"];
     header("Location: papers.php");
     exit();
 }

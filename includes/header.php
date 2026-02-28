@@ -57,7 +57,33 @@ if (isset($_SESSION['user_id'])) {
                       </div>
                   </div>
               </li>
+              
               <?php if (isset($_SESSION['user_id'])): ?>
+              <!-- Academy Dropdown -->
+              <li class="relative group">
+                  <button class="flex items-center gap-1 text-zinc-600 transition hover:text-indigo-600 focus:outline-none font-semibold">
+                      Academy
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400 group-hover:text-indigo-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                  </button>
+                  <div class="absolute left-0 top-full pt-4 w-48 origin-top-left opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div class="flex flex-col rounded-xl bg-white shadow-lg ring-1 ring-amber-500/20 overflow-hidden py-2 border border-amber-500/10">
+                          <a href="academy.php" class="px-4 py-2 text-sm text-zinc-700 hover:bg-amber-50 hover:text-amber-600 transition flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                              Dashboard
+                          </a>
+                          <a href="leaderboard.php" class="px-4 py-2 text-sm text-zinc-700 hover:bg-amber-50 hover:text-amber-600 transition flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                              Leaderboard
+                          </a>
+                          <a href="profile.php#badges" class="px-4 py-2 text-sm text-zinc-700 hover:bg-amber-50 hover:text-amber-600 transition flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                              My Badges
+                          </a>
+                      </div>
+                  </div>
+              </li>
               <li><a class="text-zinc-600 transition hover:text-indigo-600" href="request.php">Request</a></li>
               <?php endif; ?>
               <li><a class="text-zinc-600 transition hover:text-indigo-600" href="pricing.php">Pricing</a></li>
@@ -195,7 +221,29 @@ if (isset($_SESSION['user_id'])) {
                       </div>
                   </details>
               </li>
+              
               <?php if (isset($_SESSION['user_id'])): ?>
+              <li class="w-full px-6">
+                  <details class="group/mobile-academy w-full cursor-pointer">
+                      <summary class="flex items-center justify-center gap-1 text-zinc-600 hover:text-amber-600 transition list-none font-semibold text-base [&::-webkit-details-marker]:hidden">
+                          Academy
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-open/mobile-academy:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                      </summary>
+                      <div class="mt-3 flex flex-col items-center gap-3 bg-amber-50 rounded-xl py-3 border border-amber-100">
+                          <a class="text-zinc-700 hover:text-amber-700 transition text-sm flex items-center gap-2" href="academy.php">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> Dashboard
+                          </a>
+                          <a class="text-zinc-700 hover:text-amber-700 transition text-sm flex items-center gap-2" href="leaderboard.php">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> Leaderboard
+                          </a>
+                          <a class="text-zinc-700 hover:text-amber-700 transition text-sm flex items-center gap-2" href="profile.php#badges">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg> My Badges
+                          </a>
+                      </div>
+                  </details>
+              </li>
               <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="request.php">Request</a></li>
               <?php endif; ?>
               <li><a class="text-zinc-600 hover:text-indigo-600 transition" href="pricing.php">Pricing</a></li>

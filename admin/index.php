@@ -17,6 +17,12 @@ if ($result) {
     $pending_requests = $result->fetch_assoc()['count'];
 }
 
+/* Academy Stats */
+$total_skills = $conn->query("SELECT COUNT(*) as count FROM skills")->fetch_assoc()['count'];
+$total_questions = $conn->query("SELECT COUNT(*) as count FROM questions")->fetch_assoc()['count'];
+$avg_level_res = $conn->query("SELECT AVG(level) as avg_lvl FROM users")->fetch_assoc();
+$avg_level = $avg_level_res['avg_lvl'] ? round($avg_level_res['avg_lvl'], 1) : 1;
+
 // Fetch recent content
 $recent_books = $conn->query("SELECT id, title, author, created_at FROM books ORDER BY created_at DESC LIMIT 4")->fetch_all(MYSQLI_ASSOC);
 $recent_papers = $conn->query("SELECT id, title, subject, year, created_at FROM papers ORDER BY created_at DESC LIMIT 4")->fetch_all(MYSQLI_ASSOC);
@@ -36,66 +42,110 @@ include 'header.php';
 </div>
 
 <!-- Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
-    <div class="group bg-white p-6 rounded-3xl border border-zinc-200 hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
-        <div class="p-3 bg-indigo-50 rounded-2xl text-indigo-600 w-fit mb-4 group-hover:scale-110 transition-transform">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Users -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Users</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_users); ?></p>
+        </div>
+        <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
         </div>
-        <p class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Users</p>
-        <p class="text-3xl font-black text-zinc-900"><?php echo number_format($total_users); ?></p>
     </div>
 
-    <div class="group bg-white p-6 rounded-3xl border border-zinc-200 hover:border-teal-500 hover:shadow-xl hover:shadow-teal-500/5 transition-all duration-300">
-        <div class="p-3 bg-teal-50 rounded-2xl text-teal-600 w-fit mb-4 group-hover:scale-110 transition-transform">
+    <!-- Books -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-teal-500 hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Books</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_books); ?></p>
+        </div>
+        <div class="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center text-teal-600 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
         </div>
-        <p class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Books</p>
-        <p class="text-3xl font-black text-zinc-900"><?php echo number_format($total_books); ?></p>
     </div>
 
-    <div class="group bg-white p-6 rounded-3xl border border-zinc-200 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
-        <div class="p-3 bg-blue-50 rounded-2xl text-blue-600 w-fit mb-4 group-hover:scale-110 transition-transform">
+    <!-- Papers -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Papers</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_papers); ?></p>
+        </div>
+        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
         </div>
-        <p class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Papers</p>
-        <p class="text-3xl font-black text-zinc-900"><?php echo number_format($total_papers); ?></p>
     </div>
 
-    <div class="group bg-white p-6 rounded-3xl border border-zinc-200 hover:border-rose-500 hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-300">
-        <div class="p-3 bg-rose-50 rounded-2xl text-rose-600 w-fit mb-4 group-hover:scale-110 transition-transform">
+    <!-- Videos -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-rose-500 hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Videos</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_videos); ?></p>
+        </div>
+        <div class="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
-        <p class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Videos</p>
-        <p class="text-3xl font-black text-zinc-900"><?php echo number_format($total_videos); ?></p>
     </div>
 
-    <div class="group bg-white p-6 rounded-3xl border border-zinc-200 hover:border-amber-500 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300">
-        <div class="p-3 bg-amber-50 rounded-2xl text-amber-600 w-fit mb-4 group-hover:scale-110 transition-transform">
+    <!-- Posts -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-amber-500 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Posts</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_posts); ?></p>
+        </div>
+        <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
             </svg>
         </div>
-        <p class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Posts</p>
-        <p class="text-3xl font-black text-zinc-900"><?php echo number_format($total_posts); ?></p>
     </div>
 
-    <div class="group bg-white p-6 rounded-3xl border border-zinc-200 hover:border-yellow-500 hover:shadow-xl hover:shadow-yellow-500/5 transition-all duration-300">
-        <div class="p-3 bg-yellow-50 rounded-2xl text-yellow-600 w-fit mb-4 group-hover:scale-110 transition-transform">
+    <!-- Requests -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-yellow-500 hover:shadow-2xl hover:shadow-yellow-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Requests</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($pending_requests); ?></p>
+        </div>
+        <div class="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center text-yellow-600 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
-        <p class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Requests</p>
-        <p class="text-3xl font-black text-zinc-900"><?php echo number_format($pending_requests); ?></p>
+    </div>
+
+    <!-- Quiz Qs -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-purple-500 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Quiz Qs</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_questions); ?></p>
+        </div>
+        <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Avg Lvl -->
+    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Avg Lvl</p>
+            <p class="text-4xl font-black text-zinc-900"><?php echo $avg_level; ?></p>
+        </div>
+        <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        </div>
     </div>
 </div>
 
@@ -105,7 +155,7 @@ include 'header.php';
         <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
         <h2 class="text-xl font-bold text-zinc-900">Creation HUB</h2>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <a href="books.php?add=1" class="group relative p-8 rounded-[2rem] bg-indigo-600 text-white overflow-hidden shadow-xl shadow-indigo-600/20 hover:-translate-y-1 transition-all duration-300">
             <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform duration-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -154,6 +204,24 @@ include 'header.php';
                 </div>
                 <h3 class="text-xl font-bold mb-2">New Video</h3>
                 <p class="text-rose-100/80 text-sm leading-relaxed">Embed fresh video tutorials easily.</p>
+            </div>
+        </a>
+
+        <!-- Gamification / Quiz Action -->
+        <a href="manage_quiz.php" class="group relative p-8 rounded-[2rem] bg-amber-500 text-white overflow-hidden shadow-xl shadow-amber-500/20 hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform duration-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div class="relative z-10">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">New Quiz</h3>
+                <p class="text-amber-100/80 text-sm leading-relaxed">Add new gamified questions & reward XP.</p>
             </div>
         </a>
     </div>

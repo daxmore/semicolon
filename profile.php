@@ -166,7 +166,7 @@ if (!$user) {
 }
 
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$limit = 10;
+$limit = 5;
 $offset = ($page - 1) * $limit;
 $total_history = get_user_history_count($user_id);
 $total_pages = ceil($total_history / $limit);
@@ -179,6 +179,9 @@ $posts_stmt = $conn->prepare("SELECT * FROM community_posts WHERE user_id = ? OR
 $posts_stmt->bind_param('i', $user_id);
 $posts_stmt->execute();
 $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// Fetch User Badges
+$badges = get_user_badges($user_id);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -430,6 +433,59 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         <?php endif; ?>
                     </div>
                     </div> <!-- End Side-by-Side Activity Grid -->
+                    
+                    <!-- Badges Collection -->
+                    <div id="badges" class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden relative mt-6">
+                        <!-- Subtle RPG background inside badge container -->
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-50"></div>
+                        
+                        <div class="p-6 border-b border-slate-800 relative z-10 flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.5 12.5a.5.5 0 01-1 0v-5a.5.5 0 011 0v5zM12 12a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>
+                                My Badges Collection
+                            </h3>
+                        </div>
+                        
+                        <div class="p-8 relative z-10">
+                            <?php if (empty($badges)): ?>
+                                <div class="text-center py-6">
+                                    <div class="w-16 h-16 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-4 border border-slate-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                    </div>
+                                    <p class="text-slate-400">No badges earned yet. Complete challenges and maintain streaks to earn them!</p>
+                                </div>
+                            <?php else: ?>
+                                <div class="flex flex-wrap gap-6">
+                                    <?php foreach ($badges as $badge): ?>
+                                        <div class="group relative flex flex-col items-center">
+                                            <!-- Tooltip -->
+                                            <div class="absolute bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-slate-800 text-xs text-slate-200 text-center rounded-lg border border-slate-700 shadow-xl z-20">
+                                                <strong class="block text-amber-400 mb-1"><?php echo htmlspecialchars($badge['badge_name']); ?></strong>
+                                                <?php echo htmlspecialchars($badge['description']); ?>
+                                            </div>
+                                            
+                                            <!-- Badge Icon -->
+                                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border-2 <?php echo $badge['is_equipped'] ? 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'border-slate-700 hover:border-slate-500'; ?> flex items-center justify-center transition-all hover:scale-105 cursor-pointer relative overflow-hidden">
+                                                <?php if($badge['is_equipped']): ?>
+                                                    <div class="absolute inset-0 bg-amber-500/10"></div>
+                                                <?php endif; ?>
+                                                <div class="w-12 h-12 relative z-10">
+                                                    <?php echo $badge['svg_icon']; ?>
+                                                </div>
+                                            </div>
+                                            <!-- Badge Name -->
+                                            <span class="mt-3 text-xs font-semibold text-slate-300 text-center max-w-[5rem] leading-tight">
+                                                <?php echo htmlspecialchars($badge['badge_name']); ?>
+                                                <?php if($badge['is_equipped']): ?>
+                                                    <span class="block text-[10px] text-amber-500 mt-1 uppercase tracking-wider">Equipped</span>
+                                                <?php endif; ?>
+                                            </span>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
 
                 </div>
 

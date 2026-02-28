@@ -16,16 +16,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $slug = generate_slug($title);
         $slug .= '-' . substr(md5(uniqid()), 0, 5);
+        $token = generate_token();
 
-        $stmt = $conn->prepare("INSERT INTO videos (title, description, youtube_url, slug) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $title, $description, $youtube_url, $slug);
+        $stmt = $conn->prepare("INSERT INTO videos (title, description, youtube_url, slug, token) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $title, $description, $youtube_url, $slug, $token);
         $stmt->execute();
+        
+        if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+        $_SESSION['toasts'][] = ['type' => 'success', 'title' => 'Video Added', 'message' => "Successfully added: {$title}"];
     } elseif ($action === 'delete') {
         $id = $_POST['id'];
 
         $stmt = $conn->prepare("DELETE FROM videos WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
+        
+        if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+        $_SESSION['toasts'][] = ['type' => 'info', 'title' => 'Video Deleted', 'message' => "The video was removed."];
     }
     header("Location: videos.php");
     exit();

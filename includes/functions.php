@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/db.php';
+
 function get_distinct_values($column, $table = 'books')
 {
     global $conn;
@@ -216,7 +218,7 @@ function get_user_history($user_id, $limit = null, $offset = null)
             CASE 
                 WHEN h.resource_type = 'book' THEN b.token 
                 WHEN h.resource_type = 'paper' THEN p.token 
-                WHEN h.resource_type = 'video' THEN v.slug 
+                WHEN h.resource_type = 'video' THEN v.token 
                 WHEN h.resource_type = 'post' THEN cp.id 
             END as token
             FROM user_history h
@@ -376,4 +378,209 @@ function validate_image_upload($file_tmp, $file_size, $max_size = 2097152) {
         'mime' => $mime_type
     ];
 }
+
+/* ========================================================================= */
+/* ==================== SEMICOLON RPG ACADEMY ENGINE ======================= */
+/* ========================================================================= */
+
+/**
+ * Calculates user level based on total XP.
+ * Formula: Level = floor(sqrt(xp_total / 100)) + 1
+ */
+function calculate_level_from_xp($xp_total) {
+    if ($xp_total < 0) return 1;
+    return floor(sqrt($xp_total / 100)) + 1;
+}
+
+/**
+ * Updates a user's level based on their current total XP.
+ */
+function update_user_level($user_id) {
+    global $conn;
+    
+    // Get current total XP
+    $stmt = $conn->prepare("SELECT xp_total, level FROM users WHERE id = ?");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        $new_level = calculate_level_from_xp($row['xp_total']);
+        if ($new_level != $row['level']) {
+            $upd = $conn->prepare("UPDATE users SET level = ? WHERE id = ?");
+            $upd->bind_param('ii', $new_level, $user_id);
+            $upd->execute();
+            
+            if ($new_level > $row['level']) {
+                create_notification($user_id, "Level Up!", "Congratulations! You have reached Level {$new_level}!", "system");
+                if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+                $_SESSION['toasts'][] = ['type' => 'success', 'title' => 'Level Up!', 'message' => "Congratulations! You reached Level {$new_level}!"];
+            }
+        }
+    }
+}
+
+/**
+ * Adds XP to a user, respecting daily caps (Max 100 XP per day).
+ * @param int $user_id
+ * @param int $amount Amount of XP to grant
+ * @return bool True if XP was fully or partially granted
+ */
+function add_user_xp($user_id, $amount) {
+    global $conn;
+    $max_daily_xp = 100;
+    
+    // Check how much XP the user has earned today
+    $stmt = $conn->prepare("SELECT daily_xp_earned, last_activity_date FROM users WHERE id = ?");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        $today = date('Y-m-d');
+        $current_daily_xp = 0;
+        
+        // Reset daily XP if it's a new day
+        if ($row['last_activity_date'] === $today) {
+            $current_daily_xp = (int)$row['daily_xp_earned'];
+        }
+        
+        // Check if cap reached
+        if ($current_daily_xp >= $max_daily_xp) {
+            return false; // Cap reached
+        }
+        
+        // Calculate allowed XP
+        $allowed_xp = min($amount, $max_daily_xp - $current_daily_xp);
+        
+        // Update user XP
+        $sql = "UPDATE users SET xp_total = xp_total + ?, xp_weekly = xp_weekly + ?, daily_xp_earned = ?, last_activity_date = ? WHERE id = ?";
+        $new_daily_xp = $current_daily_xp + $allowed_xp;
+        $upd_stmt = $conn->prepare($sql);
+        $upd_stmt->bind_param('iiisi', $allowed_xp, $allowed_xp, $new_daily_xp, $today, $user_id);
+        $success = $upd_stmt->execute();
+        
+        if ($success) {
+            if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+            $_SESSION['toasts'][] = ['type' => 'xp', 'title' => 'XP Gained', 'message' => "+{$allowed_xp} XP earned!"];
+            update_user_level($user_id);
+        }
+        
+        return $success;
+    }
+    
+    return false;
+}
+
+/**
+ * Updates user daily streak.
+ */
+function update_daily_streak($user_id) {
+    global $conn;
+    
+    $stmt = $conn->prepare("SELECT last_activity_date, daily_streak FROM users WHERE id = ?");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        $today = date('Y-m-d');
+        $last_activity = $row['last_activity_date'];
+        
+        if ($last_activity == $today) {
+            return; // Already active today
+        }
+        
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        $new_streak = 1; // Default
+        
+        if ($last_activity == $yesterday) {
+            $new_streak = $row['daily_streak'] + 1; // Increment streak
+        }
+        
+        $upd = $conn->prepare("UPDATE users SET daily_streak = ?, last_activity_date = ? WHERE id = ?");
+        $upd->bind_param('isi', $new_streak, $today, $user_id);
+        $upd->execute();
+        
+        check_and_award_badges($user_id, 'streak', $new_streak);
+    }
+}
+
+/**
+ * Evaluates and awards badges to a user based on type and value.
+ */
+function check_and_award_badges($user_id, $check_type, $value) {
+    global $conn;
+    
+    $badge_to_award = null;
+    
+    if ($check_type == 'streak') {
+        if ($value >= 30) $badge_to_award = '30-Day Milestone';
+        elseif ($value >= 7) $badge_to_award = '7-Day Streak';
+        elseif ($value >= 3) $badge_to_award = '3-Day Streak';
+    }
+    
+    if ($badge_to_award) {
+        // Find badge ID
+        $b_stmt = $conn->prepare("SELECT id, badge_name FROM badges WHERE badge_name = ?");
+        $b_stmt->bind_param('s', $badge_to_award);
+        $b_stmt->execute();
+        $b_res = $b_stmt->get_result();
+        
+        if ($badge = $b_res->fetch_assoc()) {
+            $badge_id = $badge['id'];
+            
+            // Give user the badge if they don't have it
+            $chk = $conn->prepare("SELECT id FROM user_badges WHERE user_id = ? AND badge_id = ?");
+            $chk->bind_param('ii', $user_id, $badge_id);
+            $chk->execute();
+            if ($chk->get_result()->num_rows === 0) {
+                $ins = $conn->prepare("INSERT INTO user_badges (user_id, badge_id) VALUES (?, ?)");
+                $ins->bind_param('ii', $user_id, $badge_id);
+                $ins->execute();
+                
+                create_notification($user_id, "Badge Earned!", "You've earned the '{$badge['badge_name']}' badge!", "system");
+                if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+                $_SESSION['toasts'][] = ['type' => 'badge', 'title' => 'Badge Earned!', 'message' => "Unlocked: {$badge['badge_name']}!"];
+            }
+        }
+    }
+}
+
+/**
+ * Gets skills progress for a user.
+ */
+function get_user_skills_progress($user_id) {
+    global $conn;
+    $sql = "SELECT s.id, s.name, s.description, usp.current_level, usp.interview_unlocked
+            FROM skills s
+            LEFT JOIN user_skill_progress usp ON s.id = usp.skill_id AND usp.user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Gets all user badges.
+ */
+function get_user_badges($user_id, $only_equipped = false) {
+    global $conn;
+    $sql = "SELECT b.id, b.badge_name, b.description, b.svg_icon, ub.is_equipped, ub.earned_at
+            FROM user_badges ub
+            JOIN badges b ON ub.badge_id = b.id
+            WHERE ub.user_id = ?";
+            
+    if ($only_equipped) {
+        $sql .= " AND ub.is_equipped = 1";
+    }
+    $sql .= " ORDER BY ub.earned_at DESC";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
 ?>

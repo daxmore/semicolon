@@ -82,7 +82,11 @@ if ($is_raw && $type !== 'video') {
 
 // Record History (only on main view)
 if (!$is_raw) {
-    record_view($_SESSION['user_id'], $type, $resource['id']);
+    if (record_view($_SESSION['user_id'], $type, $resource['id'])) {
+        // Award XP for viewing a resource (5 XP)
+        // We do this if record_view is successful (which now also means it was potentially a new daily view if we added that, or just an engagement action).
+        add_user_xp($_SESSION['user_id'], 5);
+    }
 }
 
 // Fetch Reaction Stats

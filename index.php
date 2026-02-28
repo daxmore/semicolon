@@ -467,5 +467,6 @@ require_once 'includes/functions.php';
             });
         });
     </script>
+    <?php include 'includes/toast.php'; ?>
 </body>
 </html>
