@@ -46,6 +46,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -60,8 +61,9 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             }
         }
     </script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <!-- Dashboard Hero -->
@@ -78,7 +80,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
                     </div>
                     <div>
-                        <h1 class="text-2xl md:text-3xl font-bold text-zinc-900">Welcome back, <?php echo htmlspecialchars($user['username']); ?>!</h1>
+                        <h1 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">Welcome back, <?php echo htmlspecialchars($user['username']); ?>!</h1>
                         <p class="text-zinc-500 flex items-center justify-center md:justify-start gap-2 mt-1">
                             <span class="w-2 h-2 rounded-full bg-green-500"></span>
                             <?php echo ucfirst($user['role'] ?? 'User'); ?> Account
@@ -86,7 +88,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <a href="auth/logout.php" class="px-5 py-2.5 border border-zinc-200 rounded-xl text-zinc-700 hover:bg-zinc-50 transition font-medium">
+                    <a href="auth/logout.php" class="px-5 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 transition font-medium">
                         Logout
                     </a>
                     <a href="pricing.php" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-medium">
@@ -102,11 +104,11 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         <div class="container mx-auto px-28">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Total Books -->
-                <div class="bg-white rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:border-indigo-200 transition-all duration-300">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-800 hover:shadow-lg hover:border-indigo-200 transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-zinc-500 text-sm font-medium">Total Books</p>
-                            <p class="text-4xl font-bold text-zinc-900 mt-1"><?php echo $total_books; ?></p>
+                            <p class="text-4xl font-bold text-zinc-900 dark:text-white mt-1"><?php echo $total_books; ?></p>
                         </div>
                         <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -123,11 +125,11 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 </div>
 
                 <!-- Total Papers -->
-                <div class="bg-white rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:border-teal-200 transition-all duration-300">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-800 hover:shadow-lg hover:border-teal-200 transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-zinc-500 text-sm font-medium">Total Papers</p>
-                            <p class="text-4xl font-bold text-zinc-900 mt-1"><?php echo $total_papers; ?></p>
+                            <p class="text-4xl font-bold text-zinc-900 dark:text-white mt-1"><?php echo $total_papers; ?></p>
                         </div>
                         <div class="w-14 h-14 bg-teal-100 rounded-2xl flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -144,11 +146,11 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 </div>
 
                 <!-- Total Videos -->
-                <div class="bg-white rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:border-rose-200 transition-all duration-300">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-800 hover:shadow-lg hover:border-rose-200 transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-zinc-500 text-sm font-medium">Total Videos</p>
-                            <p class="text-4xl font-bold text-zinc-900 mt-1"><?php echo $total_videos; ?></p>
+                            <p class="text-4xl font-bold text-zinc-900 dark:text-white mt-1"><?php echo $total_videos; ?></p>
                         </div>
                         <div class="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -175,9 +177,9 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 
                 <!-- Recent Activity -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
-                        <div class="p-6 border-b border-zinc-100">
-                            <h2 class="text-xl font-bold text-zinc-900 flex items-center gap-2">
+                    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
+                        <div class="p-6 border-b border-zinc-100 dark:border-zinc-800">
+                            <h2 class="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -187,7 +189,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         
                         <?php if (empty($history)): ?>
                             <div class="p-12 text-center">
-                                <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <div class="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
@@ -230,7 +232,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                             <?php endif; ?>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="font-medium text-zinc-900 truncate"><?php echo htmlspecialchars($item['title'] ?? 'Unknown Resource'); ?></p>
+                                            <p class="font-medium text-zinc-900 dark:text-white truncate"><?php echo htmlspecialchars($item['title'] ?? 'Unknown Resource'); ?></p>
                                             <p class="text-sm text-zinc-500"><?php echo ucfirst($item['resource_type']); ?> • <?php echo date('M d, Y', strtotime($item['viewed_at'])); ?></p>
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -246,8 +248,8 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 <!-- Sidebar -->
                 <div class="space-y-6">
                     <!-- Quick Links -->
-                    <div class="bg-white rounded-2xl border border-zinc-100 p-6">
-                        <h3 class="text-lg font-bold text-zinc-900 mb-4">Quick Links</h3>
+                    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-6">
+                        <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-4">Quick Links</h3>
                         <div class="space-y-3">
                             <a href="books.php" class="flex items-center gap-3 p-3 rounded-xl hover:bg-indigo-50 transition group">
                                 <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
@@ -256,7 +258,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-zinc-900">Books</p>
+                                    <p class="font-medium text-zinc-900 dark:text-white">Books</p>
                                     <p class="text-xs text-zinc-500">Browse library</p>
                                 </div>
                             </a>
@@ -267,7 +269,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-zinc-900">Papers</p>
+                                    <p class="font-medium text-zinc-900 dark:text-white">Papers</p>
                                     <p class="text-xs text-zinc-500">Research & exams</p>
                                 </div>
                             </a>
@@ -279,7 +281,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-zinc-900">Videos</p>
+                                    <p class="font-medium text-zinc-900 dark:text-white">Videos</p>
                                     <p class="text-xs text-zinc-500">Tutorials</p>
                                 </div>
                             </a>
@@ -287,9 +289,9 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     </div>
 
                     <!-- My Discussions (Community) -->
-                    <div class="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
-                        <div class="p-6 border-b border-zinc-100 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
+                        <div class="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                                 </svg>
@@ -308,12 +310,12 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                 <?php foreach ($user_posts as $post): ?>
                                     <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="block p-5 hover:bg-zinc-50 transition">
                                         <div class="flex items-center gap-2 mb-1">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                                                 <?php echo htmlspecialchars($post['category']); ?>
                                             </span>
                                             <span class="text-xs text-zinc-400"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></span>
                                         </div>
-                                        <h4 class="font-bold text-zinc-900 mb-1 truncate text-sm"><?php echo htmlspecialchars($post['title']); ?></h4>
+                                        <h4 class="font-bold text-zinc-900 dark:text-white mb-1 truncate text-sm"><?php echo htmlspecialchars($post['title']); ?></h4>
                                         <div class="flex items-center gap-4 text-xs text-zinc-500 font-medium mt-2">
                                             <span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg> <?php echo $post['upvotes']; ?></span>
                                             <span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg> <?php echo $post['comment_count']; ?></span>
@@ -321,8 +323,8 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                     </a>
                                 <?php endforeach; ?>
                             </div>
-                            <div class="p-4 border-t border-zinc-100 text-center bg-zinc-50">
-                                <a href="community.php" class="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition">View community</a>
+                            <div class="p-4 border-t border-zinc-100 dark:border-zinc-800 text-center bg-zinc-50 dark:bg-zinc-800/50">
+                                <a href="community.php" class="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition">View community</a>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -340,7 +342,7 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                 <span class="font-medium"><?php echo date('M Y', strtotime($user['created_at'] ?? 'now')); ?></span>
                             </div>
                         </div>
-                        <a href="pricing.php" class="block w-full text-center py-3 bg-white text-indigo-600 font-semibold rounded-xl mt-4 hover:bg-indigo-50 transition">
+                        <a href="pricing.php" class="block w-full text-center py-3 bg-white dark:bg-zinc-900 text-indigo-600 font-semibold rounded-xl mt-4 hover:bg-indigo-50 transition">
                             Upgrade to Pro
                         </a>
                     </div>

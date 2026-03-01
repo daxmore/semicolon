@@ -77,7 +77,7 @@ $active_leaders = $current_tab == 'weekly' ? $weekly_leaders : $lifetime_leaders
 
     <!-- Toggle Tabs -->
     <div class="flex justify-center mb-10">
-        <div class="bg-white p-1.5 rounded-2xl flex gap-2 border border-slate-200 shadow-sm">
+        <div class="bg-white dark:bg-zinc-900 p-1.5 rounded-2xl flex gap-2 border border-slate-200 shadow-sm">
             <a href="?tab=weekly" class="px-8 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 <?php echo $current_tab == 'weekly' ? 'bg-indigo-50 text-indigo-600 border border-indigo-100 font-semibold' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50'; ?>">
                 Weekly Legends
             </a>
@@ -122,7 +122,7 @@ $active_leaders = $current_tab == 'weekly' ? $weekly_leaders : $lifetime_leaders
                     
                     <!-- User Info -->
                     <div class="col-span-10 sm:col-span-6 flex items-center gap-4">
-                        <div class="avatar-ring w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-white border border-slate-200 flex-shrink-0 flex items-center justify-center text-lg font-bold text-indigo-500 shadow-sm">
+                        <div class="avatar-ring w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-white dark:bg-zinc-900 border border-slate-200 flex-shrink-0 flex items-center justify-center text-lg font-bold text-indigo-500 shadow-sm">
                             <?php if (!empty($leader['avatar_url'])): ?>
                                 <img src="<?php echo htmlspecialchars($leader['avatar_url']); ?>" alt="Avatar" class="w-full h-full object-cover">
                             <?php else: ?>
@@ -142,7 +142,7 @@ $active_leaders = $current_tab == 'weekly' ? $weekly_leaders : $lifetime_leaders
                     
                     <!-- Level (Desktop) -->
                     <div class="hidden sm:flex col-span-2 justify-center items-center">
-                        <span class="px-3 py-1 bg-white text-slate-600 font-semibold border border-slate-200 rounded-lg text-sm drop-shadow-sm">
+                        <span class="px-3 py-1 bg-white dark:bg-zinc-900 text-slate-600 font-semibold border border-slate-200 rounded-lg text-sm drop-shadow-sm">
                             L<?php echo $leader['level']; ?>
                         </span>
                     </div>

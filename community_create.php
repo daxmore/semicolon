@@ -83,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -94,15 +95,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <!-- Header Area -->
-    <div class="bg-white border-b border-zinc-100 py-6 mb-10">
+    <div class="bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800 py-6 mb-10">
         <div class="container mx-auto px-6 max-w-3xl">
             <a href="community.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 mb-2 inline-block">&larr; Back to Community Feed</a>
-            <h1 class="text-3xl font-bold text-zinc-900">Start a new discussion</h1>
+            <h1 class="text-3xl font-bold text-zinc-900 dark:text-white">Start a new discussion</h1>
         </div>
     </div>
 
@@ -119,21 +121,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-            <form action="" method="POST" id="postForm" class="bg-white rounded-2xl border border-zinc-100 p-8 shadow-sm">
+            <form action="" method="POST" id="postForm" class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm">
                 
                 <!-- Hidden input to hold the compressed Base64 string -->
                 <input type="hidden" id="compressed_image_b64" name="compressed_image_b64" value="">
                     <div>
-                        <label for="title" class="block text-sm font-bold text-zinc-900 mb-2">Title</label>
+                        <label for="title" class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Title</label>
                         <input type="text" id="title" name="title" required placeholder="What's on your mind?" 
-                               class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition" 
+                               class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition" 
                                value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>">
                     </div>
 
                     <div>
-                        <label for="category" class="block text-sm font-bold text-zinc-900 mt-4 mb-2">Topic Category</label>
+                        <label for="category" class="block text-sm font-bold text-zinc-900 dark:text-white mt-4 mb-2">Topic Category</label>
                         <select id="category" name="category" required 
-                                class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
+                                class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
                             <option value="">Select a specific topic...</option>
                             <?php foreach ($categories as $cat): ?>
                                 <?php $selected = ($pre_selected_category === $cat || ($_POST['category'] ?? '') === $cat) ? 'selected' : ''; ?>
@@ -144,30 +146,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     
-                    <div class="bg-zinc-50 p-6 mb-2 mt-4 rounded-xl border border-zinc-100">
-                        <label class="block text-sm font-bold text-zinc-900 mb-1">Attach Media <span class="text-zinc-400 font-normal">(Optional)</span></label>
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 mb-2 mt-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                        <label class="block text-sm font-bold text-zinc-900 dark:text-white mb-1">Attach Media <span class="text-zinc-400 font-normal">(Optional)</span></label>
                         <p class="text-xs text-zinc-500 mb-4">Upload an image from your device, or paste a public URL.</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="image_upload" class="block text-xs font-semibold text-zinc-600 mb-2 uppercase tracking-wide">Upload File (Max 2MB)</label>
+                                <label for="image_upload" class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-2 uppercase tracking-wide">Upload File (Max 2MB)</label>
                                 <input type="file" id="image_upload" accept="image/*"
-                                       class="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                                       class="w-full px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
                             </div>
                             
                              <div>
-                                <label for="image_url" class="block text-xs font-semibold text-zinc-600 mb-2 uppercase tracking-wide">Or Image URL</label>
+                                <label for="image_url" class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-2 uppercase tracking-wide">Or Image URL</label>
                                 <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg" 
                                        oninput="handleUrlPreview(this.value)"
-                                       class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition" 
+                                       class="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition" 
                                        value="<?php echo htmlspecialchars($_POST['image_url'] ?? ''); ?>">
                             </div>
                         </div>
 
                         <!-- Image Preview Area -->
-                        <div id="preview-container" class="hidden mt-6 pt-6 border-t border-zinc-200">
+                        <div id="preview-container" class="hidden mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-700">
                             <label class="block text-xs font-bold text-zinc-500 uppercase mb-2">Attachment Preview</label>
-                            <div class="relative rounded-xl overflow-hidden bg-white border border-zinc-200 max-h-[300px] flex items-center justify-center group">
+                            <div class="relative rounded-xl overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 max-h-[300px] flex items-center justify-center group">
                                 <img id="image-preview" src="#" alt="Preview" class="max-w-full max-h-[300px] object-contain">
                                 <button type="button" onclick="clearPreview()" class="absolute top-2 right-2 p-1.5 bg-zinc-900/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm hover:bg-zinc-900">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -179,13 +181,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div>
-                        <label for="description" class="block text-sm font-bold text-zinc-900 mb-2">Description</label>
+                        <label for="description" class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Description</label>
                         <textarea id="description" name="description" rows="8" required placeholder="Add more details to your discussion..." 
-                                  class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y"><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
+                                  class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y"><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
                     </div>
 
-                    <div class="mt-8 pt-6 border-t border-zinc-100 flex justify-end gap-4 pb-4">
-                        <a href="community.php" class="px-6 py-3 border border-zinc-200 text-zinc-600 font-medium rounded-xl hover:bg-zinc-50 transition-all hover:scale-[1.02] active:scale-[0.98]">Cancel</a>
+                    <div class="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-4 pb-4">
+                        <a href="community.php" class="px-6 py-3 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-medium rounded-xl hover:bg-zinc-50 transition-all hover:scale-[1.02] active:scale-[0.98]">Cancel</a>
                         <button type="button" id="submitBtn" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]">Post Discussion</button>
                     </div>
                 </div>

@@ -73,6 +73,7 @@ $history = $stmt_d->get_result()->fetch_all(MYSQLI_ASSOC);
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -82,15 +83,16 @@ $history = $stmt_d->get_result()->fetch_all(MYSQLI_ASSOC);
             }
         }
     </script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <section class="py-12">
         <div class="container mx-auto px-6 max-w-4xl">
             
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                <h1 class="text-3xl font-bold text-zinc-900 flex items-center gap-3">
+                <h1 class="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
                     <div class="p-2 bg-indigo-50 rounded-xl text-indigo-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -101,8 +103,8 @@ $history = $stmt_d->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <!-- Enhanced Filters -->
-            <div class="flex overflow-x-auto pb-4 mb-4 gap-2 no-scrollbar border-b border-zinc-200">
-                <a href="history.php?filter=all" class="px-5 py-2.5 rounded-full text-sm font-medium transition whitespace-nowrap <?php echo $filter === 'all' ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50'; ?>">
+            <div class="flex overflow-x-auto pb-4 mb-4 gap-2 no-scrollbar border-b border-zinc-200 dark:border-zinc-700">
+                <a href="history.php?filter=all" class="px-5 py-2.5 rounded-full text-sm font-medium transition whitespace-nowrap <?php echo $filter === 'all' ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50'; ?>">
                     All Activity
                 </a>
                 <a href="history.php?filter=book" class="px-5 py-2.5 rounded-full text-sm font-medium transition whitespace-nowrap flex items-center gap-2 <?php echo $filter === 'book' ? 'bg-indigo-600 text-white border border-indigo-600' : 'bg-white text-indigo-700 border border-indigo-100 hover:bg-indigo-50'; ?>">
@@ -120,15 +122,15 @@ $history = $stmt_d->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <!-- History List -->
-            <div class="bg-white border border-zinc-100 rounded-2xl shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                 <?php if (empty($history)): ?>
                     <div class="p-16 text-center text-zinc-500">
-                        <div class="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div class="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                         </div>
-                        <p class="text-xl font-medium text-zinc-900 mb-2">No activity found</p>
+                        <p class="text-xl font-medium text-zinc-900 dark:text-white mb-2">No activity found</p>
                         <p>No history matches this filter.</p>
                     </div>
                 <?php else: ?>
@@ -165,11 +167,11 @@ $history = $stmt_d->get_result()->fetch_all(MYSQLI_ASSOC);
                                 </div>
                                 
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="font-bold text-zinc-900 truncate">
+                                    <h3 class="font-bold text-zinc-900 dark:text-white truncate">
                                         <?php echo htmlspecialchars($item['title'] ?? 'Deleted Resource'); ?>
                                     </h3>
                                     <p class="text-sm text-zinc-500 flex items-center gap-2 mt-1">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                                             <?php echo htmlspecialchars($item['resource_type']); ?>
                                         </span>
                                         •
@@ -193,11 +195,11 @@ $history = $stmt_d->get_result()->fetch_all(MYSQLI_ASSOC);
                         $filter_param = "&filter=" . urlencode($filter);
                     ?>
                     <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1 . $filter_param; ?>" class="px-5 py-2.5 bg-white border border-zinc-200 text-zinc-700 font-medium rounded-xl hover:bg-zinc-50 transition shadow-sm">
+                        <a href="?page=<?php echo $page - 1 . $filter_param; ?>" class="px-5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium rounded-xl hover:bg-zinc-50 transition shadow-sm">
                             &larr; Previous
                         </a>
                     <?php else: ?>
-                        <div class="px-5 py-2.5 bg-zinc-50 border border-zinc-100 text-zinc-400 font-medium rounded-xl cursor-not-allowed">
+                        <div class="px-5 py-2.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 text-zinc-400 font-medium rounded-xl cursor-not-allowed">
                             &larr; Previous
                         </div>
                     <?php endif; ?>
@@ -207,11 +209,11 @@ $history = $stmt_d->get_result()->fetch_all(MYSQLI_ASSOC);
                     </span>
                     
                     <?php if ($page < $total_pages): ?>
-                        <a href="?page=<?php echo $page + 1 . $filter_param; ?>" class="px-5 py-2.5 bg-white border border-zinc-200 text-zinc-700 font-medium rounded-xl hover:bg-zinc-50 transition shadow-sm">
+                        <a href="?page=<?php echo $page + 1 . $filter_param; ?>" class="px-5 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium rounded-xl hover:bg-zinc-50 transition shadow-sm">
                             Next &rarr;
                         </a>
                     <?php else: ?>
-                        <div class="px-5 py-2.5 bg-zinc-50 border border-zinc-100 text-zinc-400 font-medium rounded-xl cursor-not-allowed">
+                        <div class="px-5 py-2.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 text-zinc-400 font-medium rounded-xl cursor-not-allowed">
                             Next &rarr;
                         </div>
                     <?php endif; ?>

@@ -248,7 +248,7 @@ $icon_map = [
                 </div>
                 <h2 class="text-3xl font-extrabold text-white mb-2 tracking-tight drop-shadow-sm">Skill Mastered!</h2>
                 <p class="text-amber-50 mb-6 font-medium text-lg">You have conquered all tiers of <?php echo htmlspecialchars($skill['name']); ?>.</p>
-                <a href="certificate.php?skill=<?php echo $skill_id; ?>" class="inline-block px-8 py-3 rounded-xl bg-white text-amber-600 font-bold hover:bg-amber-50 shadow-sm border border-amber-100 transition-all hover:-translate-y-1">View Certificate</a>
+                <a href="certificate.php?skill=<?php echo $skill_id; ?>" class="inline-block px-8 py-3 rounded-xl bg-white dark:bg-zinc-900 text-amber-600 font-bold hover:bg-amber-50 shadow-sm border border-amber-100 transition-all hover:-translate-y-1">View Certificate</a>
             </div>
         <?php else: ?>
             <div class="opacity-80 group-hover:opacity-100 transition-opacity">

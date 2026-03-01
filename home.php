@@ -34,7 +34,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
             <p class="text-lg md:text-xl mb-6">Explore a world of knowledge at Semicolon. Your academic journey starts
                 here.</p>
             <a href="papers.php"
-                class="inline-block bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-full text-lg font-semibold transition duration-300 ease-in-out shadow-md">
+                class="inline-block bg-white dark:bg-zinc-900 text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-full text-lg font-semibold transition duration-300 ease-in-out shadow-md">
                 Start Exploring Papers
             </a>
         </div>
@@ -45,7 +45,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Papers Card -->
             <div
-                class="bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out p-6 flex flex-col items-center text-center">
+                class="bg-white dark:bg-zinc-900 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out p-6 flex flex-col items-center text-center">
                 <div class="text-blue-500 mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -64,7 +64,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
 
             <!-- Books Card -->
             <div
-                class="bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out p-6 flex flex-col items-center text-center">
+                class="bg-white dark:bg-zinc-900 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out p-6 flex flex-col items-center text-center">
                 <div class="text-green-500 mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -83,7 +83,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
 
             <!-- Videos Card -->
             <div
-                class="bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out p-6 flex flex-col items-center text-center">
+                class="bg-white dark:bg-zinc-900 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 ease-in-out p-6 flex flex-col items-center text-center">
                 <div class="text-red-500 mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">

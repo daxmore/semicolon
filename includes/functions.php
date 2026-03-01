@@ -9,39 +9,88 @@ function get_distinct_values($column, $table = 'books')
     $values = [];
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $values[] = $row[$column];
+            if (!empty($row[$column])) {
+                $values[] = $row[$column];
+            }
         }
     }
     return $values;
 }
 
-function get_books($subject = null, $semester = null)
+function get_system_categories() {
+    return [
+        'Frontend', 'Backend', 'Full Stack', 'App Dev', 'Game Dev', 
+        'UI/UX Design', 'Graphic Design', 'Video Editing', 'Motion Graphics', 
+        'Data Science', 'AI & ML', 'Cybersecurity', 'DevOps', 
+        'Cloud Computing', 'General Tech'
+    ];
+}
+
+function get_category_icons() {
+    return [
+        'Frontend' => '<path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>',
+        'Backend' => '<path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>',
+        'Full Stack' => '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>',
+        'App Dev' => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>',
+        'Game Dev' => '<path stroke-linecap="round" stroke-linejoin="round" d="M15 11h.01M11 15h.01M15 15h.01M11 11h.01M5 15h14M5 9h14M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>',
+        'UI/UX Design' => '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>',
+        'Graphic Design' => '<path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>',
+        'Video Editing' => '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>',
+        'Motion Graphics' => '<path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+        'Data Science' => '<path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>',
+        'AI & ML' => '<path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>',
+        'Cybersecurity' => '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
+        'DevOps' => '<path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z"/>',
+        'Cloud Computing' => '<path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>',
+        'General Tech' => '<path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m14-6h2m-2 6h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>'
+    ];
+}
+
+function get_books($category = null, $semester = null, $search_query = null)
 {
     global $conn;
     $sql = "SELECT * FROM books WHERE 1=1";
-    if ($subject) {
-        $sql .= " AND subject = ?";
+    
+    $types = '';
+    $params = [];
+    
+    if ($category) {
+        $sql .= " AND category = ?";
+        $types .= 's';
+        $params[] = &$category;
     }
     if ($semester) {
         $sql .= " AND semester = ?";
-    }
-
-    $stmt = $conn->prepare($sql);
-
-    $types = '';
-    $params = [];
-    if ($subject) {
-        $types .= 's';
-        $params[] = &$subject;
-    }
-    if ($semester) {
         $types .= 's';
         $params[] = &$semester;
     }
+    if ($search_query) {
+        $sql .= " AND (title LIKE ? OR author LIKE ? OR description LIKE ?)";
+        $search = "%$search_query%";
+        $types .= 'sss';
+        $params[] = &$search;
+        $params[] = &$search;
+        $params[] = &$search;
+    }
+    
+    $sql .= " ORDER BY created_at DESC";
 
+    $stmt = $conn->prepare($sql);
 
     if ($types) {
-        $stmt->bind_param($types, ...$params);
+        // PHP 8+ supports variadic unwrapping of parameters directly for bind_param
+        if (PHP_VERSION_ID >= 81000) {
+            $stmt->bind_param($types, ...array_map(function($p) { return $p; }, $params));
+        } else {
+            // PHP 7+ fallback
+            $bind_names[] = $types;
+            for ($i=0; $i<count($params); $i++) {
+                $bind_name = 'bind' . $i;
+                $$bind_name = $params[$i];
+                $bind_names[] = &$$bind_name;
+            }
+            call_user_func_array([$stmt, 'bind_param'], $bind_names);
+        }
     }
 
     $stmt->execute();
@@ -55,31 +104,48 @@ function get_books($subject = null, $semester = null)
     return $books;
 }
 
-function get_papers($subject = null, $year = null)
+function get_papers($category = null, $year = null, $search_query = null)
 {
     global $conn;
     $sql = "SELECT * FROM papers WHERE 1=1";
-    if ($subject) {
-        $sql .= " AND subject = ?";
+    
+    $types = '';
+    $params = [];
+    
+    if ($category) {
+        $sql .= " AND category = ?";
+        $types .= 's';
+        $params[] = &$category;
     }
     if ($year) {
         $sql .= " AND year = ?";
-    }
-    $stmt = $conn->prepare($sql);
-
-    $types = '';
-    $params = [];
-    if ($subject) {
-        $types .= 's';
-        $params[] = &$subject;
-    }
-    if ($year) {
         $types .= 'i';
         $params[] = &$year;
     }
+    if ($search_query) {
+        $sql .= " AND (title LIKE ? OR subject LIKE ?)";
+        $search = "%$search_query%";
+        $types .= 'ss';
+        $params[] = &$search;
+        $params[] = &$search;
+    }
+    
+    $sql .= " ORDER BY created_at DESC";
+    
+    $stmt = $conn->prepare($sql);
 
     if ($types) {
-        $stmt->bind_param($types, ...$params);
+        if (PHP_VERSION_ID >= 81000) {
+            $stmt->bind_param($types, ...array_map(function($p) { return $p; }, $params));
+        } else {
+            $bind_names[] = $types;
+            for ($i=0; $i<count($params); $i++) {
+                $bind_name = 'bind' . $i;
+                $$bind_name = $params[$i];
+                $bind_names[] = &$$bind_name;
+            }
+            call_user_func_array([$stmt, 'bind_param'], $bind_names);
+        }
     }
 
     $stmt->execute();
@@ -91,6 +157,61 @@ function get_papers($subject = null, $year = null)
         }
     }
     return $papers;
+}
+
+function get_videos($category = null, $year = null, $search_query = null)
+{
+    global $conn;
+    $sql = "SELECT * FROM videos WHERE 1=1";
+    
+    $types = '';
+    $params = [];
+    
+    if ($category) {
+        $sql .= " AND category = ?";
+        $types .= 's';
+        $params[] = &$category;
+    }
+    if ($year) {
+        $sql .= " AND year = ?";
+        $types .= 'i';
+        $params[] = &$year;
+    }
+    if ($search_query) {
+        $sql .= " AND (title LIKE ? OR description LIKE ?)";
+        $search = "%$search_query%";
+        $types .= 'ss';
+        $params[] = &$search;
+        $params[] = &$search;
+    }
+    
+    $sql .= " ORDER BY created_at DESC";
+    
+    $stmt = $conn->prepare($sql);
+
+    if ($types) {
+        if (PHP_VERSION_ID >= 81000) {
+            $stmt->bind_param($types, ...array_map(function($p) { return $p; }, $params));
+        } else {
+            $bind_names[] = $types;
+            for ($i=0; $i<count($params); $i++) {
+                $bind_name = 'bind' . $i;
+                $$bind_name = $params[$i];
+                $bind_names[] = &$$bind_name;
+            }
+            call_user_func_array([$stmt, 'bind_param'], $bind_names);
+        }
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $videos = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $videos[] = $row;
+        }
+    }
+    return $videos;
 }
 
 function get_youtube_id($url)
@@ -318,13 +439,55 @@ function is_pro_user($user_id) {
     // Placeholder logic. In future check pro_plans subscription.
     return false; 
 }
-function create_notification($user_id, $title, $message, $type = 'system')
+function create_notification($user_id, $title, $message, $type = 'system', $action_url = null)
 {
     global $conn;
     $sql = "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('isss', $user_id, $title, $message, $type);
-    return $stmt->execute();
+    
+    $success = $stmt->execute();
+    
+    if ($success) {
+        // Fetch user email
+        $user_sql = "SELECT email FROM users WHERE id = ?";
+        $user_stmt = $conn->prepare($user_sql);
+        $user_stmt->bind_param('i', $user_id);
+        $user_stmt->execute();
+        $user_res = $user_stmt->get_result();
+        
+        if ($user_row = $user_res->fetch_assoc()) {
+            $to = $user_row['email'];
+            
+            // Construct the base URL dynamically
+            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            
+            // Assume the project is hosted under /semicolon folder currently. Adjust as needed.
+            $base_dir = '/semicolon'; 
+            $base_url = $protocol . "://" . $host . $base_dir;
+            
+            $url = $action_url ? $base_url . '/' . ltrim($action_url, '/') : $base_url . '/dashboard.php';
+            
+            $template_path = __DIR__ . '/email_template.html';
+            if (file_exists($template_path)) {
+                $html = file_get_contents($template_path);
+                
+                $html = str_replace('{{TITLE}}', htmlspecialchars($title), $html);
+                $html = str_replace('{{MESSAGE}}', htmlspecialchars($message), $html);
+                $html = str_replace('{{ACTION_URL}}', htmlspecialchars($url), $html);
+                $html = str_replace('{{YEAR}}', date('Y'), $html);
+                
+                $headers = "MIME-Version: 1.0\r\n";
+                $headers .= "Content-type:text/html;charset=UTF-8\r\n";
+                $headers .= "From: Semicolon <noreply@" . ($host != 'localhost' ? $host : 'semicolon.local') . ">\r\n";
+                
+                @mail($to, $title, $html, $headers);
+            }
+        }
+    }
+    
+    return $success;
 }
 function get_unread_notification_count($user_id)
 {
@@ -412,7 +575,7 @@ function update_user_level($user_id) {
             $upd->execute();
             
             if ($new_level > $row['level']) {
-                create_notification($user_id, "Level Up!", "Congratulations! You have reached Level {$new_level}!", "system");
+                create_notification($user_id, "Level Up!", "Congratulations! You have reached Level {$new_level}!", "system", "profile.php");
                 if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
                 $_SESSION['toasts'][] = ['type' => 'success', 'title' => 'Level Up!', 'message' => "Congratulations! You reached Level {$new_level}!"];
             }
@@ -464,12 +627,59 @@ function add_user_xp($user_id, $amount) {
             if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
             $_SESSION['toasts'][] = ['type' => 'xp', 'title' => 'XP Gained', 'message' => "+{$allowed_xp} XP earned!"];
             update_user_level($user_id);
+            check_badge_unlocks($user_id);
         }
         
         return $success;
     }
     
     return false;
+}
+
+/**
+ * Checks and unlocks badges automatically based on user's total XP.
+ */
+function check_badge_unlocks($user_id) {
+    global $conn;
+    
+    // Get user's current total XP
+    $stmt = $conn->prepare("SELECT xp_total FROM users WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user_data = $result->fetch_assoc();
+    $current_xp = (int)$user_data['xp_total'];
+    $stmt->close();
+    
+    // Check for newly unlocked badges based on required_xp
+    $stmt = $conn->prepare("
+        SELECT id, badge_name FROM badges 
+        WHERE required_xp > 0 AND required_xp <= ? 
+        AND id NOT IN (SELECT badge_id FROM user_badges WHERE user_id = ?)
+    ");
+    $stmt->bind_param("ii", $current_xp, $user_id);
+    $stmt->execute();
+    $unlocked_badges = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    
+    if (!empty($unlocked_badges)) {
+        $insert_stmt = $conn->prepare("INSERT INTO user_badges (user_id, badge_id) VALUES (?, ?)");
+        
+        foreach ($unlocked_badges as $badge) {
+            $badge_id = $badge['id'];
+            $insert_stmt->bind_param("ii", $user_id, $badge_id);
+            $insert_stmt->execute();
+            
+            // Create a notification for the badge unlock
+            $message = "Congratulations! You've unlocked the '" . htmlspecialchars($badge['badge_name']) . "' badge by reaching " . $current_xp . " XP!";
+            create_notification($user_id, "badge_unlocked", $message, "profile.php#badges");
+            
+            // Toast notification
+            if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+            $_SESSION['toasts'][] = ['type' => 'badge', 'title' => 'Badge Unlocked!', 'message' => "You earned the {$badge['badge_name']} badge!"];
+        }
+        $insert_stmt->close();
+    }
 }
 
 /**
@@ -539,7 +749,7 @@ function check_and_award_badges($user_id, $check_type, $value) {
                 $ins->bind_param('ii', $user_id, $badge_id);
                 $ins->execute();
                 
-                create_notification($user_id, "Badge Earned!", "You've earned the '{$badge['badge_name']}' badge!", "system");
+                create_notification($user_id, "Badge Earned!", "You've earned the '{$badge['badge_name']}' badge!", "system", "profile.php");
                 if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
                 $_SESSION['toasts'][] = ['type' => 'badge', 'title' => 'Badge Earned!', 'message' => "Unlocked: {$badge['badge_name']}!"];
             }

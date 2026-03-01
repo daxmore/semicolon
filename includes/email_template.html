@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FAFAFA; color: #18181B;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FAFAFA; padding: 40px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); overflow: hidden; margin: 0 auto; border: 1px solid #E4E4E7;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 32px 40px; border-bottom: 1px solid #F4F4F5; text-align: center; background-color: #ffffff;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 800; color: #18181B; letter-spacing: -0.5px;">Semicolon<span style="color: #6366F1;">;</span></h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <h2 style="margin: 0 0 16px; font-size: 20px; font-weight: 600; color: #18181B;">{{TITLE}}</h2>
+                            <p style="margin: 0 0 32px; font-size: 16px; line-height: 1.6; color: #52525B;">
+                                {{MESSAGE}}
+                            </p>
+                            
+                            <!-- Action Button -->
+                            <table cellpadding="0" cellspacing="0" style="margin-top: 16px; margin-bottom: 32px; width: 100%;">
+                                <tr>
+                                    <td align="center">
+                                        <table cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="center" style="border-radius: 8px; background-color: #6366F1;">
+                                                    <a href="{{ACTION_URL}}" style="display: inline-block; padding: 14px 32px; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 8px;">View Details</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <hr style="border: none; border-top: 1px solid #F4F4F5; margin: 32px 0;">
+                            
+                            <p style="margin: 0; font-size: 14px; color: #71717A; line-height: 1.5;">
+                                If you're having trouble clicking the button, copy and paste the URL below into your web browser:<br>
+                                <a href="{{ACTION_URL}}" style="color: #6366F1; word-break: break-all;">{{ACTION_URL}}</a>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px 40px; background-color: #18181B; text-align: center;">
+                            <p style="margin: 0 0 12px; font-size: 14px; color: #E4E4E7; font-weight: 500;">
+                                &copy; {{YEAR}} Semicolon Inc. All rights reserved.
+                            </p>
+                            <p style="margin: 0; font-size: 12px; color: #A1A1AA;">
+                                You are receiving this notification because you are a registered user on Semicolon.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -16,6 +16,7 @@ require_once 'includes/functions.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -32,8 +33,9 @@ require_once 'includes/functions.php';
             }
         }
     </script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <!-- ===== HERO SECTION ===== -->
@@ -54,7 +56,7 @@ require_once 'includes/functions.php';
                 </div>
                 
                 <!-- Headline -->
-                <h1 class="hero-title text-5xl md:text-6xl lg:text-7xl font-bold text-zinc-900 mb-6 tracking-tight leading-tight">
+                <h1 class="hero-title text-5xl md:text-6xl lg:text-7xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight leading-tight">
                     Your Gateway to<br>
                     <span class="text-gradient">Developer Excellence</span>
                 </h1>
@@ -78,22 +80,22 @@ require_once 'includes/functions.php';
             </div>
 
             <!-- Floating Cards -->
-            <div class="hidden lg:block absolute top-1/4 left-12 w-48 bg-white rounded-2xl shadow-xl p-4 border border-zinc-100 float-animation">
+            <div class="hidden lg:block absolute top-1/4 left-12 w-48 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-4 border border-zinc-100 dark:border-zinc-800 float-animation">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">📚</div>
                     <div class="text-left">
                         <p class="text-xs text-zinc-400">Latest Book</p>
-                        <p class="text-sm font-semibold text-zinc-900 truncate">Clean Code</p>
+                        <p class="text-sm font-semibold text-zinc-900 dark:text-white truncate">Clean Code</p>
                     </div>
                 </div>
-                <div class="h-1 bg-zinc-100 rounded-full overflow-hidden">
+                <div class="h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                     <div class="h-full w-3/4 bg-indigo-500 rounded-full"></div>
                 </div>
             </div>
 
-            <div class="hidden lg:block absolute top-1/3 right-16 w-44 bg-white rounded-2xl shadow-xl p-4 border border-zinc-100 float-animation-delayed">
+            <div class="hidden lg:block absolute top-1/3 right-16 w-44 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-4 border border-zinc-100 dark:border-zinc-800 float-animation-delayed">
                 <div class="text-center">
-                    <p class="text-3xl font-bold text-zinc-900">98%</p>
+                    <p class="text-3xl font-bold text-zinc-900 dark:text-white">98%</p>
                     <p class="text-xs text-zinc-400">Student Satisfaction</p>
                 </div>
             </div>
@@ -101,7 +103,7 @@ require_once 'includes/functions.php';
     </section>
 
     <!-- ===== INFINITE MARQUEE / SOCIAL PROOF ===== -->
-    <section class="py-8 border-y border-zinc-100 bg-zinc-50/50">
+    <section class="py-8 border-y border-zinc-100 dark:border-zinc-800 bg-zinc-50/50">
         <div class="marquee-container">
             <div class="marquee-track">
                 <!-- First set -->
@@ -131,7 +133,7 @@ require_once 'includes/functions.php';
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
                 <span class="badge mb-4">Features</span>
-                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 mb-4">Everything You Need</h2>
+                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-4">Everything You Need</h2>
                 <p class="text-lg text-zinc-500 max-w-2xl mx-auto">One platform, endless learning possibilities. Discover resources curated for developers.</p>
             </div>
 
@@ -143,7 +145,7 @@ require_once 'includes/functions.php';
                     <div class="icon-box mb-4 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-zinc-900 mb-2">Book Library</h3>
+                    <h3 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Book Library</h3>
                     <p class="text-zinc-500 mb-6">Hand-picked collection of technical books covering algorithms, system design, and more.</p>
                     <div class="flex gap-2">
                         <div class="w-12 h-16 bg-indigo-200 rounded-lg"></div>
@@ -161,27 +163,27 @@ require_once 'includes/functions.php';
                     <div class="icon-box mb-4 bg-violet-100 text-violet-600 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Your History</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Your History</h3>
                     <p class="text-zinc-500 text-sm mb-4">Pick up right where you left off.</p>
                     <div class="space-y-3">
-                        <div class="flex items-center gap-3 p-2 bg-white rounded-lg border border-zinc-100">
+                        <div class="flex items-center gap-3 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800">
                             <div class="w-8 h-8 bg-indigo-100 rounded flex items-center justify-center text-xs">📚</div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs font-medium text-zinc-900 truncate">Clean Architecture</p>
+                                <p class="text-xs font-medium text-zinc-900 dark:text-white truncate">Clean Architecture</p>
                                 <p class="text-xs text-zinc-400">2h ago</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 p-2 bg-white rounded-lg border border-zinc-100">
+                        <div class="flex items-center gap-3 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800">
                             <div class="w-8 h-8 bg-teal-100 rounded flex items-center justify-center text-xs">📄</div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs font-medium text-zinc-900 truncate">Design Patterns</p>
+                                <p class="text-xs font-medium text-zinc-900 dark:text-white truncate">Design Patterns</p>
                                 <p class="text-xs text-zinc-400">Yesterday</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 p-2 bg-white rounded-lg border border-zinc-100">
+                        <div class="flex items-center gap-3 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800">
                             <div class="w-8 h-8 bg-rose-100 rounded flex items-center justify-center text-xs">🎥</div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs font-medium text-zinc-900 truncate">React Masterclass</p>
+                                <p class="text-xs font-medium text-zinc-900 dark:text-white truncate">React Masterclass</p>
                                 <p class="text-xs text-zinc-400">3 days ago</p>
                             </div>
                         </div>
@@ -193,9 +195,9 @@ require_once 'includes/functions.php';
                     <div class="icon-box bg-amber-100 text-amber-600 mb-4 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Smart Search</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Smart Search</h3>
                     <p class="text-zinc-500 text-sm mb-4">Find any resource instantly with our powerful search.</p>
-                    <div class="flex items-center gap-2 bg-white rounded-full border border-zinc-200 px-4 py-3 shadow-sm">
+                    <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 rounded-full border border-zinc-200 dark:border-zinc-700 px-4 py-3 shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         <span class="text-zinc-400 text-sm">Search books, papers, videos...</span>
                     </div>
@@ -206,7 +208,7 @@ require_once 'includes/functions.php';
                     <div class="icon-box mb-4 bg-teal-100 text-teal-600 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Research Papers</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Research Papers</h3>
                     <p class="text-zinc-500 text-sm">Latest academic papers and whitepapers from top researchers.</p>
                 </a>
 
@@ -215,7 +217,7 @@ require_once 'includes/functions.php';
                     <div class="icon-box mb-4 bg-rose-100 text-rose-600 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Video Tutorials</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Video Tutorials</h3>
                     <p class="text-zinc-500 text-sm">High-quality video content for visual learners.</p>
                 </a>
 
@@ -224,7 +226,7 @@ require_once 'includes/functions.php';
                     <div class="icon-box mb-4 bg-purple-100 text-purple-600 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Pro Access</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Pro Access</h3>
                     <p class="text-zinc-500 text-sm">Unlock premium content and exclusive features.</p>
                 </a>
             </div>
@@ -232,23 +234,23 @@ require_once 'includes/functions.php';
     </section>
 
     <!-- ===== STATS SECTION ===== -->
-    <section class="py-20 bg-white border-y border-zinc-100">
+    <section class="py-20 bg-white dark:bg-zinc-900 border-y border-zinc-100 dark:border-zinc-800">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 <div class="stat-item">
-                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 mb-2">500+</p>
+                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-2">500+</p>
                     <p class="text-zinc-500 font-medium">Books</p>
                 </div>
                 <div class="stat-item">
-                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 mb-2">200+</p>
+                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-2">200+</p>
                     <p class="text-zinc-500 font-medium">Papers</p>
                 </div>
                 <div class="stat-item">
-                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 mb-2">100+</p>
+                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-2">100+</p>
                     <p class="text-zinc-500 font-medium">Videos</p>
                 </div>
                 <div class="stat-item">
-                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 mb-2">5k+</p>
+                    <p class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-2">5k+</p>
                     <p class="text-zinc-500 font-medium">Happy Users</p>
                 </div>
             </div>
@@ -260,7 +262,7 @@ require_once 'includes/functions.php';
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
                 <span class="badge mb-4">How It Works</span>
-                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 mb-4">Simple as 1-2-3</h2>
+                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-4">Simple as 1-2-3</h2>
                 <p class="text-lg text-zinc-500 max-w-2xl mx-auto">Get started in minutes and unlock a world of knowledge.</p>
             </div>
 
@@ -270,19 +272,19 @@ require_once 'includes/functions.php';
 
                 <div class="step-card text-center relative">
                     <div class="w-16 h-16 mx-auto mb-6 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 font-bold text-2xl relative z-10">1</div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Sign Up Free</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Sign Up Free</h3>
                     <p class="text-zinc-500">Create your account in seconds. No credit card required.</p>
                 </div>
 
                 <div class="step-card text-center relative">
                     <div class="w-16 h-16 mx-auto mb-6 bg-teal-100 rounded-2xl flex items-center justify-center text-teal-600 font-bold text-2xl relative z-10">2</div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Explore Resources</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Explore Resources</h3>
                     <p class="text-zinc-500">Browse our curated collection of books, papers, and videos.</p>
                 </div>
 
                 <div class="step-card text-center relative">
                     <div class="w-16 h-16 mx-auto mb-6 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 font-bold text-2xl relative z-10">3</div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-2">Start Learning</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Start Learning</h3>
                     <p class="text-zinc-500">Access content anytime, anywhere. Your progress is saved.</p>
                 </div>
             </div>
@@ -294,44 +296,44 @@ require_once 'includes/functions.php';
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
                 <span class="badge mb-4">Testimonials</span>
-                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 mb-4">Loved by Students</h2>
+                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-4">Loved by Students</h2>
                 <p class="text-lg text-zinc-500 max-w-2xl mx-auto">Don't just take our word for it.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="testimonial-card bg-white rounded-2xl p-8 border border-zinc-100 shadow-sm">
+                <div class="testimonial-card bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-100 dark:border-zinc-800 shadow-sm">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-xl">👩‍💻</div>
                         <div>
-                            <p class="font-bold text-zinc-900">Sarah Chen</p>
+                            <p class="font-bold text-zinc-900 dark:text-white">Sarah Chen</p>
                             <p class="text-sm text-zinc-400">Computer Science, Stanford</p>
                         </div>
                     </div>
-                    <p class="text-zinc-600 italic">"Semicolon has been a game-changer for my studies. The curated book collection saved me hours of searching for quality resources."</p>
+                    <p class="text-zinc-600 dark:text-zinc-400 italic">"Semicolon has been a game-changer for my studies. The curated book collection saved me hours of searching for quality resources."</p>
                     <div class="flex gap-1 mt-4 text-amber-400">★★★★★</div>
                 </div>
 
-                <div class="testimonial-card bg-white rounded-2xl p-8 border border-zinc-100 shadow-sm">
+                <div class="testimonial-card bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-100 dark:border-zinc-800 shadow-sm">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-xl">👨‍🎓</div>
                         <div>
-                            <p class="font-bold text-zinc-900">Alex Kumar</p>
+                            <p class="font-bold text-zinc-900 dark:text-white">Alex Kumar</p>
                             <p class="text-sm text-zinc-400">Software Engineering, MIT</p>
                         </div>
                     </div>
-                    <p class="text-zinc-600 italic">"The research papers section is incredible. I found papers I couldn't find anywhere else. Highly recommend!"</p>
+                    <p class="text-zinc-600 dark:text-zinc-400 italic">"The research papers section is incredible. I found papers I couldn't find anywhere else. Highly recommend!"</p>
                     <div class="flex gap-1 mt-4 text-amber-400">★★★★★</div>
                 </div>
 
-                <div class="testimonial-card bg-white rounded-2xl p-8 border border-zinc-100 shadow-sm">
+                <div class="testimonial-card bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-100 dark:border-zinc-800 shadow-sm">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-xl">👩‍🔬</div>
                         <div>
-                            <p class="font-bold text-zinc-900">Emily Rodriguez</p>
+                            <p class="font-bold text-zinc-900 dark:text-white">Emily Rodriguez</p>
                             <p class="text-sm text-zinc-400">Data Science, Berkeley</p>
                         </div>
                     </div>
-                    <p class="text-zinc-600 italic">"The video tutorials are top-notch. Clear explanations and real-world examples. This is the learning platform I wish I had earlier."</p>
+                    <p class="text-zinc-600 dark:text-zinc-400 italic">"The video tutorials are top-notch. Clear explanations and real-world examples. This is the learning platform I wish I had earlier."</p>
                     <div class="flex gap-1 mt-4 text-amber-400">★★★★★</div>
                 </div>
             </div>
@@ -347,7 +349,7 @@ require_once 'includes/functions.php';
         <div class="container mx-auto px-6 text-center relative z-10">
             <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Ready to Level Up?</h2>
             <p class="text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">Join thousands of students who are already accelerating their learning journey.</p>
-            <a href="auth/signup.php" class="inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all hover:shadow-xl">
+            <a href="auth/signup.php" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 text-indigo-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all hover:shadow-xl">
                 Get Started Free
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </a>
@@ -355,7 +357,7 @@ require_once 'includes/functions.php';
     </section>
 
     <!-- ===== FOOTER ===== -->
-    <footer class="py-16 bg-zinc-900 text-zinc-400">
+    <footer class="py-16 bg-zinc-900 dark:bg-zinc-950 text-zinc-400">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                 <div>

@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $notif_message = "Unfortunately, we couldn't fulfill your request for \"{$material_title}\" ({$material_type}) at this time. This could be due to availability or licensing restrictions. Please try requesting something else.";
                 }
 
-                create_notification($user_id, $notif_title, $notif_message);
+                create_notification($user_id, $notif_title, $notif_message, 'system', 'dashboard.php');
             }
         } else {
             $message = 'Failed to update request status.';

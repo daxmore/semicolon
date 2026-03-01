@@ -32,7 +32,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Contact Info -->
             <div class="lg:col-span-1 space-y-6">
-                <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-8">
                     <h3 class="text-xl font-bold text-gray-900 mb-6">Contact Information</h3>
                     <div class="space-y-6">
                         <div class="flex items-start gap-4">
@@ -76,7 +76,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
 
             <!-- Contact Form -->
             <div class="lg:col-span-2">
-                <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-8">
                     <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
                     <form action="#" method="POST" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

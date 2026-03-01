@@ -61,6 +61,7 @@ $categories = [
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -109,9 +110,10 @@ $categories = [
             transform: translateY(-1px);
         }
     </style>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
 
-<body class="antialiased bg-zinc-50 min-h-screen">
+<body class="antialiased bg-zinc-50 dark:bg-zinc-800/50 min-h-screen">
     <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section with Animated Background -->
@@ -159,7 +161,7 @@ $categories = [
             <!-- Steps Indicator -->
             <div class="flex items-center justify-center gap-4 mt-12">
                 <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-white text-purple-600 font-bold text-sm flex items-center justify-center">1</div>
+                    <div class="w-8 h-8 rounded-full bg-white dark:bg-zinc-900 text-purple-600 font-bold text-sm flex items-center justify-center">1</div>
                     <span class="text-sm text-white/80 hidden sm:inline">Choose Type</span>
                 </div>
                 <div class="w-8 h-px bg-white/30"></div>
@@ -219,7 +221,7 @@ $categories = [
             <div class="glass-card rounded-3xl shadow-2xl shadow-purple-500/10 overflow-hidden">
                 
                 <!-- Material Type Section -->
-                <div class="p-8 md:p-10 border-b border-zinc-100">
+                <div class="p-8 md:p-10 border-b border-zinc-100 dark:border-zinc-800">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -227,7 +229,7 @@ $categories = [
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-zinc-900">What are you looking for?</h2>
+                            <h2 class="text-xl font-bold text-zinc-900 dark:text-white">What are you looking for?</h2>
                             <p class="text-sm text-zinc-500">Select the type of material you need</p>
                         </div>
                     </div>
@@ -236,13 +238,13 @@ $categories = [
                         <!-- Book -->
                         <label class="type-card cursor-pointer group">
                             <input type="radio" name="material_type" value="book" class="peer sr-only" required>
-                            <div class="p-6 rounded-2xl border-2 border-zinc-200 bg-zinc-50/50 transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:shadow-lg peer-checked:shadow-indigo-500/20 hover:border-indigo-300 hover:bg-indigo-50/50">
+                            <div class="p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:shadow-lg peer-checked:shadow-indigo-500/20 hover:border-indigo-300 hover:bg-indigo-50/50">
                                 <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
                                 </div>
-                                <h3 class="font-semibold text-zinc-900 mb-1">Book</h3>
+                                <h3 class="font-semibold text-zinc-900 dark:text-white mb-1">Book</h3>
                                 <p class="text-xs text-zinc-500">Textbooks & References</p>
                             </div>
                         </label>
@@ -250,13 +252,13 @@ $categories = [
                         <!-- Paper -->
                         <label class="type-card cursor-pointer group">
                             <input type="radio" name="material_type" value="paper" class="peer sr-only">
-                            <div class="p-6 rounded-2xl border-2 border-zinc-200 bg-zinc-50/50 transition-all peer-checked:border-teal-500 peer-checked:bg-teal-50 peer-checked:shadow-lg peer-checked:shadow-teal-500/20 hover:border-teal-300 hover:bg-teal-50/50">
+                            <div class="p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 transition-all peer-checked:border-teal-500 peer-checked:bg-teal-50 peer-checked:shadow-lg peer-checked:shadow-teal-500/20 hover:border-teal-300 hover:bg-teal-50/50">
                                 <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-500/30 group-hover:scale-105 transition">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
-                                <h3 class="font-semibold text-zinc-900 mb-1">Paper</h3>
+                                <h3 class="font-semibold text-zinc-900 dark:text-white mb-1">Paper</h3>
                                 <p class="text-xs text-zinc-500">Exam Papers & Notes</p>
                             </div>
                         </label>
@@ -264,14 +266,14 @@ $categories = [
                         <!-- Video -->
                         <label class="type-card cursor-pointer group">
                             <input type="radio" name="material_type" value="video" class="peer sr-only">
-                            <div class="p-6 rounded-2xl border-2 border-zinc-200 bg-zinc-50/50 transition-all peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:shadow-lg peer-checked:shadow-rose-500/20 hover:border-rose-300 hover:bg-rose-50/50">
+                            <div class="p-6 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 transition-all peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:shadow-lg peer-checked:shadow-rose-500/20 hover:border-rose-300 hover:bg-rose-50/50">
                                 <div class="w-14 h-14 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/30 group-hover:scale-105 transition">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <h3 class="font-semibold text-zinc-900 mb-1">Video</h3>
+                                <h3 class="font-semibold text-zinc-900 dark:text-white mb-1">Video</h3>
                                 <p class="text-xs text-zinc-500">Tutorials & Lectures</p>
                             </div>
                         </label>
@@ -287,20 +289,20 @@ $categories = [
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-zinc-900">Tell us more</h2>
+                            <h2 class="text-xl font-bold text-zinc-900 dark:text-white">Tell us more</h2>
                             <p class="text-sm text-zinc-500">The more details, the better we can help</p>
                         </div>
                     </div>
                     
                     <!-- Community Category Field -->
                     <div class="space-y-2">
-                        <label for="community_category" class="block text-sm font-semibold text-zinc-700">
+                        <label for="community_category" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                             Community Category <span class="text-zinc-400 font-normal">(Optional)</span>
                         </label>
                         <select 
                             name="community_category" 
                             id="community_category" 
-                            class="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 appearance-none"
+                            class="form-input w-full px-5 py-4 bg-zinc-50 dark:bg-zinc-800/50 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 dark:text-white appearance-none"
                             style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231f2937%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1.25rem top 50%; background-size: 0.85rem auto;"
                         >
                             <option value="">Select a community to target...</option>
@@ -312,7 +314,7 @@ $categories = [
 
                     <!-- Title Field -->
                     <div class="space-y-2">
-                        <label for="title" class="block text-sm font-semibold text-zinc-700">
+                        <label for="title" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                             Title / Topic <span class="text-red-500">*</span>
                         </label>
                         <input 
@@ -321,13 +323,13 @@ $categories = [
                             id="title" 
                             required 
                             placeholder="e.g. Introduction to Algorithms, 3rd Edition"
-                            class="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400"
+                            class="form-input w-full px-5 py-4 bg-zinc-50 dark:bg-zinc-800/50 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 dark:text-white placeholder:text-zinc-400"
                         >
                     </div>
                     
                     <!-- Author/Publisher Field -->
                     <div class="space-y-2">
-                        <label for="author_publisher" class="block text-sm font-semibold text-zinc-700">
+                        <label for="author_publisher" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                             Author / Publisher <span class="text-zinc-400 font-normal">(Optional)</span>
                         </label>
                         <input 
@@ -335,13 +337,13 @@ $categories = [
                             name="author_publisher" 
                             id="author_publisher" 
                             placeholder="e.g. Thomas H. Cormen, MIT Press"
-                            class="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400"
+                            class="form-input w-full px-5 py-4 bg-zinc-50 dark:bg-zinc-800/50 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 dark:text-white placeholder:text-zinc-400"
                         >
                     </div>
                     
                     <!-- Details Field -->
                     <div class="space-y-2">
-                        <label for="details" class="block text-sm font-semibold text-zinc-700">
+                        <label for="details" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                             Additional Details <span class="text-zinc-400 font-normal">(Optional)</span>
                         </label>
                         <textarea 
@@ -349,7 +351,7 @@ $categories = [
                             name="details" 
                             rows="4" 
                             placeholder="Any specific edition, year, chapter, or context that would help us find the right material..."
-                            class="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400 resize-none"
+                            class="form-input w-full px-5 py-4 bg-zinc-50 dark:bg-zinc-800/50 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none"
                         ></textarea>
                     </div>
                     
@@ -374,33 +376,33 @@ $categories = [
         
         <!-- Info Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-            <div class="bg-white rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
                 <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-amber-500/30 group-hover:scale-105 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 class="font-bold text-zinc-900 mb-2">Quick Response</h3>
+                <h3 class="font-bold text-zinc-900 dark:text-white mb-2">Quick Response</h3>
                 <p class="text-sm text-zinc-500 leading-relaxed">We review all requests within 24-48 hours and get back to you</p>
             </div>
             
-            <div class="bg-white rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
                 <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 class="font-bold text-zinc-900 mb-2">High Success Rate</h3>
+                <h3 class="font-bold text-zinc-900 dark:text-white mb-2">High Success Rate</h3>
                 <p class="text-sm text-zinc-500 leading-relaxed">Most popular requests are successfully fulfilled and added</p>
             </div>
             
-            <div class="bg-white rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
                 <div class="w-12 h-12 bg-gradient-to-br from-violet-400 to-purple-500 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-violet-500/30 group-hover:scale-105 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                 </div>
-                <h3 class="font-bold text-zinc-900 mb-2">Get Notified</h3>
+                <h3 class="font-bold text-zinc-900 dark:text-white mb-2">Get Notified</h3>
                 <p class="text-sm text-zinc-500 leading-relaxed">We'll notify you immediately when your material is available</p>
             </div>
         </div>

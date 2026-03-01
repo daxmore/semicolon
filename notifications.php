@@ -45,6 +45,7 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -54,8 +55,9 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             }
         }
     </script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <!-- Main Content -->
@@ -63,7 +65,7 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         <div class="container mx-auto px-6 max-w-3xl">
             
             <div class="flex items-center justify-between mb-8">
-                <h1 class="text-3xl font-bold text-zinc-900 flex items-center gap-3">
+                <h1 class="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
                     <div class="p-2 bg-indigo-50 rounded-xl text-indigo-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -78,13 +80,13 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <!-- Notifications List -->
-            <div class="bg-white border border-zinc-100 rounded-2xl shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                 <?php if (empty($notifications)): ?>
                     <div class="p-12 text-center text-zinc-500">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
-                        <p class="text-lg font-medium text-zinc-800">You're all caught up!</p>
+                        <p class="text-lg font-medium text-zinc-800 dark:text-zinc-200">You're all caught up!</p>
                         <p class="mt-1">You don't have any notifications right now.</p>
                     </div>
                 <?php else: ?>
@@ -118,7 +120,7 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                 <!-- Content -->
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-start justify-between gap-2">
-                                        <h3 class="font-bold text-zinc-900 <?php echo !$is_read ? '' : 'text-zinc-600'; ?>">
+                                        <h3 class="font-bold text-zinc-900 dark:text-white <?php echo !$is_read ? '' : 'text-zinc-600'; ?>">
                                             <?php echo htmlspecialchars($notif['title']); ?>
                                             <?php if (!$is_read): ?>
                                                 <span class="inline-block w-2.5 h-2.5 bg-indigo-500 rounded-full ml-2 align-middle"></span>
@@ -128,7 +130,7 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                             <?php echo date('M j, g:i a', strtotime($notif['created_at'])); ?>
                                         </span>
                                     </div>
-                                    <p class="text-zinc-600 mt-1 line-clamp-2">
+                                    <p class="text-zinc-600 dark:text-zinc-400 mt-1 line-clamp-2">
                                         <?php echo htmlspecialchars($notif['message']); ?>
                                     </p>
                                     

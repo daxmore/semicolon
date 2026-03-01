@@ -20,6 +20,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -35,8 +36,9 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
             }
         }
     </script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section -->
@@ -55,7 +57,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
                     </svg>
                     About Us
                 </span>
-                <h1 class="text-5xl md:text-6xl font-bold text-zinc-900 mb-6 tracking-tight">
+                <h1 class="text-5xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight">
                     We're Building the Future of <span class="text-gradient">Learning</span>
                 </h1>
                 <p class="text-xl text-zinc-500 leading-relaxed">
@@ -82,7 +84,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
                 <!-- Content -->
                 <div>
                     <span class="text-sm font-semibold text-indigo-600 uppercase tracking-wider">Our Story</span>
-                    <h2 class="text-4xl font-bold text-zinc-900 mt-2 mb-6">Started with a Simple Idea</h2>
+                    <h2 class="text-4xl font-bold text-zinc-900 dark:text-white mt-2 mb-6">Started with a Simple Idea</h2>
                     <p class="text-zinc-500 text-lg leading-relaxed mb-6">
                         We started Semicolon with a simple belief: quality learning resources should be accessible to everyone. As developers ourselves, we understood the struggle of finding reliable, curated content.
                     </p>
@@ -92,15 +94,15 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
                     
                     <div class="flex flex-wrap gap-8">
                         <div>
-                            <p class="text-4xl font-bold text-zinc-900">2023</p>
+                            <p class="text-4xl font-bold text-zinc-900 dark:text-white">2023</p>
                             <p class="text-zinc-500">Founded</p>
                         </div>
                         <div>
-                            <p class="text-4xl font-bold text-zinc-900">5K+</p>
+                            <p class="text-4xl font-bold text-zinc-900 dark:text-white">5K+</p>
                             <p class="text-zinc-500">Active Users</p>
                         </div>
                         <div>
-                            <p class="text-4xl font-bold text-zinc-900">800+</p>
+                            <p class="text-4xl font-bold text-zinc-900 dark:text-white">800+</p>
                             <p class="text-zinc-500">Resources</p>
                         </div>
                     </div>
@@ -116,41 +118,41 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
                 <span class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full text-sm font-medium text-indigo-600 mb-4">
                     Our Values
                 </span>
-                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 mb-4">What Drives Us</h2>
+                <h2 class="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-4">What Drives Us</h2>
                 <p class="text-lg text-zinc-500 max-w-2xl mx-auto">Our core principles guide everything we do.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Value 1 -->
-                <div class="bg-white rounded-2xl p-8 border border-zinc-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-100 dark:border-zinc-800 hover:border-indigo-200 hover:shadow-xl transition-all duration-300">
                     <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center mb-6">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-3">Accessibility</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-3">Accessibility</h3>
                     <p class="text-zinc-500 leading-relaxed">Knowledge should be available to everyone, everywhere. We're committed to breaking down barriers to education.</p>
                 </div>
 
                 <!-- Value 2 -->
-                <div class="bg-white rounded-2xl p-8 border border-zinc-100 hover:border-teal-200 hover:shadow-xl transition-all duration-300">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-100 dark:border-zinc-800 hover:border-teal-200 hover:shadow-xl transition-all duration-300">
                     <div class="w-14 h-14 bg-teal-100 rounded-2xl flex items-center justify-center mb-6">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-3">Quality</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-3">Quality</h3>
                     <p class="text-zinc-500 leading-relaxed">Every resource is carefully curated to ensure accuracy, reliability, and real-world value for our users.</p>
                 </div>
 
                 <!-- Value 3 -->
-                <div class="bg-white rounded-2xl p-8 border border-zinc-100 hover:border-rose-200 hover:shadow-xl transition-all duration-300">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-100 dark:border-zinc-800 hover:border-rose-200 hover:shadow-xl transition-all duration-300">
                     <div class="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center mb-6">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-zinc-900 mb-3">Innovation</h3>
+                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-3">Innovation</h3>
                     <p class="text-zinc-500 leading-relaxed">We constantly evolve our platform to meet the changing needs of learners in the digital age.</p>
                 </div>
             </div>
@@ -209,7 +211,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
             <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Ready to Start Learning?</h2>
             <p class="text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">Join our community of learners and unlock access to hundreds of curated resources.</p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="auth/signup.php" class="inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all hover:shadow-xl">
+                <a href="auth/signup.php" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 text-indigo-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all hover:shadow-xl">
                     Get Started Free
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -223,7 +225,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
     </section>
 
     <!-- Footer -->
-    <footer class="py-16 bg-zinc-900 text-zinc-400">
+    <footer class="py-16 bg-zinc-900 dark:bg-zinc-950 text-zinc-400">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                 <div>

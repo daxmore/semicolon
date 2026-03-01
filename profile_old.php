@@ -193,7 +193,6 @@ $badges = get_user_badges($user_id);
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -209,9 +208,8 @@ $badges = get_user_badges($user_id);
             backdrop-filter: blur(4px);
         }
     </style>
-    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
+<body class="antialiased bg-[#FAFAFA]">
     <?php include 'includes/header.php'; ?>
 
     <!-- Profile Hero -->
@@ -236,7 +234,7 @@ $badges = get_user_badges($user_id);
                 </div>
             <?php endif; ?>
 
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-8">
+            <div class="bg-white rounded-2xl border border-zinc-100 p-8">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="flex flex-col md:flex-row items-center gap-5 text-center md:text-left">
                         <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-indigo-500/25 overflow-hidden">
@@ -247,22 +245,18 @@ $badges = get_user_badges($user_id);
                             <?php endif; ?>
                         </div>
                         <div>
-                            <h1 class="text-3xl font-bold text-zinc-900 dark:text-white"><?php echo htmlspecialchars($user['username']); ?></h1>
+                            <h1 class="text-3xl font-bold text-zinc-900"><?php echo htmlspecialchars($user['username']); ?></h1>
                             <div class="flex items-center justify-center md:justify-start gap-3 mt-2">
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
                                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
                                     <?php echo ucfirst($user['role'] ?? 'User'); ?>
-                                </span>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-sm font-bold border border-amber-200 dark:border-amber-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.5 12.5a.5.5 0 01-1 0v-5a.5.5 0 011 0v5zM12 12a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>
-                                    Level <?php echo calculate_level_from_xp($user['xp'] ?? 0); ?> (<?php echo number_format($user['xp'] ?? 0); ?> XP)
                                 </span>
                                 <span class="text-zinc-500 text-sm">Member since <?php echo date('M Y', strtotime($user['created_at'] ?? 'now')); ?></span>
                             </div>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <a href="auth/logout.php" class="px-5 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition font-medium">
+                        <a href="auth/logout.php" class="px-5 py-2.5 border border-zinc-200 rounded-xl text-zinc-700 hover:bg-zinc-50 transition font-medium">
                             Logout
                         </a>
                         <button onclick="openEditModal()" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-medium flex items-center gap-2">
@@ -287,32 +281,32 @@ $badges = get_user_badges($user_id);
                     
                     <!-- Quick Actions -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <a href="books.php" class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-6 hover:border-indigo-200 hover:shadow-lg transition-all group">
+                        <a href="books.php" class="bg-white rounded-2xl border border-zinc-100 p-6 hover:border-indigo-200 hover:shadow-lg transition-all group">
                             <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                 </svg>
                             </div>
-                            <h3 class="font-bold text-zinc-900 dark:text-white">Browse Books</h3>
+                            <h3 class="font-bold text-zinc-900">Browse Books</h3>
                             <p class="text-sm text-zinc-500 mt-1">Access library</p>
                         </a>
-                        <a href="papers.php" class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-6 hover:border-teal-200 hover:shadow-lg transition-all group">
+                        <a href="papers.php" class="bg-white rounded-2xl border border-zinc-100 p-6 hover:border-teal-200 hover:shadow-lg transition-all group">
                             <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </div>
-                            <h3 class="font-bold text-zinc-900 dark:text-white">Read Papers</h3>
+                            <h3 class="font-bold text-zinc-900">Read Papers</h3>
                             <p class="text-sm text-zinc-500 mt-1">Latest research</p>
                         </a>
-                        <a href="videos.php" class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-6 hover:border-rose-200 hover:shadow-lg transition-all group">
+                        <a href="videos.php" class="bg-white rounded-2xl border border-zinc-100 p-6 hover:border-rose-200 hover:shadow-lg transition-all group">
                             <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3 class="font-bold text-zinc-900 dark:text-white">Watch Videos</h3>
+                            <h3 class="font-bold text-zinc-900">Watch Videos</h3>
                             <p class="text-sm text-zinc-500 mt-1">Tutorials & more</p>
                         </a>
                     </div>
@@ -320,9 +314,9 @@ $badges = get_user_badges($user_id);
                     <!-- Side-by-Side Activity Grid: Recently Viewed & My Discussions -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <!-- Recently Viewed -->
-                    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
-                        <div class="p-6 border-b border-zinc-100 dark:border-zinc-800">
-                            <h3 class="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <div class="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
+                        <div class="p-6 border-b border-zinc-100">
+                            <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -332,7 +326,7 @@ $badges = get_user_badges($user_id);
                         
                         <?php if (empty($history)): ?>
                             <div class="p-12 text-center">
-                                <div class="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
@@ -365,7 +359,7 @@ $badges = get_user_badges($user_id);
                                             <?php endif; ?>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="font-medium text-zinc-900 dark:text-white truncate"><?php echo htmlspecialchars($item['title'] ?? 'Unknown Resource'); ?></p>
+                                            <p class="font-medium text-zinc-900 truncate"><?php echo htmlspecialchars($item['title'] ?? 'Unknown Resource'); ?></p>
                                             <p class="text-sm text-zinc-500"><?php echo ucfirst($item['resource_type']); ?> • <?php echo date('M d, Y', strtotime($item['viewed_at'])); ?></p>
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -377,19 +371,19 @@ $badges = get_user_badges($user_id);
 
                             <!-- Pagination -->
                             <?php if ($total_pages > 1): ?>
-                            <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                            <div class="px-6 py-4 border-t border-zinc-100 flex items-center justify-between">
                                 <?php if ($page > 1): ?>
-                                    <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 transition">Previous</a>
+                                    <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">Previous</a>
                                 <?php else: ?>
-                                    <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-not-allowed">Previous</span>
+                                    <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-lg cursor-not-allowed">Previous</span>
                                 <?php endif; ?>
                                 
                                 <span class="text-sm text-zinc-500 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
                                 
                                 <?php if ($page < $total_pages): ?>
-                                    <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 transition">Next</a>
+                                    <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">Next</a>
                                 <?php else: ?>
-                                    <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-not-allowed">Next</span>
+                                    <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-lg cursor-not-allowed">Next</span>
                                 <?php endif; ?>
                             </div>
                             <?php endif; ?>
@@ -397,9 +391,9 @@ $badges = get_user_badges($user_id);
                     </div>
                     
                     <!-- My Discussions (Community) -->
-                    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
-                        <div class="p-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <div class="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
+                        <div class="p-6 border-b border-zinc-100 flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                                 </svg>
@@ -421,20 +415,20 @@ $badges = get_user_badges($user_id);
                                 <?php foreach ($user_posts as $post): ?>
                                     <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="block p-5 hover:bg-zinc-50 transition">
                                         <div class="flex items-center gap-2 mb-1">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
                                                 <?php echo htmlspecialchars($post['category']); ?>
                                             </span>
                                             <span class="text-xs text-zinc-400"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></span>
                                         </div>
-                                        <h4 class="font-bold text-zinc-900 dark:text-white mb-1 truncate"><?php echo htmlspecialchars($post['title']); ?></h4>
+                                        <h4 class="font-bold text-zinc-900 mb-1 truncate"><?php echo htmlspecialchars($post['title']); ?></h4>
                                         <div class="flex items-center gap-4 text-xs text-zinc-500 font-medium mt-2">
                                             <span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg> <?php echo $post['upvotes']; ?></span>
                                         </div>
                                     </a>
                                 <?php endforeach; ?>
                             </div>
-                            <div class="p-4 border-t border-zinc-100 dark:border-zinc-800 text-center">
-                                <a href="community.php" class="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 transition">View all community posts</a>
+                            <div class="p-4 border-t border-zinc-100 text-center">
+                                <a href="community.php" class="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition">View all community posts</a>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -499,8 +493,8 @@ $badges = get_user_badges($user_id);
                 <div class="space-y-6">
                     
                     <!-- Notifications -->
-                    <div id="notifications" class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-6">
-                        <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                    <div id="notifications" class="bg-white rounded-2xl border border-zinc-100 p-6">
+                        <h3 class="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
@@ -511,13 +505,13 @@ $badges = get_user_badges($user_id);
                         <?php else: ?>
                             <ul class="space-y-3">
                                 <?php foreach (array_slice($notifications, 0, 5) as $notif): ?>
-                                    <li class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 <?php echo !$notif['is_read'] ? 'border-l-2 border-l-indigo-500' : ''; ?>">
-                                        <p class="text-sm font-medium text-zinc-900 dark:text-white"><?php echo htmlspecialchars($notif['title']); ?></p>
+                                    <li class="p-3 rounded-xl bg-zinc-50 <?php echo !$notif['is_read'] ? 'border-l-2 border-l-indigo-500' : ''; ?>">
+                                        <p class="text-sm font-medium text-zinc-900"><?php echo htmlspecialchars($notif['title']); ?></p>
                                         <p class="text-xs text-zinc-500 mt-1 line-clamp-1"><?php echo htmlspecialchars($notif['message']); ?></p>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
-                            <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center">
+                            <div class="mt-4 pt-4 border-t border-zinc-100 text-center">
                                 <a href="notifications.php" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">View all activity &rarr;</a>
                             </div>
                         <?php endif; ?>
@@ -536,7 +530,7 @@ $badges = get_user_badges($user_id);
                                 <span class="font-medium"><?php echo ucfirst($user['status'] ?? 'Active'); ?></span>
                             </div>
                         </div>
-                        <a href="pricing.php" class="block w-full text-center py-3 bg-white dark:bg-zinc-900 text-indigo-600 font-semibold rounded-xl mt-4 hover:bg-indigo-50 transition">
+                        <a href="pricing.php" class="block w-full text-center py-3 bg-white text-indigo-600 font-semibold rounded-xl mt-4 hover:bg-indigo-50 transition">
                             Upgrade to Pro
                         </a>
                     </div>
@@ -550,7 +544,7 @@ $badges = get_user_badges($user_id);
     <div id="editModal" class="fixed inset-0 z-50 hidden">
         <div class="modal-backdrop absolute inset-0" onclick="closeEditModal()"></div>
         <div class="relative flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md lg:max-w-lg relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md lg:max-w-lg relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
                 <!-- Modal Header -->
                 <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5 flex-shrink-0">
                     <div class="flex items-center justify-between">
@@ -569,7 +563,7 @@ $badges = get_user_badges($user_id);
                     
                     <!-- Username -->
                     <div>
-                        <label for="username" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Username</label>
+                        <label for="username" class="block text-sm font-semibold text-zinc-700 mb-2">Username</label>
                         <input 
                             type="text" 
                             id="username" 
@@ -577,51 +571,51 @@ $badges = get_user_badges($user_id);
                             value="<?php echo htmlspecialchars($user['username']); ?>" 
                             required 
                             minlength="3"
-                            class="w-full px-4 py-3 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                     </div>
 
                     <!-- Avatar Upload -->
                     <div>
-                        <label for="avatar_upload" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Profile Image (Upload, max 1MB)</label>
+                        <label for="avatar_upload" class="block text-sm font-semibold text-zinc-700 mb-2">Profile Image (Upload, max 1MB)</label>
                         <input 
                             type="file" 
                             id="avatar_upload" 
                             name="avatar_upload" 
                             accept="image/*"
-                            class="w-full px-4 py-2 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 transition file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                            class="w-full px-4 py-2 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 transition file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                         >
                     </div>
 
                     <!-- Avatar URL -->
                     <div>
-                        <label for="avatar_url" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Or Image URL</label>
+                        <label for="avatar_url" class="block text-sm font-semibold text-zinc-700 mb-2">Or Image URL</label>
                         <input 
                             type="url" 
                             id="avatar_url" 
                             name="avatar_url" 
                             placeholder="https://example.com/avatar.jpg"
-                            class="w-full px-4 py-2 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                            class="w-full px-4 py-2 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                     </div>
                     
                     <!-- Divider -->
                     <div class="relative">
                         <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-zinc-200 dark:border-zinc-700"></div>
+                            <div class="w-full border-t border-zinc-200"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="bg-white dark:bg-zinc-900 px-3 text-zinc-500">Recovery Settings</span>
+                            <span class="bg-white px-3 text-zinc-500">Recovery Settings</span>
                         </div>
                     </div>
                     
                     <!-- Security Question -->
                     <div>
-                        <label for="security_question" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Security Question</label>
+                        <label for="security_question" class="block text-sm font-semibold text-zinc-700 mb-2">Security Question</label>
                         <select 
                             id="security_question" 
                             name="security_question" 
-                            class="w-full px-4 py-3 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                             <option value="">Select a security question</option>
                             <option value="What was the name of your first pet?" <?php echo ($user['security_question'] ?? '') === 'What was the name of your first pet?' ? 'selected' : ''; ?>>What was the name of your first pet?</option>
@@ -633,29 +627,29 @@ $badges = get_user_badges($user_id);
 
                     <!-- Security Answer -->
                     <div>
-                        <label for="security_answer" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Security Answer</label>
+                        <label for="security_answer" class="block text-sm font-semibold text-zinc-700 mb-2">Security Answer</label>
                         <input 
                             type="text" 
                             id="security_answer" 
                             name="security_answer" 
                             placeholder="<?php echo !empty($user['security_answer']) ? '•••••••• (Hidden for security)' : 'Enter your answer'; ?>"
-                            class="w-full px-4 py-3 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                     </div>
 
                     <!-- Divider -->
                     <div class="relative">
                         <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-zinc-200 dark:border-zinc-700"></div>
+                            <div class="w-full border-t border-zinc-200"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="bg-white dark:bg-zinc-900 px-3 text-zinc-500">Change Password (optional)</span>
+                            <span class="bg-white px-3 text-zinc-500">Change Password (optional)</span>
                         </div>
                     </div>
                     
                     <!-- Current Password -->
                     <div>
-                        <label for="current_password" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                        <label for="current_password" class="block text-sm font-semibold text-zinc-700 mb-2">
                             Current Password
                         </label>
                         <input 
@@ -663,33 +657,33 @@ $badges = get_user_badges($user_id);
                             id="current_password" 
                             name="current_password" 
                             placeholder="Enter your current password"
-                            class="w-full px-4 py-3 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                         <p class="text-xs text-zinc-500 mt-1">Only required if you are changing your password</p>
                     </div>
                     
                     <!-- New Password -->
                     <div>
-                        <label for="new_password" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">New Password</label>
+                        <label for="new_password" class="block text-sm font-semibold text-zinc-700 mb-2">New Password</label>
                         <input 
                             type="password" 
                             id="new_password" 
                             name="new_password" 
                             minlength="6"
                             placeholder="Leave blank to keep current"
-                            class="w-full px-4 py-3 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                     </div>
                     
                     <!-- Confirm New Password -->
                     <div>
-                        <label for="confirm_password" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Confirm New Password</label>
+                        <label for="confirm_password" class="block text-sm font-semibold text-zinc-700 mb-2">Confirm New Password</label>
                         <input 
                             type="password" 
                             id="confirm_password" 
                             name="confirm_password" 
                             placeholder="Repeat new password"
-                            class="w-full px-4 py-3 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                            class="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                         >
                     </div>
                     
@@ -698,7 +692,7 @@ $badges = get_user_badges($user_id);
                         <button 
                             type="button" 
                             onclick="closeEditModal()" 
-                            class="flex-1 px-4 py-3 border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl hover:bg-zinc-50 transition"
+                            class="flex-1 px-4 py-3 border-2 border-zinc-200 text-zinc-700 font-semibold rounded-xl hover:bg-zinc-50 transition"
                         >
                             Cancel
                         </button>

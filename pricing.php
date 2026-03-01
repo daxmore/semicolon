@@ -13,6 +13,7 @@ require_once 'includes/functions.php';
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -27,8 +28,9 @@ require_once 'includes/functions.php';
             }
         }
     </script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <!-- Hero Section -->
@@ -45,7 +47,7 @@ require_once 'includes/functions.php';
                 </svg>
                 Simple Pricing
             </span>
-            <h1 class="text-5xl md:text-6xl font-bold text-zinc-900 mb-6 tracking-tight">
+            <h1 class="text-5xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight">
                 Unlock <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Full Access</span>
             </h1>
             <p class="text-xl text-zinc-500 max-w-2xl mx-auto">
@@ -60,18 +62,18 @@ require_once 'includes/functions.php';
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 
                 <!-- Free Plan -->
-                <div class="bg-white rounded-3xl p-8 border border-zinc-200 hover:border-zinc-300 hover:shadow-xl transition-all duration-300 flex flex-col">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 hover:shadow-xl transition-all duration-300 flex flex-col">
                     <div class="mb-8">
-                        <h2 class="text-2xl font-bold text-zinc-900 mb-2">Free</h2>
+                        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Free</h2>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-bold text-zinc-900">$0</span>
+                            <span class="text-5xl font-bold text-zinc-900 dark:text-white">$0</span>
                             <span class="text-zinc-500">/month</span>
                         </div>
                         <p class="text-zinc-500 mt-2">Perfect for getting started</p>
                     </div>
                     
                     <ul class="space-y-4 mb-8 flex-grow">
-                        <li class="flex items-center gap-3 text-zinc-700">
+                        <li class="flex items-center gap-3 text-zinc-700 dark:text-zinc-300">
                             <div class="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                                 <svg class="h-3 w-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
@@ -79,7 +81,7 @@ require_once 'includes/functions.php';
                             </div>
                             View Books & Papers
                         </li>
-                        <li class="flex items-center gap-3 text-zinc-700">
+                        <li class="flex items-center gap-3 text-zinc-700 dark:text-zinc-300">
                             <div class="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                                 <svg class="h-3 w-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
@@ -87,7 +89,7 @@ require_once 'includes/functions.php';
                             </div>
                             Watch Videos
                         </li>
-                        <li class="flex items-center gap-3 text-zinc-700">
+                        <li class="flex items-center gap-3 text-zinc-700 dark:text-zinc-300">
                             <div class="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                                 <svg class="h-3 w-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
@@ -95,7 +97,7 @@ require_once 'includes/functions.php';
                             </div>
                             Basic Search
                         </li>
-                        <li class="flex items-center gap-3 text-zinc-700">
+                        <li class="flex items-center gap-3 text-zinc-700 dark:text-zinc-300">
                             <div class="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                                 <svg class="h-3 w-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
@@ -105,7 +107,7 @@ require_once 'includes/functions.php';
                         </li>
                     </ul>
                     
-                    <button class="w-full py-4 bg-zinc-100 text-zinc-600 font-semibold rounded-xl cursor-default">
+                    <button class="w-full py-4 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-semibold rounded-xl cursor-default">
                         Current Plan
                     </button>
                 </div>
@@ -176,7 +178,7 @@ require_once 'includes/functions.php';
                         </li>
                     </ul>
                     
-                    <button class="relative z-10 w-full py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">
+                    <button class="relative z-10 w-full py-4 bg-white dark:bg-zinc-900 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">
                         Upgrade to Pro
                     </button>
                 </div>
@@ -186,25 +188,25 @@ require_once 'includes/functions.php';
     </section>
 
     <!-- FAQ Section -->
-    <section class="py-20 bg-white border-t border-zinc-100">
+    <section class="py-20 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800">
         <div class="container mx-auto px-6">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-zinc-900 mb-4">Frequently Asked Questions</h2>
+                <h2 class="text-3xl font-bold text-zinc-900 dark:text-white mb-4">Frequently Asked Questions</h2>
                 <p class="text-zinc-500">Got questions? We've got answers.</p>
             </div>
             
             <div class="max-w-2xl mx-auto space-y-4">
-                <div class="bg-zinc-50 rounded-2xl p-6">
-                    <h3 class="font-semibold text-zinc-900 mb-2">Can I cancel anytime?</h3>
-                    <p class="text-zinc-600">Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6">
+                    <h3 class="font-semibold text-zinc-900 dark:text-white mb-2">Can I cancel anytime?</h3>
+                    <p class="text-zinc-600 dark:text-zinc-400">Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
                 </div>
-                <div class="bg-zinc-50 rounded-2xl p-6">
-                    <h3 class="font-semibold text-zinc-900 mb-2">What payment methods do you accept?</h3>
-                    <p class="text-zinc-600">We accept all major credit cards, debit cards, and UPI payments for Indian users.</p>
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6">
+                    <h3 class="font-semibold text-zinc-900 dark:text-white mb-2">What payment methods do you accept?</h3>
+                    <p class="text-zinc-600 dark:text-zinc-400">We accept all major credit cards, debit cards, and UPI payments for Indian users.</p>
                 </div>
-                <div class="bg-zinc-50 rounded-2xl p-6">
-                    <h3 class="font-semibold text-zinc-900 mb-2">Is there a student discount?</h3>
-                    <p class="text-zinc-600">Yes! Students with a valid .edu email can get 50% off Pro subscriptions. Contact us to verify.</p>
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6">
+                    <h3 class="font-semibold text-zinc-900 dark:text-white mb-2">Is there a student discount?</h3>
+                    <p class="text-zinc-600 dark:text-zinc-400">Yes! Students with a valid .edu email can get 50% off Pro subscriptions. Contact us to verify.</p>
                 </div>
             </div>
         </div>

@@ -22,6 +22,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link href="assets/css/index.css" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -32,6 +33,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
 <body class="bg-zinc-100 font-sans antialiased">
     <div class="flex min-h-screen">
@@ -130,6 +132,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </svg>
                     User Progress (XP)
                 </a>
+
+                <a href="badges.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'badges.php' ? 'bg-amber-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l-5 4v6l5 10 5-10V6l-5-4zm3 8.5L12 12l-3-1.5L12 8l3 2.5z"/>
+                    </svg>
+                    Manage Badges
+                </a>
+                
+                <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-6 mb-3 px-3 pt-6">Tools</p>
+
+                <a href="playground.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition <?php echo $current_page === 'playground.php' ? 'bg-indigo-600 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'; ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    Code Snippets
+                </a>
             </nav>
             
             <!-- Footer -->
@@ -167,6 +185,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 'users.php' => 'Manage Users',
                                 'manage_users.php' => 'User Progress (XP)',
                                 'manage_quiz.php' => 'Manage Quizzes',
+                                'badges.php' => 'Manage Badges',
+                                'playground.php' => 'Code Snippets',
                                 'manage_reports.php' => 'Manage Reports'
                             ];
                             echo $titles[$current_page] ?? 'Admin Panel';
@@ -174,6 +194,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         </h1>
                     </div>
                     <div class="flex items-center gap-4">
+                        <!-- Theme Toggle Button -->
+                        <button class="theme-toggle w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition flex items-center justify-center text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 relative overflow-hidden group">
+                            <!-- Sun Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute transition-all duration-300 dark:-rotate-90 dark:opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <!-- Moon Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute transition-all duration-300 rotate-90 opacity-0 dark:rotate-0 dark:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                        </button>
+
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-semibold text-sm">
                                 <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>

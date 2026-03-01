@@ -198,7 +198,7 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
 
     foreach ($comments_by_parent[$parent_id] as $comment) {
         $is_accepted = !empty($comment['is_accepted']);
-        $margin_class = $depth > 0 ? 'ml-8 md:ml-12 border-l-2 border-zinc-100 pl-4 mt-4' : 'bg-white border border-zinc-100 rounded-2xl p-6 shadow-sm mt-6';
+        $margin_class = $depth > 0 ? 'ml-8 md:ml-12 border-l-2 border-zinc-100 dark:border-zinc-800 pl-4 mt-4' : 'bg-white border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6 shadow-sm mt-6';
         if ($is_accepted && $depth == 0) {
             $margin_class = 'bg-emerald-50/50 border-2 border-emerald-400 rounded-2xl p-6 shadow-sm mt-6';
         }
@@ -231,7 +231,7 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-2 flex-wrap">
-                        <span class="font-bold text-zinc-900"><?php echo htmlspecialchars($comment['username']); ?></span>
+                        <span class="font-bold text-zinc-900 dark:text-white"><?php echo htmlspecialchars($comment['username']); ?></span>
                         <?php if ($is_accepted): ?>
                             <span class="inline-flex items-center gap-1 text-[10px] md:text-xs font-bold px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
@@ -245,7 +245,7 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                     </div>
                     
                     <div id="comment-display-<?php echo $comment['id']; ?>">
-                        <div class="markdown-render text-zinc-700 text-sm md:text-base leading-relaxed mb-3" data-raw="<?php echo htmlspecialchars($comment['content']); ?>">
+                        <div class="markdown-render text-zinc-700 dark:text-zinc-300 text-sm md:text-base leading-relaxed mb-3" data-raw="<?php echo htmlspecialchars($comment['content']); ?>">
                             <?php echo htmlspecialchars($comment['content']); ?>
                         </div>
                     </div>
@@ -256,7 +256,7 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                         <form action="" method="POST">
                             <input type="hidden" name="action" value="edit_comment">
                             <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
-                            <textarea name="content" rows="3" required class="w-full px-4 py-2 text-sm bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 outline-none mb-2"><?php echo htmlspecialchars($comment['content']); ?></textarea>
+                            <textarea name="content" rows="3" required class="w-full px-4 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none mb-2"><?php echo htmlspecialchars($comment['content']); ?></textarea>
                             <div class="flex justify-end gap-2">
                                 <button type="button" onclick="toggleCommentEdit(<?php echo $comment['id']; ?>)" class="px-3 py-1 text-xs text-zinc-500 hover:text-zinc-900">Cancel</button>
                                 <button type="submit" class="px-3 py-1 bg-amber-500 text-white rounded text-xs font-bold transition">Save Changes</button>
@@ -267,11 +267,11 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                     
                     <!-- Comment Actions (Vote & Reply) -->
                     <div class="flex items-center gap-4">
-                        <div class="flex items-center bg-zinc-50 border border-zinc-200 rounded-full overflow-hidden">
+                        <div class="flex items-center bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-full overflow-hidden">
                             <button onclick="handleCommentVote(<?php echo $comment['id']; ?>, 'upvote')" id="cmt-upvote-<?php echo $comment['id']; ?>" class="px-2 py-1 hover:bg-zinc-200 transition <?php echo $has_upvoted ? 'text-amber-500 bg-amber-50' : 'text-zinc-500'; ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 <?php echo !$has_upvoted ? 'group-hover:text-amber-500 transition-colors' : ''; ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
                             </button>
-                            <span id="cmt-count-<?php echo $comment['id']; ?>" class="text-xs font-bold text-zinc-700 px-2 border-x border-zinc-200"><?php echo number_format($comment['upvotes'] - $comment['downvotes']); ?></span>
+                            <span id="cmt-count-<?php echo $comment['id']; ?>" class="text-xs font-bold text-zinc-700 dark:text-zinc-300 px-2 border-x border-zinc-200 dark:border-zinc-700"><?php echo number_format($comment['upvotes'] - $comment['downvotes']); ?></span>
                             <button onclick="handleCommentVote(<?php echo $comment['id']; ?>, 'downvote')" id="cmt-downvote-<?php echo $comment['id']; ?>" class="px-2 py-1 hover:bg-zinc-200 transition <?php echo $has_downvoted ? 'text-blue-500 bg-blue-50' : 'text-zinc-500'; ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-180 <?php echo !$has_downvoted ? 'group-hover:text-blue-500 transition-colors' : ''; ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
                             </button>
@@ -282,7 +282,7 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                             </svg>
                             Reply
                         </button>
-                        <button onclick="openReportModal('comment', <?php echo $comment['id']; ?>)" class="text-xs font-bold text-zinc-400 hover:text-red-500 transition px-2 ml-2 border-l border-zinc-200" title="Report Comment">
+                        <button onclick="openReportModal('comment', <?php echo $comment['id']; ?>)" class="text-xs font-bold text-zinc-400 hover:text-red-500 transition px-2 ml-2 border-l border-zinc-200 dark:border-zinc-700" title="Report Comment">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>
                         </button>
                         
@@ -301,10 +301,10 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                         <form action="" method="POST">
                             <input type="hidden" name="action" value="post_comment">
                             <input type="hidden" name="parent_id" value="<?php echo $comment['id']; ?>">
-                            <textarea name="comment_content" rows="3" required placeholder="Write a reply..." class="w-full px-4 py-2 text-sm bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y mb-2"></textarea>
+                            <textarea name="comment_content" rows="3" required placeholder="Write a reply..." class="w-full px-4 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y mb-2"></textarea>
                             <div class="flex justify-end gap-2">
                                 <button type="button" onclick="toggleReplyForm(<?php echo $comment['id']; ?>)" class="px-4 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 font-medium transition">Cancel</button>
-                                <button type="submit" class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-lg text-xs transition shadow-sm">Post Reply</button>
+                                <button type="submit" class="px-4 py-1.5 bg-zinc-900 dark:bg-zinc-950 hover:bg-zinc-800 text-white font-medium rounded-lg text-xs transition shadow-sm">Post Reply</button>
                             </div>
                         </form>
                     </div>
@@ -343,6 +343,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -352,8 +353,9 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             }
         }
     </script>
+    <script src="/Semicolon/assets/js/theme.js"></script>
 </head>
-<body class="antialiased bg-[#FAFAFA]">
+<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
 
     <div class="container mx-auto px-6 py-10 max-w-4xl">
@@ -361,7 +363,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
         <a href="community.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 mb-6 inline-block">&larr; Back to Feed</a>
 
         <!-- Main Post -->
-        <div class="bg-white border border-zinc-100 rounded-2xl p-6 md:p-8 shadow-sm mb-8 flex gap-6 md:gap-8 relative overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6 md:p-8 shadow-sm mb-8 flex gap-6 md:gap-8 relative overflow-hidden">
             
             <!-- Voting Column -->
             <div class="flex flex-col items-center gap-2 flex-shrink-0 w-12">
@@ -372,7 +374,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                     </svg>
                 </button>
-                <span id="vote-count" class="font-bold text-lg text-zinc-900 mx-2"><?php echo number_format($post['upvotes']); ?></span>
+                <span id="vote-count" class="font-bold text-lg text-zinc-900 dark:text-white mx-2"><?php echo number_format($post['upvotes']); ?></span>
                 
                 <button onclick="handleVote(<?php echo $post['id']; ?>, 'downvote')" 
                         class="p-2 rounded-full hover:bg-zinc-100 transition group <?php echo $has_downvoted ? 'text-blue-500' : 'text-zinc-400'; ?>"
@@ -393,12 +395,12 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                     <span class="text-sm text-zinc-400"><?php echo date('F j, Y, g:i a', strtotime($post['created_at'])); ?></span>
                 </div>
 
-                <h1 class="text-2xl md:text-3xl font-bold text-zinc-900 mb-6 leading-tight">
+                <h1 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-6 leading-tight">
                     <?php echo htmlspecialchars($post['title']); ?>
                 </h1>
 
                 <div id="post-display" class="prose prose-zinc max-w-none mb-6">
-                    <div class="markdown-render text-lg text-zinc-700 leading-relaxed" data-raw="<?php echo htmlspecialchars($post['description']); ?>">
+                    <div class="markdown-render text-lg text-zinc-700 dark:text-zinc-300 leading-relaxed" data-raw="<?php echo htmlspecialchars($post['description']); ?>">
                         <?php echo htmlspecialchars($post['description']); ?>
                     </div>
                 </div>
@@ -408,14 +410,14 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                     $preview = json_decode($post['link_preview_json'], true);
                     if ($preview && !empty($preview['title'])):
                 ?>
-                    <a href="<?php echo htmlspecialchars($preview['url']); ?>" target="_blank" class="flex flex-col md:flex-row bg-white border border-zinc-200 rounded-xl overflow-hidden hover:shadow-md transition mb-6 group">
+                    <a href="<?php echo htmlspecialchars($preview['url']); ?>" target="_blank" class="flex flex-col md:flex-row bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden hover:shadow-md transition mb-6 group">
                         <?php if (!empty($preview['image'])): ?>
-                            <div class="h-48 md:w-48 md:h-auto flex-shrink-0 bg-zinc-100 overflow-hidden">
+                            <div class="h-48 md:w-48 md:h-auto flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                                 <img src="<?php echo htmlspecialchars($preview['image']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             </div>
                         <?php endif; ?>
                         <div class="p-4 flex flex-col justify-center min-w-0 flex-1">
-                            <h4 class="font-bold text-zinc-900 leading-tight mb-1 line-clamp-2"><?php echo htmlspecialchars($preview['title']); ?></h4>
+                            <h4 class="font-bold text-zinc-900 dark:text-white leading-tight mb-1 line-clamp-2"><?php echo htmlspecialchars($preview['title']); ?></h4>
                             <?php if (!empty($preview['description'])): ?>
                                 <p class="text-xs text-zinc-500 line-clamp-2"><?php echo htmlspecialchars($preview['description']); ?></p>
                             <?php endif; ?>
@@ -442,10 +444,10 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                                         const urlObj = new URL(data.url);
                                         const host = urlObj.hostname;
                                         document.getElementById('dynamic-link-preview').innerHTML = `
-                                            <a href="${data.url}" target="_blank" class="flex flex-col md:flex-row bg-white border border-zinc-200 rounded-xl overflow-hidden hover:shadow-md transition group">
-                                                ${data.image ? `<div class="h-48 md:w-48 md:h-auto flex-shrink-0 bg-zinc-100 overflow-hidden"><img src="${data.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>` : ''}
+                                            <a href="${data.url}" target="_blank" class="flex flex-col md:flex-row bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden hover:shadow-md transition group">
+                                                ${data.image ? `<div class="h-48 md:w-48 md:h-auto flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden"><img src="${data.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>` : ''}
                                                 <div class="p-4 flex flex-col justify-center min-w-0 flex-1">
-                                                    <h4 class="font-bold text-zinc-900 leading-tight mb-1 line-clamp-2">${data.title}</h4>
+                                                    <h4 class="font-bold text-zinc-900 dark:text-white leading-tight mb-1 line-clamp-2">${data.title}</h4>
                                                     ${data.description ? `<p class="text-xs text-zinc-500 line-clamp-2">${data.description}</p>` : ''}
                                                     <p class="text-xs text-zinc-400 mt-2 truncate flex items-center gap-1">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
@@ -461,27 +463,27 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                 <?php endif; endif; ?>
 
                 <?php if ($can_edit_post): ?>
-                <div id="post-edit-form" class="hidden mb-8 bg-zinc-50 p-6 rounded-2xl border border-zinc-200">
+                <div id="post-edit-form" class="hidden mb-8 bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-700">
                     <form action="" method="POST">
                         <input type="hidden" name="action" value="edit_post">
                         <div class="mb-4">
                             <label class="block text-xs font-bold text-zinc-500 uppercase mb-1">Title</label>
-                            <input type="text" name="title" value="<?php echo htmlspecialchars($post['title']); ?>" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 outline-none">
+                            <input type="text" name="title" value="<?php echo htmlspecialchars($post['title']); ?>" required class="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
                         </div>
                         <div class="mb-4">
                             <label class="block text-xs font-bold text-zinc-500 uppercase mb-1">Content</label>
-                            <textarea name="description" rows="6" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 outline-none"><?php echo htmlspecialchars($post['description']); ?></textarea>
+                            <textarea name="description" rows="6" required class="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none"><?php echo htmlspecialchars($post['description']); ?></textarea>
                         </div>
                         <div class="flex justify-end gap-3">
                             <button type="button" onclick="togglePostEdit()" class="px-4 py-2 text-sm text-zinc-500 hover:text-zinc-900 font-medium tracking-wide">Cancel</button>
-                            <button type="submit" class="px-6 py-2 bg-zinc-900 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition">Save Post</button>
+                            <button type="submit" class="px-6 py-2 bg-zinc-900 dark:bg-zinc-950 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition">Save Post</button>
                         </div>
                     </form>
                 </div>
                 <?php endif; ?>
 
                 <?php if (!empty($post['image_url'])): ?>
-                    <div class="rounded-xl overflow-hidden border border-zinc-100 mb-6 bg-zinc-50">
+                    <div class="rounded-xl overflow-hidden border border-zinc-100 dark:border-zinc-800 mb-6 bg-zinc-50 dark:bg-zinc-800/50">
                         <img src="<?php echo htmlspecialchars($post['image_url']); ?>" alt="Attached media" 
                              onerror="this.parentElement.style.display='none'; console.log('Image failed to load:', this.src);"
                              class="w-full h-auto object-contain max-h-[500px]">
@@ -515,25 +517,25 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
         </div>
 
         <!-- Comments Section -->
-        <h2 id="comments" class="text-2xl font-bold text-zinc-900 mb-6"><?php echo count($all_comments); ?> Comments</h2>
+        <h2 id="comments" class="text-2xl font-bold text-zinc-900 dark:text-white mb-6"><?php echo count($all_comments); ?> Comments</h2>
 
         <!-- Leave a comment -->
-        <div class="bg-white border border-zinc-100 rounded-2xl p-6 shadow-sm mb-8">
-            <h3 class="font-bold text-zinc-900 mb-4">Post an Answer or Reply</h3>
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6 shadow-sm mb-8">
+            <h3 class="font-bold text-zinc-900 dark:text-white mb-4">Post an Answer or Reply</h3>
             <form action="" method="POST">
                 <input type="hidden" name="action" value="post_comment">
                 <input type="hidden" name="parent_id" value="">
                 <textarea id="main-reply-textarea" name="comment_content" rows="4" required placeholder="What are your thoughts?" 
-                          class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y mb-4"></textarea>
+                          class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y mb-4"></textarea>
                 <div class="flex justify-end">
-                    <button type="submit" class="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-xl transition shadow-sm hover:shadow-md">Post Comment</button>
+                    <button type="submit" class="px-6 py-2.5 bg-zinc-900 dark:bg-zinc-950 hover:bg-zinc-800 text-white font-medium rounded-xl transition shadow-sm hover:shadow-md">Post Comment</button>
                 </div>
             </form>
         </div>
 
         <!-- Comments List -->
         <?php if (empty($all_comments)): ?>
-            <div class="text-center py-10 bg-white border border-dashed border-zinc-200 rounded-2xl">
+            <div class="text-center py-10 bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-700 rounded-2xl">
                 <p class="text-zinc-500">No comments yet. Be the first to share your thoughts!</p>
             </div>
         <?php else: ?>
@@ -548,7 +550,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             
             <?php if (count($top_level) > 10): ?>
                 <div class="text-center mb-12" id="load-more-container">
-                    <button onclick="loadMoreComments()" id="load-more-btn" class="px-6 py-2 bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 font-bold rounded-xl shadow-sm hover:shadow-md transition">
+                    <button onclick="loadMoreComments()" id="load-more-btn" class="px-6 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 font-bold rounded-xl shadow-sm hover:shadow-md transition">
                         Load More Comments
                     </button>
                     <input type="hidden" id="comments-offset" value="10">
@@ -779,9 +781,9 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
 
     <!-- Report Modal -->
     <div id="report-modal" class="fixed inset-0 z-50 hidden bg-zinc-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden transform transition-all scale-95 opacity-0" id="report-modal-content">
-            <div class="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50">
-                <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-md shadow-xl overflow-hidden transform transition-all scale-95 opacity-0" id="report-modal-content">
+            <div class="p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-800/50">
+                <h3 class="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd" /></svg>
                     Report Content
                 </h3>
@@ -792,12 +794,12 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             <div class="p-6">
                 <input type="hidden" id="report-target-type">
                 <input type="hidden" id="report-target-id">
-                <p class="text-sm text-zinc-600 mb-4">Please specify why you are reporting this content. Our moderation team will review it.</p>
-                <textarea id="report-reason" rows="4" class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition resize-none shadow-inner" placeholder="Reason for reporting..."></textarea>
+                <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Please specify why you are reporting this content. Our moderation team will review it.</p>
+                <textarea id="report-reason" rows="4" class="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition resize-none shadow-inner" placeholder="Reason for reporting..."></textarea>
                 <div id="report-error" class="text-red-500 text-sm mt-2 hidden font-medium"></div>
             </div>
-            <div class="p-4 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
-                <button onclick="closeReportModal()" class="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900 font-medium">Cancel</button>
+            <div class="p-4 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3">
+                <button onclick="closeReportModal()" class="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 font-medium">Cancel</button>
                 <button onclick="submitReport()" id="report-submit-btn" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold shadow-sm transition">Submit Report</button>
             </div>
         </div>

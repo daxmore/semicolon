@@ -105,7 +105,7 @@ $equipped_badges = get_user_badges($user_id, true);
         <!-- Player Card -->
         <div class="glass-panel rounded-2xl p-6 flex items-center gap-6 lg:col-span-2">
             <div class="relative">
-                <div class="w-24 h-24 rounded-full bg-white border-4 border-indigo-100 flex items-center justify-center text-3xl font-bold text-indigo-600 overflow-hidden shadow-sm">
+                <div class="w-24 h-24 rounded-full bg-white dark:bg-zinc-900 border-4 border-indigo-100 flex items-center justify-center text-3xl font-bold text-indigo-600 overflow-hidden shadow-sm">
                     <?php if (!empty($user['avatar_url'])): ?>
                         <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>" alt="Avatar" class="w-full h-full object-cover">
                     <?php else: ?>
@@ -113,7 +113,7 @@ $equipped_badges = get_user_badges($user_id, true);
                     <?php endif; ?>
                 </div>
                 <!-- Mini Level indicator overlay -->
-                <div class="absolute -bottom-2 -right-2 bg-white border border-indigo-200 rounded-full w-10 h-10 flex items-center justify-center shadow-md">
+                <div class="absolute -bottom-2 -right-2 bg-white dark:bg-zinc-900 border border-indigo-200 rounded-full w-10 h-10 flex items-center justify-center shadow-md">
                     <span class="text-indigo-600 font-bold text-sm">L<?php echo $level; ?></span>
                 </div>
             </div>

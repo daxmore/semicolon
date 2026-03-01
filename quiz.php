@@ -196,9 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php foreach ($dummy_question['options'] as $opt): ?>
                                 <label class="block relative cursor-pointer group">
                                     <input type="radio" name="answer" value="<?php echo $opt['id']; ?>" class="peer sr-only option-radio" required>
-                                    <div class="option-label p-5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-start gap-4">
+                                    <div class="option-label p-5 rounded-xl border border-slate-200 bg-white dark:bg-zinc-900 hover:bg-slate-50 flex items-start gap-4">
                                         <div class="w-5 h-5 mt-0.5 rounded-full border-2 border-slate-300 peer-checked:border-indigo-600 peer-checked:bg-indigo-600 flex-shrink-0 flex items-center justify-center">
-                                            <div class="w-2.5 h-2.5 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                            <div class="w-2.5 h-2.5 rounded-full bg-white dark:bg-zinc-900 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                                         </div>
                                         <span class="text-slate-700 font-medium leading-relaxed"><?php echo $opt['text']; ?></span>
                                     </div>
