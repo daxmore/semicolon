@@ -41,9 +41,6 @@ if (isset($_SESSION['user_id'])) {
               <!-- Community Link -->
               <li><a class="text-zinc-600 transition hover:text-indigo-600" href="community.php">Community</a></li>
               
-              <!-- Playground Link -->
-              <li><a class="text-zinc-600 transition hover:text-indigo-600 font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 hover:scale-105 inline-block" href="playground.php">Playground <span class="text-[10px] bg-red-500 text-white rounded px-1 ml-0.5 align-top">NEW</span></a></li>
-              
               <!-- Resources Dropdown -->
               <li class="relative group">
                   <button class="flex items-center gap-1 text-zinc-600 transition hover:text-indigo-600 focus:outline-none">
