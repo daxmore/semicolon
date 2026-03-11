@@ -198,9 +198,9 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
 
     foreach ($comments_by_parent[$parent_id] as $comment) {
         $is_accepted = !empty($comment['is_accepted']);
-        $margin_class = $depth > 0 ? 'ml-8 md:ml-12 border-l-2 border-zinc-100 dark:border-zinc-800 pl-4 mt-4' : 'bg-white border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6 shadow-sm mt-6';
+        $margin_class = $depth > 0 ? 'ml-8 md:ml-12 border-l-2 border-zinc-100 dark:border-zinc-800 pl-4 mt-4' : 'bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-6 shadow-sm mt-6';
         if ($is_accepted && $depth == 0) {
-            $margin_class = 'bg-emerald-50/50 border-2 border-emerald-400 rounded-2xl p-6 shadow-sm mt-6';
+            $margin_class = 'bg-emerald-50/50 dark:bg-emerald-950/10 border-2 border-emerald-400 dark:border-emerald-600 rounded-2xl p-6 shadow-sm mt-6';
         }
         
         $has_upvoted = isset($comment_reactions[$comment['id']]) && $comment_reactions[$comment['id']] === 'upvote';
@@ -212,11 +212,11 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
             
             <?php if ($can_edit_comment): ?>
                 <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                    <button onclick="toggleCommentEdit(<?php echo $comment['id']; ?>)" class="text-xs text-amber-600 hover:text-amber-700 font-bold bg-amber-50 hover:bg-amber-100 px-2 py-1 rounded">Edit</button>
+                    <button onclick="toggleCommentEdit(<?php echo $comment['id']; ?>)" class="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-bold bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 px-2 py-1 rounded">Edit</button>
                     <form action="" method="POST" class="inline">
                         <input type="hidden" name="action" value="delete_comment">
                         <input type="hidden" name="comment_id" value="<?php echo $comment['id']; ?>">
-                        <button type="submit" onclick="return confirm('Delete this comment permanently?')" class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 hover:bg-red-100 px-2 py-1 rounded">Delete</button>
+                        <button type="submit" onclick="return confirm('Delete this comment permanently?')" class="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-bold bg-red-50 dark:bg-red-900/20 hover:bg-red-100 px-2 py-1 rounded">Delete</button>
                     </form>
                 </div>
             <?php endif; ?>
@@ -233,15 +233,15 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                     <div class="flex items-center gap-2 mb-2 flex-wrap">
                         <span class="font-bold text-zinc-900 dark:text-white"><?php echo htmlspecialchars($comment['username']); ?></span>
                         <?php if ($is_accepted): ?>
-                            <span class="inline-flex items-center gap-1 text-[10px] md:text-xs font-bold px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md shadow-sm">
+                            <span class="inline-flex items-center gap-1 text-[10px] md:text-xs font-bold px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 rounded-md shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                                 Accepted Answer
                             </span>
                         <?php endif; ?>
                         <?php if ($comment['user_id'] === $post_user_id): ?>
-                            <span class="text-[10px] md:text-xs font-bold px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md">OP</span>
+                            <span class="text-[10px] md:text-xs font-bold px-2 py-0.5 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 rounded-md">OP</span>
                         <?php endif; ?>
-                        <span class="text-xs text-zinc-400"><?php echo date('M j, Y, g:i a', strtotime($comment['created_at'])); ?></span>
+                        <span class="text-xs text-zinc-400 dark:text-zinc-500"><?php echo date('M j, Y, g:i a', strtotime($comment['created_at'])); ?></span>
                     </div>
                     
                     <div id="comment-display-<?php echo $comment['id']; ?>">
@@ -268,21 +268,21 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                     <!-- Comment Actions (Vote & Reply) -->
                     <div class="flex items-center gap-4">
                         <div class="flex items-center bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-full overflow-hidden">
-                            <button onclick="handleCommentVote(<?php echo $comment['id']; ?>, 'upvote')" id="cmt-upvote-<?php echo $comment['id']; ?>" class="px-2 py-1 hover:bg-zinc-200 transition <?php echo $has_upvoted ? 'text-amber-500 bg-amber-50' : 'text-zinc-500'; ?>">
+                            <button onclick="handleCommentVote(<?php echo $comment['id']; ?>, 'upvote')" id="cmt-upvote-<?php echo $comment['id']; ?>" class="px-2 py-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition <?php echo $has_upvoted ? 'text-amber-500 bg-amber-50 dark:bg-amber-400/10' : 'text-zinc-500 dark:text-zinc-400'; ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 <?php echo !$has_upvoted ? 'group-hover:text-amber-500 transition-colors' : ''; ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
                             </button>
                             <span id="cmt-count-<?php echo $comment['id']; ?>" class="text-xs font-bold text-zinc-700 dark:text-zinc-300 px-2 border-x border-zinc-200 dark:border-zinc-700"><?php echo number_format($comment['upvotes'] - $comment['downvotes']); ?></span>
-                            <button onclick="handleCommentVote(<?php echo $comment['id']; ?>, 'downvote')" id="cmt-downvote-<?php echo $comment['id']; ?>" class="px-2 py-1 hover:bg-zinc-200 transition <?php echo $has_downvoted ? 'text-blue-500 bg-blue-50' : 'text-zinc-500'; ?>">
+                            <button onclick="handleCommentVote(<?php echo $comment['id']; ?>, 'downvote')" id="cmt-downvote-<?php echo $comment['id']; ?>" class="px-2 py-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition <?php echo $has_downvoted ? 'text-blue-500 bg-blue-50 dark:bg-blue-400/10' : 'text-zinc-500 dark:text-zinc-400'; ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform rotate-180 <?php echo !$has_downvoted ? 'group-hover:text-blue-500 transition-colors' : ''; ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
                             </button>
                         </div>
-                        <button onclick="toggleReplyForm(<?php echo $comment['id']; ?>)" class="text-xs font-bold text-zinc-500 hover:text-zinc-900 transition flex items-center gap-1">
+                        <button onclick="toggleReplyForm(<?php echo $comment['id']; ?>)" class="text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition flex items-center gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                             </svg>
                             Reply
                         </button>
-                        <button onclick="openReportModal('comment', <?php echo $comment['id']; ?>)" class="text-xs font-bold text-zinc-400 hover:text-red-500 transition px-2 ml-2 border-l border-zinc-200 dark:border-zinc-700" title="Report Comment">
+                        <button onclick="openReportModal('comment', <?php echo $comment['id']; ?>)" class="text-xs font-bold text-zinc-400 dark:text-zinc-500 hover:text-red-500 transition px-2 ml-2 border-l border-zinc-200 dark:border-zinc-700" title="Report Comment">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>
                         </button>
                         
@@ -303,8 +303,8 @@ function render_comments($parent_id, $comments_by_parent, $post_user_id, $depth 
                             <input type="hidden" name="parent_id" value="<?php echo $comment['id']; ?>">
                             <textarea name="comment_content" rows="3" required placeholder="Write a reply..." class="w-full px-4 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y mb-2"></textarea>
                             <div class="flex justify-end gap-2">
-                                <button type="button" onclick="toggleReplyForm(<?php echo $comment['id']; ?>)" class="px-4 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 font-medium transition">Cancel</button>
-                                <button type="submit" class="px-4 py-1.5 bg-zinc-900 dark:bg-zinc-950 hover:bg-zinc-800 text-white font-medium rounded-lg text-xs transition shadow-sm">Post Reply</button>
+                                <button type="button" onclick="toggleReplyForm(<?php echo $comment['id']; ?>)" class="px-4 py-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 font-medium transition">Cancel</button>
+                                <button type="submit" class="px-4 py-1.5 bg-zinc-900 dark:bg-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white font-medium rounded-lg text-xs transition shadow-sm">Post Reply</button>
                             </div>
                         </form>
                     </div>
@@ -353,7 +353,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             }
         }
     </script>
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="assets/js/theme.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
@@ -368,7 +368,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             <!-- Voting Column -->
             <div class="flex flex-col items-center gap-2 flex-shrink-0 w-12">
                 <button onclick="handleVote(<?php echo $post['id']; ?>, 'upvote')" 
-                        class="p-2 rounded-full hover:bg-zinc-100 transition group <?php echo $has_upvoted ? 'text-amber-500' : 'text-zinc-400'; ?>"
+                        class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition group <?php echo $has_upvoted ? 'text-amber-500' : 'text-zinc-400 dark:text-zinc-500'; ?>"
                         id="btn-upvote">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 <?php echo !$has_upvoted ? 'group-hover:text-amber-500 transition-colors' : ''; ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
@@ -377,10 +377,18 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                 <span id="vote-count" class="font-bold text-lg text-zinc-900 dark:text-white mx-2"><?php echo number_format($post['upvotes']); ?></span>
                 
                 <button onclick="handleVote(<?php echo $post['id']; ?>, 'downvote')" 
-                        class="p-2 rounded-full hover:bg-zinc-100 transition group <?php echo $has_downvoted ? 'text-blue-500' : 'text-zinc-400'; ?>"
+                        class="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition group <?php echo $has_downvoted ? 'text-blue-500' : 'text-zinc-400 dark:text-zinc-500'; ?>"
                         id="btn-downvote">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 transform rotate-180 <?php echo !$has_downvoted ? 'group-hover:text-blue-500 transition-colors' : ''; ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+                    
+                <!-- Share Button -->
+                <button onclick="sharePost('<?php echo htmlspecialchars('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>')" 
+                        class="p-2 mt-4 rounded-full text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-indigo-500 dark:hover:text-indigo-400 transition group flex flex-col items-center gap-1" title="Share Post">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                     </svg>
                 </button>
             </div>
@@ -388,11 +396,11 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             <!-- Post Content -->
                 <div class="flex-1 min-w-0 pr-4">
                 <div class="flex items-center gap-3 mb-4 flex-wrap">
-                    <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-amber-50 text-amber-700">
+                    <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
                         <?php echo htmlspecialchars($post['category']); ?>
                     </span>
-                    <span class="text-zinc-500 font-medium">Posted by <?php echo htmlspecialchars($post['username']); ?></span>
-                    <span class="text-sm text-zinc-400"><?php echo date('F j, Y, g:i a', strtotime($post['created_at'])); ?></span>
+                    <span class="text-zinc-500 dark:text-zinc-400 font-medium">Posted by <?php echo htmlspecialchars($post['username']); ?></span>
+                    <span class="text-sm text-zinc-400 dark:text-zinc-500"><?php echo date('F j, Y, g:i a', strtotime($post['created_at'])); ?></span>
                 </div>
 
                 <h1 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-6 leading-tight">
@@ -421,7 +429,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                             <?php if (!empty($preview['description'])): ?>
                                 <p class="text-xs text-zinc-500 line-clamp-2"><?php echo htmlspecialchars($preview['description']); ?></p>
                             <?php endif; ?>
-                            <p class="text-xs text-zinc-400 mt-2 truncate flex items-center gap-1">
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-2 truncate flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                                 <?php echo htmlspecialchars(parse_url($preview['url'], PHP_URL_HOST)); ?>
                             </p>
@@ -493,7 +501,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
             
             <div class="absolute top-4 right-4 flex gap-2">
                 <?php if ($can_edit_post): ?>
-                    <button onclick="togglePostEdit()" class="px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 rounded-lg text-sm font-bold transition flex items-center gap-1">
+                    <button onclick="togglePostEdit()" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 hover:text-amber-700 rounded-lg text-sm font-bold transition flex items-center gap-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
@@ -501,7 +509,7 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                     </button>
                     <form action="" method="POST" class="inline">
                         <input type="hidden" name="action" value="delete_post">
-                        <button type="submit" onclick="return confirm('Delete this entire post? This will destroy all comments too.')" class="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-lg text-sm font-bold transition flex items-center gap-1">
+                        <button type="submit" onclick="return confirm('Delete this entire post? This will destroy all comments too.')" class="px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-700 rounded-lg text-sm font-bold transition flex items-center gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
@@ -714,23 +722,39 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                 
                 if(!upBtn || !downBtn) return;
                 
-                upBtn.className = 'px-2 py-1 hover:bg-zinc-200 transition text-zinc-500';
-                downBtn.className = 'px-2 py-1 hover:bg-zinc-200 transition text-zinc-500';
+                upBtn.className = 'px-2 py-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition text-zinc-500 dark:text-zinc-400';
+                downBtn.className = 'px-2 py-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition text-zinc-500 dark:text-zinc-400';
                 
                 if (data.user_reaction === 'upvote') {
-                    upBtn.className = 'px-2 py-1 transition text-amber-500 bg-amber-50 rounded-l-full';
+                    upBtn.className = 'px-2 py-1 transition text-amber-500 bg-amber-50 dark:bg-amber-400/10 rounded-l-full';
                 } else if (data.user_reaction === 'downvote') {
-                    downBtn.className = 'px-2 py-1 transition text-blue-500 bg-blue-50 rounded-r-full';
+                    downBtn.className = 'px-2 py-1 transition text-blue-500 bg-blue-50 dark:bg-blue-400/10 rounded-r-full';
                 }
             } else { alert(data.error || 'An error occurred.'); }
         })
         .catch(error => console.error('Error:', error));
+    }
+    
+    function sharePost(url) {
+        if (navigator.share) {
+            navigator.share({
+                title: '<?php echo htmlspecialchars($post['title']); ?>',
+                url: url
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
     }
     </script>
 
     <style>
         /* Markdown specific overrides to fit the design */
         .markdown-render h1, .markdown-render h2, .markdown-render h3 { font-weight: bold; margin-top: 1.5em; margin-bottom: 0.5em; color: #18181b; }
+        .dark .markdown-render h1, .dark .markdown-render h2, .dark .markdown-render h3 { color: #f4f4f5; }
         .markdown-render h1 { font-size: 1.5em; }
         .markdown-render h2 { font-size: 1.25em; }
         .markdown-render p { margin-bottom: 1em; }
@@ -738,12 +762,18 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
         .markdown-render ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em; }
         .markdown-render a { color: #d97706; text-decoration: underline; }
         .markdown-render pre { background: #f4f4f5; padding: 1em; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1em; border: 1px solid #e4e4e7; }
+        .dark .markdown-render pre { background: #18181b; border-color: #3f3f46; }
         .markdown-render code { background: #f4f4f5; padding: 0.2em 0.4em; border-radius: 0.25rem; font-size: 0.875em; font-family: monospace; }
+        .dark .markdown-render code { background: #18181b; }
         .markdown-render blockquote { border-left: 4px solid #d4d4d8; padding-left: 1em; color: #71717a; font-style: italic; margin-bottom: 1em; }
+        .dark .markdown-render blockquote { border-left-color: #3f3f46; color: #a1a1aa; }
         .markdown-render img { max-width: 100%; height: auto; border-radius: 0.5rem; margin-bottom: 1em; border: 1px solid #e4e4e7; }
+        .dark .markdown-render img { border-color: #3f3f46; }
         .markdown-render table { width: 100%; margin-bottom: 1em; border-collapse: collapse; }
         .markdown-render th, .markdown-render td { border: 1px solid #e4e4e7; padding: 0.5em; text-align: left; }
+        .dark .markdown-render th, .dark .markdown-render td { border-color: #3f3f46; }
         .markdown-render th { background: #f4f4f5; font-weight: bold; }
+        .dark .markdown-render th { background: #18181b; }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -752,8 +782,13 @@ $has_downvoted = ($user_reaction && $user_reaction['reaction_type'] === 'downvot
                 const raw = el.getAttribute('data-raw');
                 if (raw) {
                     const html = marked.parse(raw);
-                    // Use DOMPurify to prevent XSS
-                    el.innerHTML = DOMPurify.sanitize(html);
+                    // Use DOMPurify to prevent XSS but allow safe formatting like links and images
+                    el.innerHTML = DOMPurify.sanitize(html, {
+                        ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+                        'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
+                        'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'img'],
+                        ALLOWED_ATTR: ['href', 'name', 'target', 'src', 'alt', 'class']
+                    });
                 }
             });
 

@@ -93,8 +93,9 @@ $equipped_badges = get_user_badges($user_id, true);
             100% { transform: translateX(100%); }
         }
     </style>
+    <script src="assets/js/theme.js"></script>
 </head>
-<body class="rpg-bg text-slate-800 min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-900 antialiased">
+<body class="rpg-bg text-[var(--text-primary)] min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-900 antialiased transition-colors duration-300">
 
 <?php include 'includes/header.php'; ?>
 
@@ -119,15 +120,15 @@ $equipped_badges = get_user_badges($user_id, true);
             </div>
             
             <div class="flex-1">
-                <h1 class="text-2xl font-bold text-slate-900 tracking-tight mb-1"><?php echo htmlspecialchars($user['username']); ?></h1>
-                <p class="text-slate-500 text-sm font-medium mb-3">Level <?php echo $level; ?> Challenger</p>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight mb-1"><?php echo htmlspecialchars($user['username']); ?></h1>
+                <p class="text-zinc-500 dark:text-zinc-400 text-sm font-medium mb-3">Level <?php echo $level; ?> Challenger</p>
                 
                 <!-- XP Bar -->
-                <div class="flex justify-between text-xs text-slate-500 mb-1 font-medium">
+                <div class="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1 font-medium">
                     <span><?php echo number_format($xp_total); ?> XP</span>
                     <span>Next: <?php echo number_format($xp_for_next_level); ?> XP</span>
                 </div>
-                <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                <div class="w-full h-3 bg-zinc-100 dark:bg-zinc-800/50 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700">
                     <div class="h-full progress-bar-fill rounded-full" style="width: <?php echo $progress_percentage; ?>%;"></div>
                 </div>
             </div>
@@ -136,26 +137,26 @@ $equipped_badges = get_user_badges($user_id, true);
         <!-- Stats / Equipped Badges -->
         <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
             <div>
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Active Status</h3>
+                <h3 class="text-sm font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-4">Active Status</h3>
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 border border-orange-500/20">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" /></svg>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-white"><?php echo $streak; ?> Days</div>
+                        <div class="text-2xl font-bold text-zinc-900 dark:text-white"><?php echo $streak; ?> Days</div>
                         <div class="text-xs text-orange-400">Current Streak</div>
                     </div>
                 </div>
             </div>
             
             <div>
-                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Equipped Badges</h3>
+                <h3 class="text-xs font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-2">Equipped Badges</h3>
                 <div class="flex gap-2">
                     <?php if (empty($equipped_badges)): ?>
-                        <div class="text-sm text-slate-500 italic">No badges equipped.</div>
+                        <div class="text-sm text-slate-500 dark:text-zinc-500 italic">No badges equipped.</div>
                     <?php else: ?>
                         <?php foreach($equipped_badges as $badge): ?>
-                            <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center" title="<?php echo htmlspecialchars($badge['badge_name']); ?>">
+                            <div class="w-10 h-10 rounded-lg bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center" title="<?php echo htmlspecialchars($badge['badge_name']); ?>">
                                 <?php echo $badge['svg_icon']; ?>
                             </div>
                         <?php endforeach; ?>
@@ -167,8 +168,8 @@ $equipped_badges = get_user_badges($user_id, true);
 
     <div class="mb-8 flex items-center justify-between">
         <div>
-            <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Skill Trees</h2>
-            <p class="text-slate-500 mt-1">Conquer challenges to unlock higher tiers and earn certifications.</p>
+            <h2 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Skill Trees</h2>
+            <p class="text-zinc-500 dark:text-zinc-400 mt-1">Conquer challenges to unlock higher tiers and earn certifications.</p>
         </div>
     </div>
 
@@ -200,7 +201,7 @@ $equipped_badges = get_user_badges($user_id, true);
                         break;
                     default:
                         $icon = '<img src="assets/images/skills-logo/programing.png" class="w-10 h-10 object-contain">';
-                        $color_class = 'text-slate-400'; $bg_class = 'bg-slate-500';
+                        $color_class = 'text-slate-400 dark:text-zinc-500'; $bg_class = 'bg-slate-500';
                 }
                 
                 // Determine progression states
@@ -213,26 +214,26 @@ $equipped_badges = get_user_badges($user_id, true);
                 <div class="absolute -top-10 -right-10 w-32 h-32 <?php echo $bg_class; ?> rounded-full blur-3xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
                 
                 <div class="flex items-center justify-between mb-4 relative z-10">
-                    <div class="w-16 h-16 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <div class="w-16 h-16 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center">
                         <?php echo $icon; ?>
                     </div>
                     <?php if ($current_index == 3 && $skill['interview_unlocked'] == 1): ?>
-                        <span class="px-2 py-1 text-xs font-bold text-amber-900 bg-amber-100 rounded uppercase tracking-wider shadow-sm border border-amber-200">Mastered</span>
+                        <span class="px-2 py-1 text-xs font-bold text-amber-900 dark:text-amber-200 bg-amber-100 dark:bg-amber-900/50 rounded uppercase tracking-wider shadow-sm border border-amber-200 dark:border-amber-800">Mastered</span>
                     <?php else: ?>
-                        <span class="px-2 py-1 text-xs font-bold <?php echo $color_class; ?> bg-slate-50 rounded border border-slate-200 uppercase tracking-wider"><?php echo $current_level; ?></span>
+                        <span class="px-2 py-1 text-xs font-bold <?php echo $color_class; ?> bg-slate-50 dark:bg-zinc-800 rounded border border-slate-200 dark:border-zinc-700 uppercase tracking-wider"><?php echo $current_level; ?></span>
                     <?php endif; ?>
                 </div>
                 
-                <h3 class="text-xl font-bold text-slate-800 mb-2 relative z-10"><?php echo $skill_name; ?></h3>
-                <p class="text-slate-500 text-sm mb-6 line-clamp-2 relative z-10"><?php echo $skill_desc; ?></p>
+                <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2 relative z-10"><?php echo $skill_name; ?></h3>
+                <p class="text-zinc-500 dark:text-zinc-400 text-sm mb-6 line-clamp-2 relative z-10"><?php echo $skill_desc; ?></p>
                 
                 <!-- Skill Progress Bar -->
                 <div class="mt-auto relative z-10">
-                    <div class="flex justify-between text-xs font-medium text-slate-500 mb-1">
+                    <div class="flex justify-between text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                         <span>Progress</span>
                         <span><?php echo $percentage; ?>%</span>
                     </div>
-                    <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div class="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                         <div class="h-full <?php echo $bg_class; ?> rounded-full" style="width: <?php echo $percentage; ?>%;"></div>
                     </div>
                 </div>

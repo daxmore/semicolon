@@ -209,7 +209,7 @@ $badges = get_user_badges($user_id);
             backdrop-filter: blur(4px);
         }
     </style>
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="assets/js/theme.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
@@ -224,7 +224,7 @@ $badges = get_user_badges($user_id);
         <div class="container mx-auto px-6">
             <!-- Alert Message -->
             <?php if ($message): ?>
-                <div class="rounded-2xl p-4 mb-6 <?php echo $message_type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'; ?>">
+                <div class="rounded-2xl p-4 mb-6 <?php echo $message_type === 'success' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800/50'; ?>">
                     <div class="flex items-center gap-3">
                         <?php if ($message_type === 'success'): ?>
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -255,9 +255,9 @@ $badges = get_user_badges($user_id);
                                 </span>
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-sm font-bold border border-amber-200 dark:border-amber-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.5 12.5a.5.5 0 01-1 0v-5a.5.5 0 011 0v5zM12 12a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>
-                                    Level <?php echo calculate_level_from_xp($user['xp'] ?? 0); ?> (<?php echo number_format($user['xp'] ?? 0); ?> XP)
+                                    Level <?php echo calculate_level_from_xp($user['xp_total'] ?? 0); ?> (<?php echo number_format($user['xp_total'] ?? 0); ?> XP)
                                 </span>
-                                <span class="text-zinc-500 text-sm">Member since <?php echo date('M Y', strtotime($user['created_at'] ?? 'now')); ?></span>
+                                <span class="text-zinc-500 dark:text-zinc-400 text-sm">Member since <?php echo date('M Y', strtotime($user['created_at'] ?? 'now')); ?></span>
                             </div>
                         </div>
                     </div>
@@ -294,7 +294,7 @@ $badges = get_user_badges($user_id);
                                 </svg>
                             </div>
                             <h3 class="font-bold text-zinc-900 dark:text-white">Browse Books</h3>
-                            <p class="text-sm text-zinc-500 mt-1">Access library</p>
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Access library</p>
                         </a>
                         <a href="papers.php" class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-6 hover:border-teal-200 hover:shadow-lg transition-all group">
                             <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
@@ -303,7 +303,7 @@ $badges = get_user_badges($user_id);
                                 </svg>
                             </div>
                             <h3 class="font-bold text-zinc-900 dark:text-white">Read Papers</h3>
-                            <p class="text-sm text-zinc-500 mt-1">Latest research</p>
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Latest research</p>
                         </a>
                         <a href="videos.php" class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-6 hover:border-rose-200 hover:shadow-lg transition-all group">
                             <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
@@ -313,7 +313,7 @@ $badges = get_user_badges($user_id);
                                 </svg>
                             </div>
                             <h3 class="font-bold text-zinc-900 dark:text-white">Watch Videos</h3>
-                            <p class="text-sm text-zinc-500 mt-1">Tutorials & more</p>
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Tutorials & more</p>
                         </a>
                     </div>
 
@@ -337,13 +337,13 @@ $badges = get_user_badges($user_id);
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
                                 </div>
-                                <p class="text-zinc-500 mb-2">No activity yet</p>
-                                <a href="books.php" class="text-indigo-600 hover:text-indigo-700 font-medium text-sm">Start exploring resources →</a>
+                                <p class="text-zinc-500 dark:text-zinc-400 mb-2">No activity yet</p>
+                                <a href="books.php" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium text-sm">Start exploring resources →</a>
                             </div>
                         <?php else: ?>
-                            <div class="divide-y divide-zinc-100">
+                            <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
                                 <?php foreach ($history as $item): ?>
-                                    <a href="view.php?token=<?php echo $item['token'] ?? ''; ?>" class="flex items-center gap-4 p-4 hover:bg-zinc-50 transition">
+                                    <a href="view.php?token=<?php echo $item['token'] ?? ''; ?>" class="flex items-center gap-4 p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition">
                                         <?php 
                                         $iconBg = $item['resource_type'] === 'book' ? 'bg-indigo-100 text-indigo-600' : 
                                                   ($item['resource_type'] === 'paper' ? 'bg-teal-100 text-teal-600' : 'bg-rose-100 text-rose-600');
@@ -366,7 +366,7 @@ $badges = get_user_badges($user_id);
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="font-medium text-zinc-900 dark:text-white truncate"><?php echo htmlspecialchars($item['title'] ?? 'Unknown Resource'); ?></p>
-                                            <p class="text-sm text-zinc-500"><?php echo ucfirst($item['resource_type']); ?> • <?php echo date('M d, Y', strtotime($item['viewed_at'])); ?></p>
+                                            <p class="text-sm text-zinc-500 dark:text-zinc-400"><?php echo ucfirst($item['resource_type']); ?> • <?php echo date('M d, Y', strtotime($item['viewed_at'])); ?></p>
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -384,7 +384,7 @@ $badges = get_user_badges($user_id);
                                     <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-not-allowed">Previous</span>
                                 <?php endif; ?>
                                 
-                                <span class="text-sm text-zinc-500 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
+                                <span class="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
                                 
                                 <?php if ($page < $total_pages): ?>
                                     <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 transition">Next</a>
@@ -406,20 +406,20 @@ $badges = get_user_badges($user_id);
                                 My Discussions
                             </h3>
                             <div class="flex gap-4">
-                                <a href="manage_posts.php" class="text-sm font-medium text-zinc-500 hover:text-zinc-800 transition">Manage</a>
+                                <a href="manage_posts.php" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition">Manage</a>
                                 <a href="community_create.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 transition">Start New &rarr;</a>
                             </div>
                         </div>
                         
                         <?php if (empty($user_posts)): ?>
                             <div class="p-10 text-center">
-                                <p class="text-zinc-500 mb-2">You haven't started any discussions yet.</p>
-                                <a href="community.php" class="text-amber-600 hover:text-amber-700 font-medium text-sm">Browse the community →</a>
+                                <p class="text-zinc-500 dark:text-zinc-400 mb-2">You haven't started any discussions yet.</p>
+                                <a href="community.php" class="text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium text-sm">Browse the community →</a>
                             </div>
                         <?php else: ?>
-                            <div class="divide-y divide-zinc-100">
+                            <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
                                 <?php foreach ($user_posts as $post): ?>
-                                    <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="block p-5 hover:bg-zinc-50 transition">
+                                    <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="block p-5 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition">
                                         <div class="flex items-center gap-2 mb-1">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                                                 <?php echo htmlspecialchars($post['category']); ?>
@@ -427,7 +427,7 @@ $badges = get_user_badges($user_id);
                                             <span class="text-xs text-zinc-400"><?php echo date('M d, Y', strtotime($post['created_at'])); ?></span>
                                         </div>
                                         <h4 class="font-bold text-zinc-900 dark:text-white mb-1 truncate"><?php echo htmlspecialchars($post['title']); ?></h4>
-                                        <div class="flex items-center gap-4 text-xs text-zinc-500 font-medium mt-2">
+                                        <div class="flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-2">
                                             <span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg> <?php echo $post['upvotes']; ?></span>
                                         </div>
                                     </a>

@@ -33,9 +33,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="../assets/js/theme.js"></script>
 </head>
-<body class="bg-zinc-100 font-sans antialiased">
+<body class="bg-zinc-100 dark:bg-zinc-950 font-sans antialiased transition-colors duration-300">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside class="fixed inset-y-0 left-0 w-64 bg-zinc-900 text-white flex flex-col z-50">
@@ -159,12 +159,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </aside>
         
         <!-- Main Content Area -->
-        <main class="flex-1 ml-64">
+        <main class="flex-1 ml-64 min-h-screen">
             <!-- Top Bar -->
-            <header class="bg-white border-b border-zinc-200 px-8 py-4 sticky top-0 z-40">
+            <header class="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-8 py-4 sticky top-0 z-40">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-xl font-bold text-zinc-900">
+                        <h1 class="text-xl font-bold text-zinc-900 dark:text-white">
                             <?php
                             $titles = [
                                 'index.php' => 'Dashboard',
@@ -201,7 +201,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
                             </div>
                             <div class="hidden sm:block">
-                                <p class="text-sm font-medium text-zinc-900"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></p>
+                                <p class="text-sm font-medium text-zinc-900 dark:text-white"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></p>
                                 <p class="text-xs text-zinc-500">Administrator</p>
                             </div>
                         </div>

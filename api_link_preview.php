@@ -26,6 +26,31 @@ if ($row && !empty($row['link_preview_json'])) {
     exit();
 }
 
+// Quick check if URL is a direct image
+$headers = @get_headers($url, 1);
+if ($headers) {
+    // get_headers can return an array of content-types if there were redirects
+    $content_type = is_array($headers['Content-Type']) ? end($headers['Content-Type']) : $headers['Content-Type'];
+    if (strpos(strtolower($content_type), 'image/') === 0) {
+        $preview_data = [
+            'success' => true,
+            'title' => 'Image content',
+            'description' => '',
+            'image' => $url,
+            'url' => $url
+        ];
+        $json_val = json_encode($preview_data);
+        
+        // Save to DB for caching
+        $upd = $conn->prepare("UPDATE community_posts SET link_preview_json = ? WHERE id = ?");
+        $upd->bind_param('si', $json_val, $post_id);
+        $upd->execute();
+        
+        echo $json_val;
+        exit();
+    }
+}
+
 // Fetch open graph tags natively
 $context = stream_context_create([
     'http' => [

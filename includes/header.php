@@ -121,7 +121,7 @@ if (isset($_SESSION['user_id'])) {
                 <button class="flex items-center gap-2 rounded-full bg-zinc-100 hover:bg-zinc-200 pl-1 pr-3 py-1 text-sm font-medium text-zinc-700 transition">
                     <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-sm overflow-hidden">
                         <?php if ($header_user_avatar): ?>
-                            <img src="/Semicolon/<?php echo htmlspecialchars($header_user_avatar); ?>" alt="Avatar" class="w-full h-full object-cover">
+                            <img src="<?php echo htmlspecialchars($header_user_avatar); ?>" alt="Avatar" class="w-full h-full object-cover">
                         <?php else: ?>
                             <?php echo strtoupper(substr($_SESSION['username'] ?? 'U', 0, 1)); ?>
                         <?php endif; ?>

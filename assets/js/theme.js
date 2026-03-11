@@ -13,20 +13,17 @@ function initTheme() {
 // Run immediately to prevent FOUC
 initTheme();
 
-document.addEventListener('DOMContentLoaded', () => {
-    const themeToggles = document.querySelectorAll('.theme-toggle');
-    
-    themeToggles.forEach(toggle => {
-        toggle.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            
-            if (isDark) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        });
-    });
+document.addEventListener('click', (e) => {
+    const toggleBtn = e.target.closest('.theme-toggle');
+    if (toggleBtn) {
+        const isDark = document.documentElement.classList.contains('dark');
+        
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
 });

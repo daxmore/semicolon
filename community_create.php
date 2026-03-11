@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="assets/js/theme.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container mx-auto px-6 max-w-3xl">
             
             <?php if ($error): ?>
-                <div class="mb-6 bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-center gap-3">
+                <div class="mb-6 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 p-4 rounded-xl border border-red-100 dark:border-red-800/50 flex items-center gap-3 error-banner">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                     </svg>
@@ -132,8 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>">
                     </div>
 
-                    <div>
-                        <label for="category" class="block text-sm font-bold text-zinc-900 dark:text-white mt-4 mb-2">Topic Category</label>
+                    <div class="mb-4">
+                        <label for="category" class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Topic Category</label>
                         <select id="category" name="category" required 
                                 class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
                             <option value="">Select a specific topic...</option>
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     
-                    <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 mb-2 mt-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 mb-6 rounded-xl border border-zinc-100 dark:border-zinc-800">
                         <label class="block text-sm font-bold text-zinc-900 dark:text-white mb-1">Attach Media <span class="text-zinc-400 font-normal">(Optional)</span></label>
                         <p class="text-xs text-zinc-500 mb-4">Upload an image from your device, or paste a public URL.</p>
                         
@@ -154,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div>
                                 <label for="image_upload" class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-2 uppercase tracking-wide">Upload File (Max 2MB)</label>
                                 <input type="file" id="image_upload" accept="image/*"
-                                       class="w-full px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                                       class="w-full px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-50 dark:file:bg-amber-900/40 file:text-amber-700 dark:file:text-amber-400 hover:file:bg-amber-100 dark:hover:file:bg-amber-900/60">
                             </div>
                             
                              <div>
@@ -180,17 +180,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-                    <div>
+                    <div class="mt-4">
                         <label for="description" class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Description</label>
                         <textarea id="description" name="description" rows="8" required placeholder="Add more details to your discussion..." 
                                   class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y"><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
                     </div>
 
                     <div class="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-4 pb-4">
-                        <a href="community.php" class="px-6 py-3 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-medium rounded-xl hover:bg-zinc-50 transition-all hover:scale-[1.02] active:scale-[0.98]">Cancel</a>
+                        <a href="community.php" class="px-6 py-3 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 font-medium rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all hover:scale-[1.02] active:scale-[0.98]">Cancel</a>
                         <button type="button" id="submitBtn" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]">Post Discussion</button>
                     </div>
-                </div>
             </form>
 
         </div>
@@ -219,9 +218,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     });
 
     function handleUrlPreview(url) {
+        url = url.trim();
         if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
             showPreview(url);
             document.getElementById('image_upload').value = ''; // Clear file if URL entered
+            document.getElementById('compressed_image_b64').value = '';
+        } else if (url && !url.includes('://') && url.includes('.')) {
+            // Try adding https if it looks like a domain
+            const fullUrl = 'https://' + url;
+            showPreview(fullUrl);
+            document.getElementById('image_upload').value = '';
             document.getElementById('compressed_image_b64').value = '';
         } else {
             document.getElementById('preview-container').classList.add('hidden');
@@ -264,7 +270,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const file = fileInput.files[0];
         // Validate roughly 2MB constraint before processing
         if (file.size > 2 * 1024 * 1024) {
-            alert("Image must be under 2MB.");
+            // Check if there's already an error banner, if not create one or append to it
+            const errorBanner = document.createElement('div');
+            errorBanner.className = 'mb-6 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 p-4 rounded-xl border border-red-100 dark:border-red-800/50 flex items-center gap-3 error-banner';
+            errorBanner.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                Image must be under 2MB. Please select a smaller file.
+            `;
+            
+            // Remove previous JS-generated banners
+            document.querySelectorAll('.error-banner').forEach(el => el.remove());
+            
+            form.parentNode.insertBefore(errorBanner, form);
+            
+            // Scroll to top to see error
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 

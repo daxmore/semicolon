@@ -40,7 +40,7 @@ $books = get_books($selected_category, null, $search_query);
             }
         }
     </script>
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="assets/js/theme.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
@@ -73,16 +73,16 @@ $books = get_books($selected_category, null, $search_query);
                     <div class="sticky top-20">
                         <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 px-3">Filter by Category</h3>
                         <div class="space-y-0.5 max-h-[75vh] overflow-y-auto custom-scrollbar pr-2">
-                            <a href="books.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition <?php echo !$selected_category ? 'bg-indigo-50 text-indigo-700' : 'text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900'; ?>">
-                                <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 <?php echo !$selected_category ? 'bg-indigo-100/50 text-indigo-600' : 'text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100'; ?>">
+                            <a href="books.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition <?php echo !$selected_category ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-200'; ?>">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 <?php echo !$selected_category ? 'bg-indigo-100/50 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800'; ?>">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
                                 </div>
                                 All Books
                             </a>
                             <?php foreach ($categories as $cat): ?>
                                 <a href="books.php?category=<?php echo urlencode($cat); ?>" 
-                                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition group <?php echo ($selected_category === $cat) ? 'bg-indigo-50 text-indigo-700' : 'text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900'; ?>">
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 <?php echo ($selected_category === $cat) ? 'bg-indigo-100/50 text-indigo-600' : 'text-zinc-400 group-hover:text-zinc-500 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100'; ?>">
+                                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition group <?php echo ($selected_category === $cat) ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-200'; ?>">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 <?php echo ($selected_category === $cat) ? 'bg-indigo-100/50 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-500 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800'; ?>">
                                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <?php echo $category_icons[$cat] ?? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/>'; ?>
                                         </svg>

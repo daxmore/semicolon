@@ -36,20 +36,20 @@ include 'header.php';
 <!-- Welcome & System Status -->
 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
     <div>
-        <h2 class="text-2xl font-bold text-zinc-900">Welcome Back, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</h2>
-        <p class="text-zinc-500">Here's what's happening on <span class="font-semibold text-indigo-600">Semicolon</span> today.</p>
+        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">Welcome Back, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</h2>
+        <p class="text-zinc-500 dark:text-zinc-400">Here's what's happening on <span class="font-semibold text-indigo-600">Semicolon</span> today.</p>
     </div>
 </div>
 
 <!-- Stats Grid -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Users -->
-    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 flex items-center justify-between">
+    <div class="group bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 flex items-center justify-between">
         <div>
-            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Users</p>
-            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_users); ?></p>
+            <p class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Users</p>
+            <p class="text-4xl font-black text-zinc-900 dark:text-white"><?php echo number_format($total_users); ?></p>
         </div>
-        <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+        <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
@@ -57,12 +57,12 @@ include 'header.php';
     </div>
 
     <!-- Books -->
-    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-teal-500 hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 flex items-center justify-between">
+    <div class="group bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 hover:border-teal-500 hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 flex items-center justify-between">
         <div>
-            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Books</p>
-            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_books); ?></p>
+            <p class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Books</p>
+            <p class="text-4xl font-black text-zinc-900 dark:text-white"><?php echo number_format($total_books); ?></p>
         </div>
-        <div class="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center text-teal-600 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+        <div class="w-14 h-14 bg-teal-50 dark:bg-teal-900/30 rounded-2xl flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
@@ -70,12 +70,12 @@ include 'header.php';
     </div>
 
     <!-- Papers -->
-    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex items-center justify-between">
+    <div class="group bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex items-center justify-between">
         <div>
-            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Papers</p>
-            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_papers); ?></p>
+            <p class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Papers</p>
+            <p class="text-4xl font-black text-zinc-900 dark:text-white"><?php echo number_format($total_papers); ?></p>
         </div>
-        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+        <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -83,12 +83,12 @@ include 'header.php';
     </div>
 
     <!-- Videos -->
-    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-rose-500 hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 flex items-center justify-between">
+    <div class="group bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 hover:border-rose-500 hover:shadow-2xl hover:shadow-rose-500/10 transition-all duration-300 flex items-center justify-between">
         <div>
-            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Videos</p>
-            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_videos); ?></p>
+            <p class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Videos</p>
+            <p class="text-4xl font-black text-zinc-900 dark:text-white"><?php echo number_format($total_videos); ?></p>
         </div>
-        <div class="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+        <div class="w-14 h-14 bg-rose-50 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -97,12 +97,12 @@ include 'header.php';
     </div>
 
     <!-- Posts -->
-    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-amber-500 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 flex items-center justify-between">
+    <div class="group bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 hover:border-amber-500 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 flex items-center justify-between">
         <div>
-            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Posts</p>
-            <p class="text-4xl font-black text-zinc-900"><?php echo number_format($total_posts); ?></p>
+            <p class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Posts</p>
+            <p class="text-4xl font-black text-zinc-900 dark:text-white"><?php echo number_format($total_posts); ?></p>
         </div>
-        <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+        <div class="w-14 h-14 bg-amber-50 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
             </svg>
@@ -136,12 +136,12 @@ include 'header.php';
     </div>
 
     <!-- Avg Lvl -->
-    <div class="group bg-white p-6 rounded-[2rem] border border-zinc-200 hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 flex items-center justify-between">
+    <div class="group bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 flex items-center justify-between">
         <div>
-            <p class="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Avg Lvl</p>
-            <p class="text-4xl font-black text-zinc-900"><?php echo $avg_level; ?></p>
+            <p class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Avg Lvl</p>
+            <p class="text-4xl font-black text-zinc-900 dark:text-white"><?php echo $avg_level; ?></p>
         </div>
-        <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+        <div class="w-14 h-14 bg-orange-50 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center text-orange-600 dark:text-orange-400 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -153,7 +153,7 @@ include 'header.php';
 <div class="mb-10">
     <div class="flex items-center gap-2 mb-6">
         <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
-        <h2 class="text-xl font-bold text-zinc-900">Creation HUB</h2>
+        <h2 class="text-xl font-bold text-zinc-900 dark:text-white">Creation HUB</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <a href="books.php?add=1" class="group relative p-8 rounded-[2rem] bg-indigo-600 text-white overflow-hidden shadow-xl shadow-indigo-600/20 hover:-translate-y-1 transition-all duration-300">
@@ -228,9 +228,9 @@ include 'header.php';
 </div>
 
 <!-- Unified Content Stream -->
-<div class="bg-white rounded-[2.5rem] border border-zinc-200 shadow-sm overflow-hidden mb-8">
-    <div class="px-8 py-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
-        <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
+<div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden mb-8">
+    <div class="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/50">
+        <h3 class="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
@@ -241,14 +241,14 @@ include 'header.php';
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Recent Books Sub-grid -->
             <div class="space-y-3">
-                <p class="px-4 text-xs font-bold text-zinc-400 uppercase tracking-widest">Latest Books</p>
+                <p class="px-4 text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Latest Books</p>
                 <?php foreach ($recent_books as $book): ?>
-                <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-transparent hover:border-indigo-100 hover:bg-white transition-all group">
+                <div class="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900/40 hover:bg-white dark:hover:bg-zinc-800 transition-all group">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-bold text-sm group-hover:bg-indigo-600 group-hover:text-white transition-colors">B</div>
+                        <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center font-bold text-sm group-hover:bg-indigo-600 group-hover:text-white transition-colors">B</div>
                         <div>
-                            <p class="font-bold text-zinc-900 text-sm line-clamp-1"><?php echo htmlspecialchars($book['title']); ?></p>
-                            <p class="text-xs text-zinc-500"><?php echo htmlspecialchars($book['author']); ?></p>
+                            <p class="font-bold text-zinc-900 dark:text-white text-sm line-clamp-1"><?php echo htmlspecialchars($book['title']); ?></p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400"><?php echo htmlspecialchars($book['author']); ?></p>
                         </div>
                     </div>
                 </div>
@@ -256,14 +256,14 @@ include 'header.php';
             </div>
             <!-- Recent Papers Sub-grid -->
             <div class="space-y-3">
-                <p class="px-4 text-xs font-bold text-zinc-400 uppercase tracking-widest">Latest Papers</p>
+                <p class="px-4 text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Latest Papers</p>
                 <?php foreach ($recent_papers as $paper): ?>
-                <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-transparent hover:border-teal-100 hover:bg-white transition-all group">
+                <div class="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-transparent hover:border-teal-100 dark:hover:border-teal-900/40 hover:bg-white dark:hover:bg-zinc-800 transition-all group">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center font-bold text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors">P</div>
+                        <div class="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-xl flex items-center justify-center font-bold text-sm group-hover:bg-teal-600 group-hover:text-white transition-colors">P</div>
                         <div>
-                            <p class="font-bold text-zinc-900 text-sm line-clamp-1"><?php echo htmlspecialchars($paper['title']); ?></p>
-                            <p class="text-xs text-zinc-500"><?php echo htmlspecialchars($paper['subject']); ?> • <?php echo $paper['year']; ?></p>
+                            <p class="font-bold text-zinc-900 dark:text-white text-sm line-clamp-1"><?php echo htmlspecialchars($paper['title']); ?></p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400"><?php echo htmlspecialchars($paper['subject']); ?> • <?php echo $paper['year']; ?></p>
                         </div>
                     </div>
                 </div>
@@ -271,14 +271,14 @@ include 'header.php';
             </div>
             <!-- Recent Videos Sub-grid -->
             <div class="space-y-3">
-                <p class="px-4 text-xs font-bold text-zinc-400 uppercase tracking-widest">Latest Videos</p>
+                <p class="px-4 text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Latest Videos</p>
                 <?php foreach ($recent_videos as $video): ?>
-                <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-transparent hover:border-rose-100 hover:bg-white transition-all group">
+                <div class="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-transparent hover:border-rose-100 dark:hover:border-rose-900/40 hover:bg-white dark:hover:bg-zinc-800 transition-all group">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center font-bold text-sm group-hover:bg-rose-600 group-hover:text-white transition-colors">V</div>
+                        <div class="w-10 h-10 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center font-bold text-sm group-hover:bg-rose-600 group-hover:text-white transition-colors">V</div>
                         <div>
-                            <p class="font-bold text-zinc-900 text-sm line-clamp-1"><?php echo htmlspecialchars($video['title']); ?></p>
-                            <p class="text-xs text-zinc-500">Video Lesson</p>
+                            <p class="font-bold text-zinc-900 dark:text-white text-sm line-clamp-1"><?php echo htmlspecialchars($video['title']); ?></p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400">Video Lesson</p>
                         </div>
                     </div>
                 </div>
@@ -286,10 +286,10 @@ include 'header.php';
             </div>
         </div>
     </div>
-    <div class="px-8 py-4 bg-zinc-50 border-t border-zinc-100 flex justify-center gap-6">
-        <a href="books.php" class="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition">Manage Books →</a>
-        <a href="papers.php" class="text-sm font-bold text-teal-600 hover:text-teal-700 transition">Manage Papers →</a>
-        <a href="videos.php" class="text-sm font-bold text-rose-600 hover:text-rose-700 transition">Manage Videos →</a>
+    <div class="px-8 py-4 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-100 dark:border-zinc-800 flex justify-center gap-6">
+        <a href="books.php" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition">Manage Books →</a>
+        <a href="papers.php" class="text-sm font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition">Manage Papers →</a>
+        <a href="videos.php" class="text-sm font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition">Manage Videos →</a>
     </div>
 </div>
 
@@ -299,26 +299,26 @@ include 'header.php';
     <div class="lg:col-span-8 space-y-8">
 
         <!-- Community Moderation Feed -->
-        <div class="bg-white rounded-[2.5rem] border border-zinc-200 shadow-sm overflow-hidden">
-            <div class="px-8 py-6 border-b border-zinc-100 bg-amber-50/30 flex items-center justify-between">
-                <h3 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
+        <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+            <div class="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 bg-amber-50/30 dark:bg-amber-900/10 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                     </svg>
                     Community Activity
                 </h3>
-                <a href="community.php" class="text-xs font-bold text-amber-600 uppercase tracking-widest hover:underline">Moderate</a>
+                <a href="community.php" class="text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest hover:underline">Moderate</a>
             </div>
-            <div class="divide-y divide-zinc-100">
+            <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
                 <?php foreach ($recent_posts as $post): ?>
-                <div class="px-8 py-5 flex items-center justify-between hover:bg-zinc-50 transition drop-shadow-sm">
+                <div class="px-8 py-5 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition drop-shadow-sm">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center font-bold text-xs text-zinc-500 border-2 border-white shadow-sm">
+                        <div class="w-10 h-10 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold text-xs text-zinc-500 dark:text-zinc-400 border-2 border-white dark:border-zinc-700 shadow-sm">
                             <?php echo strtoupper(substr($post['username'] ?? 'A', 0, 1)); ?>
                         </div>
                         <div>
-                            <p class="font-bold text-zinc-900 text-sm"><?php echo htmlspecialchars($post['title']); ?></p>
-                            <p class="text-xs text-zinc-500">By <span class="font-semibold text-zinc-700"><?php echo htmlspecialchars($post['username'] ?? 'Anonymous'); ?></span> • <?php echo date('M d, h:ia', strtotime($post['created_at'])); ?></p>
+                            <p class="font-bold text-zinc-900 dark:text-white text-sm"><?php echo htmlspecialchars($post['title']); ?></p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400">By <span class="font-semibold text-zinc-700 dark:text-zinc-300"><?php echo htmlspecialchars($post['username'] ?? 'Anonymous'); ?></span> • <?php echo date('M d, h:ia', strtotime($post['created_at'])); ?></p>
                         </div>
                     </div>
                     <a href="../community_post_detail.php?id=<?php echo $post['id']; ?>" target="_blank" class="p-2 text-zinc-400 hover:text-indigo-600 transition" aria-label="View post">
@@ -343,25 +343,25 @@ include 'header.php';
     <!-- Right Column: Secondary Info -->
     <div class="lg:col-span-4 space-y-8">
         <!-- New Arrivals (Users) -->
-        <div class="bg-white rounded-[2.5rem] border border-zinc-200 shadow-sm overflow-hidden">
-            <div class="px-8 py-6 border-b border-zinc-100 bg-zinc-50/50">
-                <h3 class="font-bold text-zinc-900">New Members</h3>
+        <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+            <div class="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50">
+                <h3 class="font-bold text-zinc-900 dark:text-white">New Members</h3>
             </div>
             <div class="p-6 space-y-4">
                 <?php foreach ($recent_users as $user): ?>
                     <div class="flex items-center gap-4 group">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 group-hover:border-indigo-200 transition-colors">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 border-2 border-white dark:border-zinc-800 shadow-sm flex items-center justify-center overflow-hidden shrink-0 group-hover:border-indigo-200 transition-colors">
                             <?php if (!empty($user['avatar_url'])): ?>
                                 <img src="../<?php echo htmlspecialchars($user['avatar_url']); ?>" alt="" class="w-full h-full object-cover">
                             <?php else: ?>
-                                <span class="font-black text-indigo-600"><?php echo strtoupper(substr($user['username'], 0, 1)); ?></span>
+                                <span class="font-black text-indigo-600 dark:text-indigo-400"><?php echo strtoupper(substr($user['username'], 0, 1)); ?></span>
                             <?php endif; ?>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-bold text-zinc-900 text-sm truncate"><?php echo htmlspecialchars($user['username']); ?></p>
-                            <p class="text-xs text-zinc-500"><?php echo $user['role'] === 'admin' ? '🛡️ Admin' : '👤 Member'; ?></p>
+                            <p class="font-bold text-zinc-900 dark:text-white text-sm truncate"><?php echo htmlspecialchars($user['username']); ?></p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400"><?php echo $user['role'] === 'admin' ? '🛡️ Admin' : '👤 Member'; ?></p>
                         </div>
-                        <div class="text-[10px] font-bold text-zinc-300 uppercase"><?php echo date('M d', strtotime($user['created_at'])); ?></div>
+                        <div class="text-[10px] font-bold text-zinc-300 dark:text-zinc-600 uppercase"><?php echo date('M d', strtotime($user['created_at'])); ?></div>
                     </div>
                 <?php endforeach; ?>
                 <a href="users.php" class="block w-full text-center py-3 bg-zinc-900 text-white rounded-2xl text-xs font-bold hover:bg-zinc-800 transition shadow-lg shadow-zinc-900/10">Manage Users</a>

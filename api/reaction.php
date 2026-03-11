@@ -27,8 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     
     if (toggle_reaction($user_id, $resource_type, $resource_id, $is_helpful)) {
+        // Fetch new state to pass back to frontend so UI knows if it was deleted
+        $stmt_check = $conn->prepare("SELECT is_helpful FROM reactions WHERE user_id = ? AND resource_type = ? AND resource_id = ?");
+        $stmt_check->bind_param('isi', $user_id, $resource_type, $resource_id);
+        $stmt_check->execute();
+        $user_reaction = $stmt_check->get_result()->fetch_assoc();
+        
         $stats = get_reaction_stats($resource_type, $resource_id);
-        echo json_encode(['success' => true, 'stats' => $stats]);
+        echo json_encode(['success' => true, 'stats' => $stats, 'user_reaction' => $user_reaction ? $user_reaction['is_helpful'] : null]);
     } else {
         http_response_code(500);
         echo json_encode(['error' => 'Database error']);

@@ -190,18 +190,15 @@ $is_helpful = $user_reaction ? $user_reaction['is_helpful'] : null;
                     const btnHelpful = document.getElementById('btn-helpful');
                     const btnNotHelpful = document.getElementById('btn-not-helpful');
 
-                    if (isHelpful === 1) {
-                        btnHelpful.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-700');
-                        btnHelpful.classList.add('bg-green-600', 'text-white');
-                        
-                        btnNotHelpful.classList.remove('bg-red-600', 'text-white');
-                        btnNotHelpful.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-700');
-                    } else {
-                        btnNotHelpful.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-700');
-                        btnNotHelpful.classList.add('bg-red-600', 'text-white');
+                    // Reset both to inactive state first
+                    btnHelpful.className = 'flex items-center gap-1 px-3 py-1.5 rounded transition text-gray-400 hover:text-white hover:bg-gray-700';
+                    btnNotHelpful.className = 'flex items-center gap-1 px-3 py-1.5 rounded transition text-gray-400 hover:text-white hover:bg-gray-700';
 
-                        btnHelpful.classList.remove('bg-green-600', 'text-white');
-                        btnHelpful.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-700');
+                    // Apply active state if there is a reaction
+                    if (data.user_reaction === 1) {
+                        btnHelpful.className = 'flex items-center gap-1 px-3 py-1.5 rounded transition bg-green-600 text-white';
+                    } else if (data.user_reaction === 0 || data.user_reaction === '0') {
+                        btnNotHelpful.className = 'flex items-center gap-1 px-3 py-1.5 rounded transition bg-red-600 text-white';
                     }
                 }
             })

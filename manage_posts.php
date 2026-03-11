@@ -110,7 +110,7 @@ $categories = [
             backdrop-filter: blur(4px);
         }
     </style>
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="assets/js/theme.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
@@ -120,7 +120,7 @@ $categories = [
         <div class="container mx-auto px-6 max-w-5xl">
             <a href="profile.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 mb-2 inline-block">&larr; Back to Profile</a>
             <h1 class="text-3xl font-bold text-zinc-900 dark:text-white">Manage My Posts</h1>
-            <p class="text-zinc-500 mt-2">Edit or delete the discussions you've started in the community.</p>
+            <p class="text-zinc-500 dark:text-zinc-400 mt-2">Edit or delete the discussions you've started in the community.</p>
         </div>
     </div>
 
@@ -129,7 +129,13 @@ $categories = [
         <div class="container mx-auto px-6 max-w-5xl">
             
             <?php if ($message): ?>
-                <div class="mb-6 p-4 rounded-xl border <?php echo strpos($message, 'successfully') !== false ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'; ?> flex flex-row items-center gap-3">
+                <?php 
+                    $isSuccess = strpos($message, 'successfully') !== false;
+                    $bannerClass = $isSuccess 
+                        ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50' 
+                        : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50';
+                ?>
+                <div class="mb-6 p-4 rounded-xl border <?php echo $bannerClass; ?> flex flex-row items-center gap-3">
                     <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                     <span class="font-medium"><?php echo htmlspecialchars($message); ?></span>
                 </div>
@@ -144,7 +150,7 @@ $categories = [
                             </svg>
                         </div>
                         <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">No Posts Yet</h2>
-                        <p class="text-zinc-500 mb-6 max-w-md mx-auto">You haven't created any community posts. Start a discussion to engage with other members!</p>
+                        <p class="text-zinc-500 dark:text-zinc-400 mb-6 max-w-md mx-auto">You haven't created any community posts. Start a discussion to engage with other members!</p>
                         <a href="community_create.php" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition shadow-sm inline-block">Create Post</a>
                     </div>
                 <?php else: ?>
@@ -152,15 +158,15 @@ $categories = [
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-100 dark:border-zinc-800">
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Post Details</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider w-32">Stats</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider w-40">Date</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right w-40">Actions</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Post Details</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider w-32">Stats</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider w-40">Date</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider text-right w-40">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-zinc-100">
                                 <?php foreach ($posts as $post): ?>
-                                    <tr class="hover:bg-zinc-50/50 transition">
+                                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 transition">
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-2 mb-1">
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
@@ -183,18 +189,20 @@ $categories = [
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
                                             <button 
-                                                onclick='openEditModal(<?php echo json_encode([
-                                                    "id" => $post['id'],
-                                                    "title" => $post['title'],
-                                                    "category" => $post['category'],
-                                                    "description" => $post['description']
-                                                ]); ?>)'
-                                                class="text-amber-600 hover:text-amber-900 hover:bg-amber-50 px-2 py-1 rounded transition font-medium mr-2">Edit</button>
+    onclick="openEditModal(<?php echo htmlspecialchars(json_encode([
+        'id' => $post['id'],
+        'title' => $post['title'],
+        'category' => $post['category'],
+        'description' => $post['description']
+    ]), ENT_QUOTES, 'UTF-8'); ?>)"
+    class="text-amber-600 hover:text-amber-900 hover:bg-amber-50 dark:text-amber-400 dark:hover:text-amber-300 dark:hover:bg-amber-900/30 px-2 py-1 rounded transition font-medium mr-2">
+    Edit
+</button>
                                             
                                             <form action="" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this post? This cannot be undone.');">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                                                <button type="submit" class="text-red-600 hover:text-red-900 hover:bg-red-50 px-2 py-1 rounded transition font-medium cursor-pointer">Delete</button>
+                                                <button type="submit" class="text-red-600 hover:text-red-900 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30 px-2 py-1 rounded transition font-medium cursor-pointer">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -207,15 +215,15 @@ $categories = [
                     <?php if ($total_pages > 1): ?>
                     <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                         <?php if ($page > 1): ?>
-                            <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 transition">Previous</a>
+                            <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">Previous</a>
                         <?php else: ?>
                             <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-not-allowed">Previous</span>
                         <?php endif; ?>
                         
-                        <span class="text-sm text-zinc-500 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
+                        <span class="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
                         
                         <?php if ($page < $total_pages): ?>
-                            <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 transition">Next</a>
+                            <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">Next</a>
                         <?php else: ?>
                             <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-not-allowed">Next</span>
                         <?php endif; ?>
@@ -285,7 +293,7 @@ $categories = [
 
                 <!-- Modal Footer -->
                 <div class="bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-100 dark:border-zinc-800 px-6 py-4 flex gap-3 justify-end flex-shrink-0">
-                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium rounded-xl hover:bg-white transition bg-transparent">Cancel</button>
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium rounded-xl hover:bg-white dark:hover:bg-zinc-800 transition bg-transparent">Cancel</button>
                     <button type="button" onclick="document.getElementById('editForm').submit();" class="px-6 py-2.5 bg-amber-500 text-white font-medium rounded-xl hover:bg-amber-600 transition shadow-sm">Save Changes</button>
                 </div>
             </div>

@@ -126,7 +126,7 @@ include 'header.php';
 
 <!-- Header with Add Button -->
 <div class="flex justify-between items-center mb-6">
-    <p class="text-zinc-500">Manage your papers collection</p>
+    <p class="text-zinc-500 dark:text-zinc-400">Manage your papers collection</p>
     <?php if (!$showForm): ?>
         <a href="papers.php?add=1" class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -135,7 +135,7 @@ include 'header.php';
             Add New Paper
         </a>
     <?php else: ?>
-        <a href="papers.php" class="inline-flex items-center gap-2 px-4 py-2 border border-zinc-200 text-zinc-700 rounded-xl font-medium hover:bg-zinc-50 transition">
+        <a href="papers.php" class="inline-flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
             Cancel
         </a>
     <?php endif; ?>
@@ -143,42 +143,45 @@ include 'header.php';
 
 <?php if ($showForm): ?>
 <!-- Add Form -->
-<div class="bg-white p-6 rounded-2xl border border-zinc-200 mb-8">
-    <h2 class="text-lg font-bold text-zinc-900 mb-6">Add New Paper</h2>
+<div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 mb-8 shadow-sm">
+    <h2 class="text-lg font-bold text-zinc-900 dark:text-white mb-6">Add New Paper</h2>
     <form action="papers.php" method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input type="hidden" name="action" value="add">
         <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-zinc-700 mb-1">Title</label>
-            <input type="text" name="title" required class="w-full px-4 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+            <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Title</label>
+            <input type="text" name="title" required class="w-full px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition">
         </div>
         <div>
-            <label class="block text-sm font-medium text-zinc-700 mb-1">Subject</label>
-            <input type="text" name="subject" required class="w-full px-4 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+            <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Subject</label>
+            <input type="text" name="subject" required class="w-full px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition">
         </div>
         <div>
-            <label class="block text-sm font-medium text-zinc-700 mb-1">Year</label>
-            <input type="number" name="year" required min="2000" max="2030" value="<?php echo date('Y'); ?>" class="w-full px-4 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+            <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Year</label>
+            <input type="number" name="year" required min="2000" max="2030" value="<?php echo date('Y'); ?>" class="w-full px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition">
         </div>
         
-        <div class="md:col-span-2 border-t border-zinc-100 pt-4 mt-2">
-            <p class="text-sm font-medium text-zinc-700 mb-3">Resource Source (Choose One)</p>
+        <div class="md:col-span-2 border-t border-zinc-100 dark:border-zinc-800 pt-4 mt-2">
+            <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">Resource Source (Choose One)</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm text-zinc-600 mb-2">Upload PDF</label>
-                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-300 rounded-xl cursor-pointer bg-zinc-50 hover:bg-zinc-100 transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm text-zinc-600 dark:text-zinc-400">Upload PDF</label>
+                        <button type="button" id="clearFileBtn" class="hidden text-[10px] font-bold text-red-500 uppercase hover:underline">Clear</button>
+                    </div>
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl cursor-pointer bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
                         <div class="flex flex-col items-center justify-center">
                             <svg class="w-8 h-8 mb-2 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                             </svg>
-                            <p class="text-sm text-zinc-500"><span id="file-name-display" class="font-medium text-teal-600">Click to upload</span></p>
+                            <p class="text-sm text-zinc-500"><span id="file-name-display" class="font-medium text-teal-600 dark:text-teal-400">Click to upload</span></p>
                             <p class="text-xs text-zinc-400">PDF only</p>
                         </div>
                         <input type="file" id="fileUploadInput" name="file_upload" accept=".pdf" class="hidden">
                     </label>
                 </div>
                 <div>
-                    <label class="block text-sm text-zinc-600 mb-2">Or External URL</label>
-                    <input type="url" id="fileUrlInput" name="file_url" placeholder="https://example.com/paper.pdf" class="w-full px-4 py-3 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition">
+                    <label class="block text-sm text-zinc-600 dark:text-zinc-400 mb-2">Or External URL</label>
+                    <input type="url" id="fileUrlInput" name="file_url" placeholder="https://example.com/paper.pdf" class="w-full px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition">
                     <p class="text-xs text-zinc-400 mt-2">Link to an external PDF file</p>
                 </div>
             </div>
@@ -194,47 +197,59 @@ include 'header.php';
 <?php endif; ?>
 
 <!-- Papers Table -->
-<div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
-    <div class="p-4 border-b border-zinc-100">
+<div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+    <div class="p-4 border-b border-zinc-100 dark:border-zinc-800">
         <input type="text" id="searchInput" onkeyup="searchPapers()" placeholder="Search papers..." 
-            class="w-full px-4 py-2 bg-zinc-50 border-0 rounded-xl focus:ring-2 focus:ring-teal-500">
+            class="w-full px-4 py-2 bg-zinc-50 dark:bg-zinc-800 border-0 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-teal-500 outline-none transition">
     </div>
     <div class="overflow-x-auto">
         <table id="papersTable" class="w-full">
             <thead>
-                <tr class="bg-zinc-50 border-b border-zinc-200 text-xs uppercase text-zinc-500 font-semibold">
+                <tr class="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-700 text-xs uppercase text-zinc-500 dark:text-zinc-400 font-semibold">
                     <th class="px-6 py-4 text-left">Title</th>
                     <th class="px-6 py-4 text-left">Subject</th>
                     <th class="px-6 py-4 text-left">Year</th>
                     <th class="px-6 py-4 text-right">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-100">
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                 <?php if (empty($papers)): ?>
                     <tr>
                         <td colspan="4" class="px-6 py-12 text-center text-zinc-500">No papers found.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($papers as $paper): ?>
-                        <tr class="hover:bg-zinc-50 transition">
-                            <td class="px-6 py-4 font-medium text-zinc-900"><?php echo htmlspecialchars($paper['title']); ?></td>
+                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
+                            <td class="px-6 py-4 font-medium text-zinc-900 dark:text-white"><?php echo htmlspecialchars($paper['title']); ?></td>
                             <td class="px-6 py-4">
-                                <span class="inline-flex px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">
+                                <span class="inline-flex px-2.5 py-1 bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 rounded-full text-xs font-medium">
                                     <?php echo htmlspecialchars($paper['subject']); ?>
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-zinc-600"><?php echo htmlspecialchars($paper['year']); ?></td>
+                            <td class="px-6 py-4 text-zinc-600 dark:text-zinc-400"><?php echo htmlspecialchars($paper['year']); ?></td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="edit_paper.php?id=<?php echo $paper['id']; ?>" class="p-2 bg-teal-100 text-teal-600 rounded-lg hover:bg-teal-200 transition">
+                                    <a href="edit_paper.php?id=<?php echo $paper['id']; ?>" class="p-2 bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-900/60 transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </a>
+                                    <?php if (!empty($paper['private_path'])): ?>
+                                        <?php 
+                                            $is_url = filter_var($paper['private_path'], FILTER_VALIDATE_URL);
+                                            $link = $is_url ? $paper['private_path'] : '../' . $paper['private_path'];
+                                        ?>
+                                        <a href="<?php echo htmlspecialchars($link); ?>" target="_blank" class="p-2 bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 rounded-lg hover:bg-teal-200 dark:hover:bg-teal-900/60 transition" title="View Paper">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </a>
+                                    <?php endif; ?>
                                     <form action="papers.php" method="post" class="inline" onsubmit="return confirm('Delete this paper?');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="id" value="<?php echo $paper['id']; ?>">
-                                        <button type="submit" class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
+                                        <button type="submit" class="p-2 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/60 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -270,13 +285,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('fileUploadInput');
     const urlInput = document.getElementById('fileUrlInput');
     const fileNameDisplay = document.getElementById('file-name-display');
+    const clearFileBtn = document.getElementById('clearFileBtn');
     const uploadArea = fileInput ? fileInput.closest('label') : null;
 
     if (fileInput && urlInput && fileNameDisplay) {
+        function resetInputs() {
+            fileInput.value = '';
+            urlInput.value = '';
+            fileNameDisplay.textContent = 'Click to upload';
+            fileNameDisplay.classList.remove('text-teal-600');
+            urlInput.disabled = false;
+            urlInput.classList.remove('bg-zinc-100', 'dark:bg-zinc-800/10', 'cursor-not-allowed', 'opacity-50');
+            uploadArea.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+            if(clearFileBtn) clearFileBtn.classList.add('hidden');
+        }
+
         fileInput.addEventListener('change', function(e) {
             if (e.target.files.length > 0) {
                 const fileName = e.target.files[0].name;
-                fileNameDisplay.innerHTML = `<span class="text-teal-600 flex items-center gap-1">
+                fileNameDisplay.innerHTML = `<span class="text-teal-600 dark:text-teal-400 flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
@@ -284,11 +311,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 </span>`;
                 urlInput.value = '';
                 urlInput.disabled = true;
-                urlInput.classList.add('bg-zinc-100', 'cursor-not-allowed', 'opacity-50');
+                urlInput.classList.add('bg-zinc-100', 'dark:bg-zinc-800/10', 'cursor-not-allowed', 'opacity-50');
+                if(clearFileBtn) clearFileBtn.classList.remove('hidden');
             } else {
                 fileNameDisplay.textContent = 'Click to upload';
                 urlInput.disabled = false;
-                urlInput.classList.remove('bg-zinc-100', 'cursor-not-allowed', 'opacity-50');
+                urlInput.classList.remove('bg-zinc-100', 'dark:bg-zinc-800/10', 'cursor-not-allowed', 'opacity-50');
+                if(clearFileBtn) clearFileBtn.classList.add('hidden');
             }
         });
 
@@ -297,11 +326,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileInput.value = '';
                 uploadArea.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
                 fileNameDisplay.textContent = 'Upload disabled';
+                if(clearFileBtn) clearFileBtn.classList.add('hidden');
             } else {
                 uploadArea.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
                 fileNameDisplay.textContent = 'Click to upload';
             }
         });
+
+        if(clearFileBtn) {
+            clearFileBtn.addEventListener('click', resetInputs);
+        }
     }
 });
 </script>

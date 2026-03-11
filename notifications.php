@@ -55,7 +55,7 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             }
         }
     </script>
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="assets/js/theme.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
@@ -66,7 +66,7 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             
             <div class="flex items-center justify-between mb-8">
                 <h1 class="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
-                    <div class="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+                    <div class="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
@@ -83,11 +83,11 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <div class="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                 <?php if (empty($notifications)): ?>
                     <div class="p-12 text-center text-zinc-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-zinc-300 dark:text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                         <p class="text-lg font-medium text-zinc-800 dark:text-zinc-200">You're all caught up!</p>
-                        <p class="mt-1">You don't have any notifications right now.</p>
+                        <p class="mt-1 dark:text-zinc-400">You don't have any notifications right now.</p>
                     </div>
                 <?php else: ?>
                     <div class="divide-y divide-zinc-100">
@@ -108,7 +108,7 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                     $icon_svg = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
                                 }
                             ?>
-                            <div class="p-6 transition hover:bg-zinc-50 flex gap-4 <?php echo !$is_read ? 'bg-indigo-50/20' : ''; ?>">
+                            <div class="p-6 transition hover:bg-zinc-50 dark:hover:bg-zinc-800/50 flex gap-4 <?php echo !$is_read ? 'bg-indigo-50/20 dark:bg-indigo-900/10' : ''; ?>">
                                 
                                 <!-- Icon -->
                                 <div class="w-12 h-12 rounded-full <?php echo $icon_bg . ' ' . $icon_text; ?> flex items-center justify-center flex-shrink-0">
@@ -144,14 +144,14 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                 <!-- Mark as Read Action (Right Side) -->
                                 <?php if (!$is_read): ?>
                                     <div class="flex-shrink-0 flex items-start pt-1">
-                                        <a href="notifications.php?mark_read=<?php echo $notif['id']; ?>" class="text-zinc-300 hover:text-indigo-600 transition" title="Mark as read">
+                                        <a href="notifications.php?mark_read=<?php echo $notif['id']; ?>" class="text-zinc-300 dark:text-zinc-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition" title="Mark as read">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </a>
                                     </div>
                                 <?php else: ?>
-                                    <div class="flex-shrink-0 flex items-start pt-1 text-zinc-200" title="Read">
+                                    <div class="flex-shrink-0 flex items-start pt-1 text-zinc-200 dark:text-zinc-800" title="Read">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                                             <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
                                         </svg>

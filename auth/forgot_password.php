@@ -93,6 +93,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FAFAFA',
+                        secondary: '#F4F4F5',
+                        accent: '#6366F1',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../assets/js/theme.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-serif { font-family: 'Cormorant Garamond', serif; }
@@ -107,15 +126,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: transparent;
             transition: border-color 0.3s;
         }
+        .dark .input-underline {
+            border-bottom-color: #3f3f46;
+            color: #f4f4f5;
+        }
         .input-underline:focus {
             outline: none;
             border-bottom-color: #4338ca;
         }
     </style>
 </head>
-<body class="antialiased bg-zinc-100 min-h-screen flex items-center justify-center p-4">
+<body class="antialiased bg-zinc-100 dark:bg-zinc-950 min-h-screen flex items-center justify-center p-4">
     
-    <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden p-8 lg:p-12 text-center">
+    <div class="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden p-8 lg:p-12 text-center border border-zinc-200 dark:border-zinc-800">
         <!-- Logo -->
         <a href="../index.php" class="inline-block mb-10">
             <svg width="60" height="36" viewBox="0 0 50 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </svg>
         </div>
 
-        <h1 class="text-3xl font-semibold text-zinc-900 mb-4">
+        <h1 class="text-3xl font-semibold text-zinc-900 dark:text-white mb-4">
             <?php 
                 if ($step === 1) echo "Recovery";
                 elseif ($step === 2) echo "Security Check";
@@ -151,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <?php if ($step === 1): ?>
-            <p class="text-zinc-500 mb-8 leading-relaxed">
+            <p class="text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed">
                 Enter your username or email to begin the recovery process.
             </p>
             <form action="forgot_password.php" method="POST" class="space-y-6">
@@ -160,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         type="text" 
                         name="identifier" 
                         required 
-                        class="input-underline w-full text-center text-lg" 
+                        class="input-underline w-full text-center text-lg text-zinc-900 dark:text-white" 
                         placeholder="Username or Email"
                         value="<?php echo htmlspecialchars($identifier ?? ''); ?>"
                     >
@@ -170,10 +193,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </form>
         <?php elseif ($step === 2): ?>
-            <p class="text-zinc-500 mb-2 leading-relaxed italic">
+            <p class="text-zinc-500 dark:text-zinc-400 mb-2 leading-relaxed italic">
                 Step 2: Security Question
             </p>
-            <h2 class="text-xl font-bold text-zinc-900 mb-8"><?php echo htmlspecialchars($question); ?></h2>
+            <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-8"><?php echo htmlspecialchars($question); ?></h2>
             <form action="forgot_password.php" method="POST" class="space-y-6">
                 <div>
                     <input 
@@ -181,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         name="answer" 
                         required 
                         autofocus
-                        class="input-underline w-full text-center text-lg" 
+                        class="input-underline w-full text-center text-lg text-zinc-900 dark:text-white" 
                         placeholder="Type your answer here"
                     >
                 </div>
@@ -190,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </form>
         <?php elseif ($step === 3): ?>
-            <p class="text-zinc-500 mb-8 leading-relaxed">
+            <p class="text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed">
                 Choose a strong new password.
             </p>
             <form action="forgot_password.php" method="POST" class="space-y-6">
@@ -200,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         name="new_password" 
                         required 
                         minlength="6"
-                        class="input-underline w-full text-center text-lg" 
+                        class="input-underline w-full text-center text-lg text-zinc-900 dark:text-white" 
                         placeholder="New Password"
                     >
                 </div>
@@ -210,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         name="confirm_password" 
                         required 
                         minlength="6"
-                        class="input-underline w-full text-center text-lg" 
+                        class="input-underline w-full text-center text-lg text-zinc-900 dark:text-white" 
                         placeholder="Confirm New Password"
                     >
                 </div>
@@ -219,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </form>
         <?php else: ?>
-            <p class="text-zinc-500 mb-8 leading-relaxed text-lg">
+            <p class="text-zinc-500 dark:text-zinc-400 mb-8 leading-relaxed text-lg">
                 Your password has been securely updated.
             </p>
             <a href="login.php" class="block w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-2xl transition-colors">
@@ -228,12 +251,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <?php if ($step < 4): ?>
-            <div class="mt-8 pt-8 border-t border-zinc-100 flex flex-col gap-4">
-                <a href="login.php" class="text-sm font-medium text-zinc-400 hover:text-indigo-600 transition">
+            <div class="mt-8 pt-8 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-4">
+                <a href="login.php" class="text-sm font-medium text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
                     Back to Login
                 </a>
-                <p class="text-xs text-zinc-400">
-                    If you're still having trouble, contact <span class="text-indigo-600 font-medium">admin@semicolon.edu</span>
+                <p class="text-xs text-zinc-400 dark:text-zinc-600">
+                    If you're still having trouble, contact <span class="text-indigo-600 dark:text-indigo-500 font-medium">admin@semicolon.edu</span>
                 </p>
             </div>
         <?php endif; ?>

@@ -55,7 +55,7 @@ function get_books($category = null, $semester = null, $search_query = null)
     $params = [];
     
     if ($category) {
-        $sql .= " AND category = ?";
+        $sql .= " AND subject = ?";
         $types .= 's';
         $params[] = &$category;
     }
@@ -113,7 +113,7 @@ function get_papers($category = null, $year = null, $search_query = null)
     $params = [];
     
     if ($category) {
-        $sql .= " AND category = ?";
+        $sql .= " AND subject = ?";
         $types .= 's';
         $params[] = &$category;
     }
@@ -401,17 +401,25 @@ function toggle_reaction($user_id, $resource_type, $resource_id, $is_helpful)
 {
     global $conn;
     // Check if exists
-    $sql = "SELECT id FROM reactions WHERE user_id = ? AND resource_type = ? AND resource_id = ?";
+    $sql = "SELECT id, is_helpful FROM reactions WHERE user_id = ? AND resource_type = ? AND resource_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('isi', $user_id, $resource_type, $resource_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Update
-        $sql = "UPDATE reactions SET is_helpful = ? WHERE user_id = ? AND resource_type = ? AND resource_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param('iisi', $is_helpful, $user_id, $resource_type, $resource_id);
+        $row = $result->fetch_assoc();
+        // If they click the same reaction, toggle it OFF (delete)
+        if ($row['is_helpful'] == $is_helpful) {
+            $sql = "DELETE FROM reactions WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param('i', $row['id']);
+        } else {
+            // Otherwise, update to new reaction
+            $sql = "UPDATE reactions SET is_helpful = ? WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param('ii', $is_helpful, $row['id']);
+        }
     } else {
         // Insert
         $sql = "INSERT INTO reactions (user_id, resource_type, resource_id, is_helpful) VALUES (?, ?, ?, ?)";
@@ -426,7 +434,7 @@ function get_reaction_stats($resource_type, $resource_id)
     global $conn;
     $sql = "SELECT 
             COUNT(*) as total, 
-            SUM(CASE WHEN is_helpful = 1 THEN 1 ELSE 0 END) as helpful 
+            COALESCE(SUM(CASE WHEN is_helpful = 1 THEN 1 ELSE 0 END), 0) as helpful 
             FROM reactions 
             WHERE resource_type = ? AND resource_id = ?";
     $stmt = $conn->prepare($sql);
@@ -478,16 +486,46 @@ function create_notification($user_id, $title, $message, $type = 'system', $acti
                 $html = str_replace('{{ACTION_URL}}', htmlspecialchars($url), $html);
                 $html = str_replace('{{YEAR}}', date('Y'), $html);
                 
-                $headers = "MIME-Version: 1.0\r\n";
-                $headers .= "Content-type:text/html;charset=UTF-8\r\n";
-                $headers .= "From: Semicolon <noreply@" . ($host != 'localhost' ? $host : 'semicolon.local') . ">\r\n";
-                
-                @mail($to, $title, $html, $headers);
+                send_custom_mail($to, $title, $html);
             }
         }
     }
     
     return $success;
+}
+
+function send_custom_mail($to, $subject, $body) {
+    // Include PHPMailer autoload if not already included
+    require_once __DIR__ . '/../vendor/autoload.php';
+    
+    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+    
+    try {
+        // Server settings (Modify these to match your SMTP provider)
+        // For development, you can use Mailtrap or a real Gmail app password
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com'; // Replace with your SMTP host
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'semicoloncode@gmail.com'; // Replace with your email
+        $mail->Password   = 'vzyexuqdntokvowj'; // Replace with your App Password
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+        
+        // Recipients
+        $mail->setFrom('semicoloncode@gmail.com', 'Semicolon');
+        $mail->addAddress($to);
+        
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+        
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        // Log error if needed: error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
 }
 function get_unread_notification_count($user_id)
 {
@@ -589,51 +627,54 @@ function update_user_level($user_id) {
  * @param int $amount Amount of XP to grant
  * @return bool True if XP was fully or partially granted
  */
-function add_user_xp($user_id, $amount) {
+function add_user_xp($user_id, $amount, $ignore_cap = false) {
     global $conn;
     $max_daily_xp = 100;
     
-    // Check how much XP the user has earned today
-    $stmt = $conn->prepare("SELECT daily_xp_earned, last_activity_date FROM users WHERE id = ?");
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($row = $result->fetch_assoc()) {
-        $today = date('Y-m-d');
-        $current_daily_xp = 0;
+    if (!$ignore_cap) {
+        // Check how much XP the user has earned today
+        $stmt = $conn->prepare("SELECT daily_xp_earned, last_activity_date FROM users WHERE id = ?");
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
         
-        // Reset daily XP if it's a new day
-        if ($row['last_activity_date'] === $today) {
-            $current_daily_xp = (int)$row['daily_xp_earned'];
+        if ($row = $result->fetch_assoc()) {
+            $today = date('Y-m-d');
+            $current_daily_xp = 0;
+            
+            // Reset daily XP if it's a new day
+            if ($row['last_activity_date'] === $today) {
+                $current_daily_xp = (int)$row['daily_xp_earned'];
+            }
+            
+            // Check if cap reached
+            if ($current_daily_xp >= $max_daily_xp) {
+                return false; // Cap reached
+            }
+            
+            // Calculate allowed XP
+            $amount = min($amount, $max_daily_xp - $current_daily_xp);
         }
-        
-        // Check if cap reached
-        if ($current_daily_xp >= $max_daily_xp) {
-            return false; // Cap reached
-        }
-        
-        // Calculate allowed XP
-        $allowed_xp = min($amount, $max_daily_xp - $current_daily_xp);
-        
-        // Update user XP
-        $sql = "UPDATE users SET xp_total = xp_total + ?, xp_weekly = xp_weekly + ?, daily_xp_earned = ?, last_activity_date = ? WHERE id = ?";
-        $new_daily_xp = $current_daily_xp + $allowed_xp;
-        $upd_stmt = $conn->prepare($sql);
-        $upd_stmt->bind_param('iiisi', $allowed_xp, $allowed_xp, $new_daily_xp, $today, $user_id);
-        $success = $upd_stmt->execute();
-        
-        if ($success) {
-            if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
-            $_SESSION['toasts'][] = ['type' => 'xp', 'title' => 'XP Gained', 'message' => "+{$allowed_xp} XP earned!"];
-            update_user_level($user_id);
-            check_badge_unlocks($user_id);
-        }
-        
-        return $success;
     }
     
-    return false;
+    if ($amount <= 0) return false;
+    
+    $today = date('Y-m-d');
+    
+    // Update user XP
+    $sql = "UPDATE users SET xp_total = xp_total + ?, xp_weekly = xp_weekly + ?, daily_xp_earned = daily_xp_earned + ?, last_activity_date = ? WHERE id = ?";
+    $upd_stmt = $conn->prepare($sql);
+    $upd_stmt->bind_param('iiisi', $amount, $amount, $amount, $today, $user_id);
+    $success = $upd_stmt->execute();
+        
+    if ($success) {
+        if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
+        $_SESSION['toasts'][] = ['type' => 'xp', 'title' => 'XP Gained', 'message' => "+{$amount} XP earned!"];
+        update_user_level($user_id);
+        check_badge_unlocks($user_id);
+    }
+    
+    return $success;
 }
 
 /**

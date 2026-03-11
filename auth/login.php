@@ -34,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['role'] = $user['role'];
 
             if ($user['role'] === 'admin') {
-                header('Location: /Semicolon/admin/index.php');
+                header('Location: ../admin/index.php');
             } else {
-                header('Location: /Semicolon/dashboard.php');
+                header('Location: ../dashboard.php');
             }
                 exit();
             }
@@ -56,6 +56,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FAFAFA',
+                        secondary: '#F4F4F5',
+                        accent: '#6366F1',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../assets/js/theme.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-serif { font-family: 'Cormorant Garamond', serif; }
@@ -66,6 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 12px 0;
             background: transparent;
             transition: border-color 0.3s;
+        }
+        .dark .input-underline {
+            border-bottom-color: #3f3f46;
+            color: #f4f4f5;
         }
         .input-underline:focus {
             outline: none;
@@ -83,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
-<body class="antialiased bg-zinc-100 min-h-screen flex items-center justify-center p-4">
+<body class="antialiased bg-zinc-100 dark:bg-zinc-950 min-h-screen flex items-center justify-center p-4">
     
-    <div class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex min-h-[600px]">
+    <div class="w-full max-w-5xl bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden flex min-h-[600px] border border-zinc-200 dark:border-zinc-800">
         
         <!-- Left Side - Form -->
         <div class="w-full lg:w-1/2 p-10 lg:p-16 flex flex-col">
@@ -104,8 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-semibold text-zinc-900">Welcome Back</h1>
-                        <p class="text-zinc-500 text-sm">Sign in to your account</p>
+                        <h1 class="text-2xl font-semibold text-zinc-900 dark:text-white">Welcome Back</h1>
+                        <p class="text-zinc-500 dark:text-zinc-400 text-sm">Sign in to your account</p>
                     </div>
                 </div>
                 
@@ -124,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Form -->
                 <form action="login.php" method="POST" class="space-y-6">
                     <div>
-                        <label for="username" class="block text-sm text-zinc-600 mb-1">Username</label>
+                        <label for="username" class="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Username</label>
                         <input 
                             type="text" 
                             id="username" 
@@ -132,15 +155,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             required
                             pattern="^[a-zA-Z0-9_]{3,20}$"
                             title="Username must be 3-20 characters and can only contain letters, numbers, and underscores."
-                            class="input-underline w-full text-zinc-900"
+                            class="input-underline w-full text-zinc-900 dark:text-white"
                             placeholder="Enter your username"
                         >
                     </div>
                     
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label for="password" class="block text-sm text-zinc-600">Password</label>
-                            <a href="forgot_password.php" class="text-sm text-zinc-500 hover:text-indigo-600">Forgot?</a>
+                            <label for="password" class="block text-sm text-zinc-600 dark:text-zinc-400">Password</label>
+                            <a href="forgot_password.php" class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400">Forgot?</a>
                         </div>
                         <input 
                             type="password" 
@@ -150,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             minlength="6"
                             pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
                             title="Password must be 6+ chars with at least one uppercase letter, one number, and one symbol."
-                            class="input-underline w-full text-zinc-900"
+                            class="input-underline w-full text-zinc-900 dark:text-white"
                             placeholder="Enter your password"
                         >
                     </div>
@@ -163,8 +186,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </button>
                 </form>
                 
-                <p class="mt-8 text-center text-zinc-500 text-sm">
-                    Don't have an account? <a href="signup.php" class="text-zinc-900 font-medium hover:text-indigo-600">Sign up</a>
+                <p class="mt-8 text-center text-zinc-500 dark:text-zinc-400 text-sm">
+                    Don't have an account? <a href="signup.php" class="text-zinc-900 dark:text-white font-medium hover:text-indigo-600 dark:hover:text-indigo-400">Sign up</a>
                 </p>
             </div>
         </div>

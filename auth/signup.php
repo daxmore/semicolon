@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $security_answer = $_POST['security_answer'] ?? null;
                 
                 if (createUser($username, $email, $password, $new_avatar_url, $security_question, $security_answer)) {
-                    header('Location: /Semicolon/auth/login.php');
+                    header('Location: login.php');
                     exit();
                 } else {
                     $errors[] = 'Error creating user. Please try again.';
@@ -62,6 +62,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FAFAFA',
+                        secondary: '#F4F4F5',
+                        accent: '#6366F1',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../assets/js/theme.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .font-serif { font-family: 'Cormorant Garamond', serif; }
@@ -72,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 12px 0;
             background: transparent;
             transition: border-color 0.3s;
+        }
+        .dark .input-underline {
+            border-bottom-color: #3f3f46;
+            color: #f4f4f5;
         }
         .input-underline:focus {
             outline: none;
@@ -138,9 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </script>
 </head>
-<body class="antialiased bg-zinc-100 min-h-screen flex items-center justify-center p-4">
+<body class="antialiased bg-zinc-100 dark:bg-zinc-950 min-h-screen flex items-center justify-center p-4">
     
-    <div class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex min-h-[650px]">
+    <div class="w-full max-w-5xl bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden flex min-h-[650px] border border-zinc-200 dark:border-zinc-800">
         
         <!-- Left Side - Form -->
         <div class="w-full lg:w-1/2 p-10 lg:p-16 flex flex-col">
@@ -159,8 +182,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </svg>
                     </div>
                     <div>
-                        <h1 id="step-title" class="text-2xl font-semibold text-zinc-900">Get Started</h1>
-                        <p id="step-subtitle" class="text-zinc-500 text-sm">Step 1 of 2</p>
+                        <h1 id="step-title" class="text-2xl font-semibold text-zinc-900 dark:text-white">Get Started</h1>
+                        <p id="step-subtitle" class="text-zinc-500 dark:text-zinc-400 text-sm">Step 1 of 2</p>
                     </div>
                 </div>
                 
@@ -182,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Step 1 -->
                     <div id="step1" class="step-transition space-y-4">
                         <div>
-                            <label for="username" class="block text-sm text-zinc-600 mb-1">Username</label>
+                            <label for="username" class="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Username</label>
                             <input 
                                 type="text" 
                                 id="username" 
@@ -190,27 +213,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 required
                                 pattern="^[a-zA-Z0-9_]{3,20}$"
                                 title="Username must be 3-20 characters and can only contain letters, numbers, and underscores."
-                                class="input-underline w-full text-zinc-900"
+                                class="input-underline w-full text-zinc-900 dark:text-white"
                                 placeholder="Choose a username"
                                 value="<?php echo htmlspecialchars($username); ?>"
                             >
                         </div>
 
                         <div>
-                            <label for="email" class="block text-sm text-zinc-600 mb-1">Email ID</label>
+                            <label for="email" class="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Email ID</label>
                             <input 
                                 type="email" 
                                 id="email" 
                                 name="email" 
                                 required
-                                class="input-underline w-full text-zinc-900"
+                                class="input-underline w-full text-zinc-900 dark:text-white"
                                 placeholder="Enter your email"
                                 value="<?php echo htmlspecialchars($email); ?>"
                             >
                         </div>
                         
                         <div>
-                            <label for="password" class="block text-sm text-zinc-600 mb-1">Password</label>
+                            <label for="password" class="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Password</label>
                             <input 
                                 type="password" 
                                 id="password" 
@@ -219,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 minlength="6"
                                 pattern="(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}"
                                 title="Password must be 6+ chars with at least one uppercase letter, one number, and one symbol."
-                                class="input-underline w-full text-zinc-900"
+                                class="input-underline w-full text-zinc-900 dark:text-white"
                                 placeholder="Create a password"
                             >
                         </div>
@@ -239,12 +262,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Step 2 -->
                     <div id="step2" class="step-transition hidden-step space-y-4">
                         <div>
-                            <label for="security_question" class="block text-sm text-zinc-600 mb-1">Security Question</label>
+                            <label for="security_question" class="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Security Question</label>
                             <select 
                                 id="security_question" 
                                 name="security_question" 
                                 required
-                                class="input-underline w-full text-zinc-900"
+                                class="input-underline w-full text-zinc-900 dark:text-white dark:bg-zinc-900"
                             >
                                 <option value="">Select a security question</option>
                                 <option value="What was the name of your first pet?">What was the name of your first pet?</option>
@@ -255,13 +278,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                         <div>
-                            <label for="security_answer" class="block text-sm text-zinc-600 mb-1">Security Answer</label>
+                            <label for="security_answer" class="block text-sm text-zinc-600 dark:text-zinc-400 mb-1">Security Answer</label>
                             <input 
                                 type="text" 
                                 id="security_answer" 
                                 name="security_answer" 
                                 required
-                                class="input-underline w-full text-zinc-900"
+                                class="input-underline w-full text-zinc-900 dark:text-white"
                                 placeholder="Your answer"
                             >
                         </div>
@@ -270,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button 
                                 type="button"
                                 onclick="prevStep()"
-                                class="flex-1 py-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium rounded-full transition-colors"
+                                class="flex-1 py-4 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-300 text-zinc-700 font-medium rounded-full transition-colors"
                             >
                                 Back
                             </button>
@@ -284,8 +307,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </form>
                 
-                <p class="mt-6 text-center text-zinc-500 text-sm">
-                    Already have an account? <a href="login.php" class="text-zinc-900 font-medium hover:text-teal-600">Log in</a>
+                <p class="mt-6 text-center text-zinc-500 dark:text-zinc-400 text-sm">
+                    Already have an account? <a href="login.php" class="text-zinc-900 dark:text-white font-medium hover:text-teal-600 dark:hover:text-teal-400">Log in</a>
                 </p>
             </div>
         </div>

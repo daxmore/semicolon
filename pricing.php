@@ -50,7 +50,7 @@ require_once 'includes/functions.php';
             <h1 class="text-5xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight">
                 Unlock <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Full Access</span>
             </h1>
-            <p class="text-xl text-zinc-500 max-w-2xl mx-auto">
+            <p class="text-xl text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
                 Choose the plan that fits your learning needs. Upgrade to Pro for exclusive features and priority support.
             </p>
         </div>
@@ -67,9 +67,9 @@ require_once 'includes/functions.php';
                         <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Free</h2>
                         <div class="flex items-baseline gap-1">
                             <span class="text-5xl font-bold text-zinc-900 dark:text-white">$0</span>
-                            <span class="text-zinc-500">/month</span>
+                            <span class="text-zinc-500 dark:text-zinc-400">/month</span>
                         </div>
-                        <p class="text-zinc-500 mt-2">Perfect for getting started</p>
+                        <p class="text-zinc-500 dark:text-zinc-400 mt-2">Perfect for getting started</p>
                     </div>
                     
                     <ul class="space-y-4 mb-8 flex-grow">
@@ -178,7 +178,7 @@ require_once 'includes/functions.php';
                         </li>
                     </ul>
                     
-                    <button class="relative z-10 w-full py-4 bg-white dark:bg-zinc-900 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">
+                    <button class="relative z-10 w-full py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">
                         Upgrade to Pro
                     </button>
                 </div>

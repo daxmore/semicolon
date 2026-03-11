@@ -33,7 +33,7 @@ require_once 'includes/functions.php';
             }
         }
     </script>
-    <script src="/Semicolon/assets/js/theme.js"></script>
+    <script src="assets/js/theme.js"></script>
 </head>
 <body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
     <?php include 'includes/header.php'; ?>
@@ -50,7 +50,7 @@ require_once 'includes/functions.php';
         <div class="container mx-auto px-6 text-center">
             <div class="max-w-4xl mx-auto">
                 <!-- Badge -->
-                <div class="hero-badge inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full text-sm font-medium text-indigo-600 mb-8">
+                <div class="hero-badge inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-full text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-8">
                     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                     Trusted by 1,000+ students
                 </div>
@@ -58,11 +58,11 @@ require_once 'includes/functions.php';
                 <!-- Headline -->
                 <h1 class="hero-title text-5xl md:text-6xl lg:text-7xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight leading-tight">
                     Your Gateway to<br>
-                    <span class="text-gradient">Developer Excellence</span>
+                    <span class="text-gradient dark:from-indigo-400 dark:to-teal-400">Developer Excellence</span>
                 </h1>
                 
                 <!-- Subheadline -->
-                <p class="hero-desc text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p class="hero-desc text-xl text-zinc-500 dark:text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
                     Curated books, research papers, and video tutorials. Everything you need to level up your skills, organized and accessible.
                 </p>
                 
@@ -103,7 +103,7 @@ require_once 'includes/functions.php';
     </section>
 
     <!-- ===== INFINITE MARQUEE / SOCIAL PROOF ===== -->
-    <section class="py-8 border-y border-zinc-100 dark:border-zinc-800 bg-zinc-50/50">
+    <section class="py-8 border-y border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20">
         <div class="marquee-container">
             <div class="marquee-track">
                 <!-- First set -->
@@ -129,7 +129,7 @@ require_once 'includes/functions.php';
     </section>
 
     <!-- ===== BENTO GRID FEATURES ===== -->
-    <section id="features" class="section-padding bg-zinc-50/30">
+    <section id="features" class="section-padding bg-zinc-50/30 dark:bg-zinc-900/10">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
                 <span class="badge mb-4">Features</span>
@@ -141,12 +141,12 @@ require_once 'includes/functions.php';
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 <!-- Book Library Card -->
-                <a href="books.php" class="bento-item group bg-gradient-to-br from-indigo-50 to-white hover:from-indigo-100 min-h-[280px]">
-                    <div class="icon-box mb-4 group-hover:scale-110 transition-transform">
+                <a href="books.php" class="bento-item group bg-gradient-to-br from-indigo-50 to-white dark:from-zinc-800 dark:to-zinc-900/50 hover:from-indigo-100 dark:hover:from-zinc-700 min-h-[280px]">
+                    <div class="icon-box mb-4 group-hover:scale-110 transition-transform dark:bg-indigo-500/10 dark:text-indigo-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     </div>
                     <h3 class="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Book Library</h3>
-                    <p class="text-zinc-500 mb-6">Hand-picked collection of technical books covering algorithms, system design, and more.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400 mb-6">Hand-picked collection of technical books covering algorithms, system design, and more.</p>
                     <div class="flex gap-2">
                         <div class="w-12 h-16 bg-indigo-200 rounded-lg"></div>
                         <div class="w-12 h-16 bg-teal-200 rounded-lg"></div>
@@ -159,12 +159,12 @@ require_once 'includes/functions.php';
                 </a>
 
                 <!-- Your History Card (Side by Side with Book Library) -->
-                <div class="bento-item group bg-gradient-to-b from-violet-50 to-white min-h-[280px]">
-                    <div class="icon-box mb-4 bg-violet-100 text-violet-600 group-hover:scale-110 transition-transform">
+                <div class="bento-item group bg-gradient-to-b from-violet-50 to-white dark:from-zinc-800 dark:to-zinc-900/50 min-h-[280px]">
+                    <div class="icon-box mb-4 bg-violet-100 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Your History</h3>
-                    <p class="text-zinc-500 text-sm mb-4">Pick up right where you left off.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400 text-sm mb-4">Pick up right where you left off.</p>
                     <div class="space-y-3">
                         <div class="flex items-center gap-3 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800">
                             <div class="w-8 h-8 bg-indigo-100 rounded flex items-center justify-center text-xs">📚</div>
@@ -191,12 +191,12 @@ require_once 'includes/functions.php';
                 </div>
 
                 <!-- Smart Search Card -->
-                <div class="bento-item group bg-gradient-to-r from-amber-50 to-white min-h-[280px]">
-                    <div class="icon-box bg-amber-100 text-amber-600 mb-4 group-hover:scale-110 transition-transform">
+                <div class="bento-item group bg-gradient-to-r from-amber-50 to-white dark:from-zinc-800 dark:to-zinc-900/50 min-h-[280px]">
+                    <div class="icon-box bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 mb-4 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Smart Search</h3>
-                    <p class="text-zinc-500 text-sm mb-4">Find any resource instantly with our powerful search.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400 text-sm mb-4">Find any resource instantly with our powerful search.</p>
                     <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 rounded-full border border-zinc-200 dark:border-zinc-700 px-4 py-3 shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         <span class="text-zinc-400 text-sm">Search books, papers, videos...</span>
@@ -204,30 +204,30 @@ require_once 'includes/functions.php';
                 </div>
 
                 <!-- Research Papers Card -->
-                <a href="papers.php" class="bento-item group bg-gradient-to-br from-teal-50 to-white hover:from-teal-100">
-                    <div class="icon-box mb-4 bg-teal-100 text-teal-600 group-hover:scale-110 transition-transform">
+                <a href="papers.php" class="bento-item group bg-gradient-to-br from-teal-50 to-white dark:from-zinc-800 dark:to-zinc-900/50 hover:from-teal-100 dark:hover:from-zinc-700">
+                    <div class="icon-box mb-4 bg-teal-100 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Research Papers</h3>
-                    <p class="text-zinc-500 text-sm">Latest academic papers and whitepapers from top researchers.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400 text-sm">Latest academic papers and whitepapers from top researchers.</p>
                 </a>
 
                 <!-- Video Tutorials Card -->
-                <a href="videos.php" class="bento-item group bg-gradient-to-br from-rose-50 to-white hover:from-rose-100">
-                    <div class="icon-box mb-4 bg-rose-100 text-rose-600 group-hover:scale-110 transition-transform">
+                <a href="videos.php" class="bento-item group bg-gradient-to-br from-rose-50 to-white dark:from-zinc-800 dark:to-zinc-900/50 hover:from-rose-100 dark:hover:from-zinc-700">
+                    <div class="icon-box mb-4 bg-rose-100 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Video Tutorials</h3>
-                    <p class="text-zinc-500 text-sm">High-quality video content for visual learners.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400 text-sm">High-quality video content for visual learners.</p>
                 </a>
 
                 <!-- Pro Access Card -->
-                <a href="pricing.php" class="bento-item group bg-gradient-to-br from-purple-50 to-white hover:from-purple-100">
-                    <div class="icon-box mb-4 bg-purple-100 text-purple-600 group-hover:scale-110 transition-transform">
+                <a href="pricing.php" class="bento-item group bg-gradient-to-br from-purple-50 to-white dark:from-zinc-800 dark:to-zinc-900/50 hover:from-purple-100 dark:hover:from-zinc-700">
+                    <div class="icon-box mb-4 bg-purple-100 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Pro Access</h3>
-                    <p class="text-zinc-500 text-sm">Unlock premium content and exclusive features.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400 text-sm">Unlock premium content and exclusive features.</p>
                 </a>
             </div>
         </div>
@@ -271,21 +271,21 @@ require_once 'includes/functions.php';
                 <div class="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-indigo-200 via-teal-200 to-rose-200"></div>
 
                 <div class="step-card text-center relative">
-                    <div class="w-16 h-16 mx-auto mb-6 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 font-bold text-2xl relative z-10">1</div>
+                    <div class="w-16 h-16 mx-auto mb-6 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-2xl relative z-10">1</div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Sign Up Free</h3>
-                    <p class="text-zinc-500">Create your account in seconds. No credit card required.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400">Create your account in seconds. No credit card required.</p>
                 </div>
 
                 <div class="step-card text-center relative">
-                    <div class="w-16 h-16 mx-auto mb-6 bg-teal-100 rounded-2xl flex items-center justify-center text-teal-600 font-bold text-2xl relative z-10">2</div>
+                    <div class="w-16 h-16 mx-auto mb-6 bg-teal-100 dark:bg-teal-900/30 rounded-2xl flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold text-2xl relative z-10">2</div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Explore Resources</h3>
-                    <p class="text-zinc-500">Browse our curated collection of books, papers, and videos.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400">Browse our curated collection of books, papers, and videos.</p>
                 </div>
 
                 <div class="step-card text-center relative">
-                    <div class="w-16 h-16 mx-auto mb-6 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 font-bold text-2xl relative z-10">3</div>
+                    <div class="w-16 h-16 mx-auto mb-6 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold text-2xl relative z-10">3</div>
                     <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">Start Learning</h3>
-                    <p class="text-zinc-500">Access content anytime, anywhere. Your progress is saved.</p>
+                    <p class="text-zinc-500 dark:text-zinc-400">Access content anytime, anywhere. Your progress is saved.</p>
                 </div>
             </div>
         </div>
