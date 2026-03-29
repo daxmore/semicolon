@@ -495,35 +495,13 @@ function create_notification($user_id, $title, $message, $type = 'system', $acti
 }
 
 function send_custom_mail($to, $subject, $body) {
-    // Include PHPMailer autoload if not already included
-    require_once __DIR__ . '/../vendor/autoload.php';
-    
-    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-    
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= 'From: Semicolon <semicoloncode@gmail.com>' . "\r\n";
+
     try {
-        // Server settings (Modify these to match your SMTP provider)
-        // For development, you can use Mailtrap or a real Gmail app password
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com'; // Replace with your SMTP host
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'semicoloncode@gmail.com'; // Replace with your email
-        $mail->Password   = 'vzyexuqdntokvowj'; // Replace with your App Password
-        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
-        
-        // Recipients
-        $mail->setFrom('semicoloncode@gmail.com', 'Semicolon');
-        $mail->addAddress($to);
-        
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $body;
-        
-        $mail->send();
-        return true;
+        return mail($to, $subject, $body, $headers);
     } catch (Exception $e) {
-        // Log error if needed: error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
         return false;
     }
 }

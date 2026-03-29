@@ -94,7 +94,6 @@ $categories = [
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -110,17 +109,16 @@ $categories = [
             backdrop-filter: blur(4px);
         }
     </style>
-    <script src="assets/js/theme.js"></script>
-</head>
-<body class="antialiased bg-[#FAFAFA] dark:bg-zinc-950 dark:text-zinc-200">
+    </head>
+<body class="antialiased bg-[#FAFAFA]">
     <?php include 'includes/header.php'; ?>
 
     <!-- Header Area -->
-    <div class="bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800 py-6 mb-10">
+    <div class="bg-white border-b border-zinc-100 py-6 mb-10">
         <div class="container mx-auto px-6 max-w-5xl">
             <a href="profile.php" class="text-sm font-medium text-amber-600 hover:text-amber-700 mb-2 inline-block">&larr; Back to Profile</a>
-            <h1 class="text-3xl font-bold text-zinc-900 dark:text-white">Manage My Posts</h1>
-            <p class="text-zinc-500 dark:text-zinc-400 mt-2">Edit or delete the discussions you've started in the community.</p>
+            <h1 class="text-3xl font-bold text-zinc-900">Manage My Posts</h1>
+            <p class="text-zinc-500 mt-2">Edit or delete the discussions you've started in the community.</p>
         </div>
     </div>
 
@@ -132,8 +130,8 @@ $categories = [
                 <?php 
                     $isSuccess = strpos($message, 'successfully') !== false;
                     $bannerClass = $isSuccess 
-                        ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50' 
-                        : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50';
+                        ? 'bg-green-50 text-green-700 border-green-200' 
+                        : 'bg-red-50 text-red-700 border-red-200';
                 ?>
                 <div class="mb-6 p-4 rounded-xl border <?php echo $bannerClass; ?> flex flex-row items-center gap-3">
                     <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -141,44 +139,44 @@ $categories = [
                 </div>
             <?php endif; ?>
 
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
                 <?php if (empty($posts)): ?>
                     <div class="p-12 text-center">
-                        <div class="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                             </svg>
                         </div>
-                        <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">No Posts Yet</h2>
-                        <p class="text-zinc-500 dark:text-zinc-400 mb-6 max-w-md mx-auto">You haven't created any community posts. Start a discussion to engage with other members!</p>
+                        <h2 class="text-xl font-bold text-zinc-900 mb-2">No Posts Yet</h2>
+                        <p class="text-zinc-500 mb-6 max-w-md mx-auto">You haven't created any community posts. Start a discussion to engage with other members!</p>
                         <a href="community_create.php" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition shadow-sm inline-block">Create Post</a>
                     </div>
                 <?php else: ?>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-100 dark:border-zinc-800">
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Post Details</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider w-32">Stats</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider w-40">Date</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider text-right w-40">Actions</th>
+                                <tr class="bg-zinc-50 border-b border-zinc-100">
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Post Details</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider w-32">Stats</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider w-40">Date</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right w-40">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-zinc-100">
                                 <?php foreach ($posts as $post): ?>
-                                    <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 transition">
+                                    <tr class="hover:bg-zinc-50/50 transition">
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-2 mb-1">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
                                                     <?php echo htmlspecialchars($post['category']); ?>
                                                 </span>
                                             </div>
-                                            <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="font-bold text-zinc-900 dark:text-white hover:text-amber-600 transition block break-words">
+                                            <a href="community_post_detail.php?id=<?php echo $post['id']; ?>" class="font-bold text-zinc-900 hover:text-amber-600 transition block break-words">
                                                 <?php echo htmlspecialchars($post['title']); ?>
                                             </a>
                                             <p class="text-sm text-zinc-500 mt-1 line-clamp-1 block truncate max-w-md"><?php echo htmlspecialchars($post['description']); ?></p>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-400 font-medium">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 font-medium">
                                             <div class="flex flex-col gap-1">
                                                 <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg> <?php echo $post['upvotes']; ?> votes</span>
                                                 <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg> <?php echo $post['comment_count']; ?> msgs</span>
@@ -195,14 +193,14 @@ $categories = [
         'category' => $post['category'],
         'description' => $post['description']
     ]), ENT_QUOTES, 'UTF-8'); ?>)"
-    class="text-amber-600 hover:text-amber-900 hover:bg-amber-50 dark:text-amber-400 dark:hover:text-amber-300 dark:hover:bg-amber-900/30 px-2 py-1 rounded transition font-medium mr-2">
+    class="text-amber-600 hover:text-amber-900 hover:bg-amber-50 px-2 py-1 rounded transition font-medium mr-2">
     Edit
 </button>
                                             
                                             <form action="" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this post? This cannot be undone.');">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                                                <button type="submit" class="text-red-600 hover:text-red-900 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30 px-2 py-1 rounded transition font-medium cursor-pointer">Delete</button>
+                                                <button type="submit" class="text-red-600 hover:text-red-900 hover:bg-red-50 px-2 py-1 rounded transition font-medium cursor-pointer">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -213,19 +211,19 @@ $categories = [
 
                     <!-- Pagination -->
                     <?php if ($total_pages > 1): ?>
-                    <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                    <div class="px-6 py-4 border-t border-zinc-100 flex items-center justify-between">
                         <?php if ($page > 1): ?>
-                            <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">Previous</a>
+                            <a href="?page=<?php echo $page - 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">Previous</a>
                         <?php else: ?>
-                            <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-not-allowed">Previous</span>
+                            <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-lg cursor-not-allowed">Previous</span>
                         <?php endif; ?>
                         
-                        <span class="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
+                        <span class="text-sm text-zinc-500 font-medium">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
                         
                         <?php if ($page < $total_pages): ?>
-                            <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">Next</a>
+                            <a href="?page=<?php echo $page + 1; ?>" class="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition">Next</a>
                         <?php else: ?>
-                            <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg cursor-not-allowed">Next</span>
+                            <span class="px-4 py-2 text-sm font-medium text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-lg cursor-not-allowed">Next</span>
                         <?php endif; ?>
                     </div>
                     <?php endif; ?>
@@ -239,10 +237,10 @@ $categories = [
     <div id="editModal" class="fixed inset-0 z-50 hidden">
         <div class="modal-backdrop absolute inset-0" onclick="closeEditModal()"></div>
         <div class="relative flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
                 <!-- Modal Header -->
-                <div class="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-100 dark:border-zinc-800 px-6 py-5 flex items-center justify-between flex-shrink-0">
-                    <h2 class="text-xl font-bold text-zinc-900 dark:text-white">Edit Post</h2>
+                <div class="bg-zinc-50 border-b border-zinc-100 px-6 py-5 flex items-center justify-between flex-shrink-0">
+                    <h2 class="text-xl font-bold text-zinc-900">Edit Post</h2>
                     <button onclick="closeEditModal()" class="text-zinc-400 hover:text-zinc-600 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -257,19 +255,19 @@ $categories = [
                         <input type="hidden" name="post_id" id="edit_post_id" value="">
                         
                         <div>
-                            <label for="edit_title" class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Title</label>
+                            <label for="edit_title" class="block text-sm font-bold text-zinc-900 mb-2">Title</label>
                             <input 
                                 type="text" 
                                 id="edit_title" 
                                 name="title" 
                                 required 
-                                class="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                                class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
                             >
                         </div>
 
                         <div>
-                            <label for="edit_category" class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Topic Category</label>
-                            <select id="edit_category" name="category" required class="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
+                            <label for="edit_category" class="block text-sm font-bold text-zinc-900 mb-2">Topic Category</label>
+                            <select id="edit_category" name="category" required class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
                                 <?php foreach ($categories as $cat): ?>
                                     <option value="<?php echo htmlspecialchars($cat); ?>">
                                         <?php echo htmlspecialchars($cat); ?>
@@ -279,21 +277,21 @@ $categories = [
                         </div>
                         
                         <div>
-                            <label for="edit_description" class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Description</label>
+                            <label for="edit_description" class="block text-sm font-bold text-zinc-900 mb-2">Description</label>
                             <textarea 
                                 id="edit_description" 
                                 name="description" 
                                 rows="6" 
                                 required 
-                                class="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y"
+                                class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition resize-y"
                             ></textarea>
                         </div>
                     </form>
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-100 dark:border-zinc-800 px-6 py-4 flex gap-3 justify-end flex-shrink-0">
-                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium rounded-xl hover:bg-white dark:hover:bg-zinc-800 transition bg-transparent">Cancel</button>
+                <div class="bg-zinc-50 border-t border-zinc-100 px-6 py-4 flex gap-3 justify-end flex-shrink-0">
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 border border-zinc-200 text-zinc-700 font-medium rounded-xl hover:bg-white transition bg-transparent">Cancel</button>
                     <button type="button" onclick="document.getElementById('editForm').submit();" class="px-6 py-2.5 bg-amber-500 text-white font-medium rounded-xl hover:bg-amber-600 transition shadow-sm">Save Changes</button>
                 </div>
             </div>

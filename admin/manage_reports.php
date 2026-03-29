@@ -71,45 +71,45 @@ include 'header.php';
 
 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10 px-4 sm:px-0">
     <div>
-        <h2 class="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">Community Reports</h2>
-        <p class="text-zinc-500 dark:text-zinc-400 mt-2">Monitor and moderate reported content from the community.</p>
+        <h2 class="text-3xl font-black text-zinc-900 tracking-tight">Community Reports</h2>
+        <p class="text-zinc-500 mt-2">Monitor and moderate reported content from the community.</p>
     </div>
 </div>
 
-<div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-xl mx-4 sm:mx-0">
+<div class="bg-white rounded-3xl border border-zinc-200 overflow-hidden shadow-xl mx-4 sm:mx-0">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
-                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Reporter Info</th>
-                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Target Content</th>
-                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Reason / Flag</th>
-                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest text-right">Moderation</th>
+                <tr class="bg-zinc-50 border-b border-zinc-200">
+                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Reporter Info</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Target Content</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Reason / Flag</th>
+                    <th class="px-6 py-5 text-[10px] font-black text-zinc-500 uppercase tracking-widest text-right">Moderation</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-zinc-100">
                 <?php if (empty($reports)): ?>
                     <tr>
                         <td colspan="4" class="px-6 py-12 text-center">
-                            <div class="w-16 h-16 bg-zinc-50 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div class="w-16 h-16 bg-zinc-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <p class="text-zinc-500 dark:text-zinc-400 font-medium">No pending reports.</p>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Community looks safe and clean!</p>
+                            <p class="text-zinc-500 font-medium">No pending reports.</p>
+                            <p class="text-xs text-zinc-400 mt-1">Community looks safe and clean!</p>
                         </td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($reports as $r): ?>
-                        <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors group">
-                            <td class="px-6 py-6 border-b border-zinc-100 dark:border-zinc-800">
-                                <p class="font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase text-xs tracking-tight"><?php echo htmlspecialchars($r['reporter_name']); ?></p>
-                                <p class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 mt-0.5"><?php echo date('M j, Y g:i a', strtotime($r['created_at'])); ?></p>
+                        <tr class="hover:bg-zinc-50/50 transition-colors group">
+                            <td class="px-6 py-6 border-b border-zinc-100">
+                                <p class="font-bold text-zinc-900 group-hover:text-indigo-600 transition-colors uppercase text-xs tracking-tight"><?php echo htmlspecialchars($r['reporter_name']); ?></p>
+                                <p class="text-[10px] font-black text-zinc-400 mt-0.5"><?php echo date('M j, Y g:i a', strtotime($r['created_at'])); ?></p>
                             </td>
-                            <td class="px-6 py-6 border-b border-zinc-100 dark:border-zinc-800">
+                            <td class="px-6 py-6 border-b border-zinc-100">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <span class="inline-flex px-2 py-0.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-[9px] font-black uppercase rounded border border-amber-100 dark:border-amber-900/30">
+                                    <span class="inline-flex px-2 py-0.5 bg-amber-50 text-amber-600 text-[9px] font-black uppercase rounded border border-amber-100">
                                         <?php echo htmlspecialchars($r['target_type']); ?>
                                     </span>
                                     <span class="text-[9px] font-bold text-zinc-400 font-mono">#<?php echo $r['target_id']; ?></span>
@@ -138,7 +138,7 @@ include 'header.php';
                                 }
                                 ?>
                                 <?php if ($link): ?>
-                                    <a href="<?php echo $link; ?>" target="_blank" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 underline flex items-center gap-1 group/link">
+                                    <a href="<?php echo $link; ?>" target="_blank" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 underline flex items-center gap-1 group/link">
                                         Launch Content 
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 transform group-hover/link:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                     </a>
@@ -149,18 +149,18 @@ include 'header.php';
                                     </span>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-6 py-6 border-b border-zinc-100 dark:border-zinc-800 max-w-xs xl:max-w-md">
-                                <div class="p-4 bg-red-50 dark:bg-rose-950/20 rounded-2xl border border-red-100 dark:border-rose-900/30">
-                                    <p class="text-xs font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-1 opacity-60">Violation Reason</p>
-                                    <p class="text-sm font-bold text-zinc-700 dark:text-zinc-300 line-clamp-3 leading-relaxed">"<?php echo htmlspecialchars($r['reason']); ?>"</p>
+                            <td class="px-6 py-6 border-b border-zinc-100 max-w-xs xl:max-w-md">
+                                <div class="p-4 bg-red-50 rounded-2xl border border-red-100">
+                                    <p class="text-xs font-black text-rose-500 uppercase tracking-widest mb-1 opacity-60">Violation Reason</p>
+                                    <p class="text-sm font-bold text-zinc-700 line-clamp-3 leading-relaxed">"<?php echo htmlspecialchars($r['reason']); ?>"</p>
                                 </div>
                             </td>
-                            <td class="px-6 py-6 border-b border-zinc-100 dark:border-zinc-800 text-right">
+                            <td class="px-6 py-6 border-b border-zinc-100 text-right">
                                 <div class="flex items-center justify-end gap-3">
                                     <form action="" method="POST" class="inline">
                                         <input type="hidden" name="action" value="dismiss">
                                         <input type="hidden" name="report_id" value="<?php echo $r['id']; ?>">
-                                        <button type="submit" class="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-[11px] font-black uppercase transition shadow-sm">Dismiss</button>
+                                        <button type="submit" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-xl text-[11px] font-black uppercase transition shadow-sm">Dismiss</button>
                                     </form>
                                     <form action="" method="POST" class="inline">
                                         <input type="hidden" name="action" value="delete_content">

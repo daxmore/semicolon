@@ -97,21 +97,9 @@ if (isset($_SESSION['user_id'])) {
       <!-- Section 3: Actions (Right) -->
       <div class="flex items-center gap-3">
         <!-- Search Icon Button -->
-        <button id="search-trigger" class="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition flex items-center justify-center text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
+        <button id="search-trigger" class="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 transition flex items-center justify-center text-zinc-500 hover:text-zinc-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-        </button>
-
-        <!-- Theme Toggle -->
-        <button class="theme-toggle w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition flex items-center justify-center text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 relative overflow-hidden group">
-            <!-- Sun Icon (Hidden in Dark Mode) -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute transition-all duration-300 dark:-rotate-90 dark:opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <!-- Moon Icon (Hidden in Light Mode) -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute transition-all duration-300 rotate-90 opacity-0 dark:rotate-0 dark:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
             </svg>
         </button>
 

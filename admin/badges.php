@@ -50,12 +50,12 @@ include 'header.php';
 <!-- Header with count -->
 <div class="flex justify-between items-center mb-6">
     <div>
-        <h2 class="text-xl font-bold text-zinc-900 dark:text-white">Gamification Badges</h2>
-        <p class="text-zinc-500 dark:text-zinc-400">Manage unlocked automated badges and XP milestones</p>
+        <h2 class="text-xl font-bold text-zinc-900">Gamification Badges</h2>
+        <p class="text-zinc-500">Manage unlocked automated badges and XP milestones</p>
     </div>
     <div class="flex items-center gap-4">
-        <div class="text-sm text-zinc-500 dark:text-zinc-400">
-            Total Badges: <span class="font-bold text-zinc-900 dark:text-white"><?php echo count($badges); ?></span>
+        <div class="text-sm text-zinc-500">
+            Total Badges: <span class="font-bold text-zinc-900"><?php echo count($badges); ?></span>
         </div>
         <button onclick="showCreateModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -67,12 +67,12 @@ include 'header.php';
 <!-- Badges Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php if (empty($badges)): ?>
-        <div class="col-span-full py-12 text-center text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+        <div class="col-span-full py-12 text-center text-zinc-500 bg-white rounded-2xl border border-zinc-200">
             No badges found. Create one to get started!
         </div>
     <?php else: ?>
         <?php foreach ($badges as $badge): ?>
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 flex flex-col justify-between hover:shadow-md transition">
+            <div class="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col justify-between hover:shadow-md transition">
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 flex-shrink-0">
@@ -94,15 +94,15 @@ include 'header.php';
                         </div>
                     </div>
                     
-                    <h3 class="font-bold text-lg text-zinc-900 dark:text-white leading-tight mb-2">
+                    <h3 class="font-bold text-lg text-zinc-900 leading-tight mb-2">
                         <?php echo htmlspecialchars($badge['badge_name']); ?>
                     </h3>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-3 mb-6">
+                    <p class="text-sm text-zinc-500 line-clamp-3 mb-6">
                         <?php echo htmlspecialchars($badge['description']); ?>
                     </p>
                 </div>
                 
-                <div class="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                <div class="flex justify-end gap-2 pt-4 border-t border-zinc-100">
                     <button onclick="showEditModal(<?php echo htmlspecialchars(json_encode($badge)); ?>)" class="px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition">Edit</button>
                     <button onclick="showDeleteModal(<?php echo $badge['id']; ?>, '<?php echo htmlspecialchars(addslashes($badge['badge_name'])); ?>')" class="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Delete</button>
                 </div>
@@ -115,10 +115,10 @@ include 'header.php';
 <div id="badgeFormModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeFormModal()"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl">
-            <div class="p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-800/50">
-                <h3 id="formModalTitle" class="font-bold text-lg text-zinc-900 dark:text-white">Add New Badge</h3>
-                <button onclick="closeFormModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition">
+        <div class="bg-white rounded-2xl shadow-xl">
+            <div class="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50">
+                <h3 id="formModalTitle" class="font-bold text-lg text-zinc-900">Add New Badge</h3>
+                <button onclick="closeFormModal()" class="text-zinc-400 hover:text-zinc-600 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
@@ -127,19 +127,19 @@ include 'header.php';
                 <input type="hidden" name="badge_id" id="formBadgeId" value="">
                 
                 <div class="mb-5">
-                    <label class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Badge Name</label>
-                    <input type="text" name="badge_name" id="badge_name" required class="w-full px-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <label class="block text-sm font-bold text-zinc-900 mb-2">Badge Name</label>
+                    <input type="text" name="badge_name" id="badge_name" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4 mb-5">
                     <div>
-                        <label class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Required XP</label>
-                        <input type="number" name="required_xp" id="required_xp" min="0" value="0" class="w-full px-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-sm font-bold text-zinc-900 mb-2">Required XP</label>
+                        <input type="number" name="required_xp" id="required_xp" min="0" value="0" class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 outline-none">
                         <p class="text-xs text-zinc-500 mt-1">XP to auto-unlock</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Type</label>
-                        <select name="badge_type" id="badge_type" class="w-full px-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-sm font-bold text-zinc-900 mb-2">Type</label>
+                        <select name="badge_type" id="badge_type" class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 outline-none">
                             <option value="skill">Skill</option>
                             <option value="streak">Streak</option>
                             <option value="leaderboard">Leaderboard</option>
@@ -149,17 +149,17 @@ include 'header.php';
                 </div>
 
                 <div class="mb-5">
-                    <label class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Description</label>
-                    <textarea name="description" id="description" rows="3" class="w-full px-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    <label class="block text-sm font-bold text-zinc-900 mb-2">Description</label>
+                    <textarea name="description" id="description" rows="3" class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-sm font-bold text-zinc-900 dark:text-white mb-2">SVG Icon Code</label>
-                    <textarea name="svg_icon" id="svg_icon" rows="4" placeholder="<svg>...</svg>" class="w-full px-4 py-2 text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-600 dark:text-zinc-400 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    <label class="block text-sm font-bold text-zinc-900 mb-2">SVG Icon Code</label>
+                    <textarea name="svg_icon" id="svg_icon" rows="4" placeholder="<svg>...</svg>" class="w-full px-4 py-2 text-xs font-mono bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-600 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
                 </div>
                 
-                <div class="flex justify-end gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                    <button type="button" onclick="closeFormModal()" class="px-5 py-2 text-zinc-600 dark:text-zinc-400 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition">Cancel</button>
+                <div class="flex justify-end gap-3 pt-4 border-t border-zinc-100">
+                    <button type="button" onclick="closeFormModal()" class="px-5 py-2 text-zinc-600 font-medium hover:bg-zinc-50 rounded-lg transition">Cancel</button>
                     <button type="submit" id="formSubmitBtn" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition">Create Badge</button>
                 </div>
             </form>
@@ -171,7 +171,7 @@ include 'header.php';
 <div id="deleteModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-6">
+        <div class="bg-white rounded-2xl shadow-xl p-6">
             <div class="flex items-center gap-4 mb-4">
                 <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 flex-shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -179,13 +179,13 @@ include 'header.php';
                     </svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-lg text-zinc-900 dark:text-white">Delete Badge</h3>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">This action cannot be undone.</p>
+                    <h3 class="font-bold text-lg text-zinc-900">Delete Badge</h3>
+                    <p class="text-sm text-zinc-500">This action cannot be undone.</p>
                 </div>
             </div>
-            <p id="deleteModalMessage" class="text-zinc-600 dark:text-zinc-300 mb-6"></p>
+            <p id="deleteModalMessage" class="text-zinc-600 mb-6"></p>
             <div class="flex justify-end gap-3">
-                <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 text-zinc-600 dark:text-zinc-400 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl transition">Cancel</button>
+                <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 text-zinc-600 font-medium hover:bg-zinc-50 rounded-xl transition">Cancel</button>
                 <form action="badges.php" method="POST">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="badge_id" id="deleteBadgeId">

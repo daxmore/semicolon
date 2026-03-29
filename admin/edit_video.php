@@ -41,7 +41,7 @@ include 'header.php';
 
 <!-- Back Link -->
 <div class="mb-8 px-4 sm:px-0">
-    <a href="videos.php" class="inline-flex items-center gap-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 font-medium transition group">
+    <a href="videos.php" class="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-700 font-medium transition group">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
@@ -51,33 +51,33 @@ include 'header.php';
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 px-4 sm:px-0">
     <!-- Edit Form -->
-    <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-xl">
-        <h2 class="text-xl font-black text-zinc-900 dark:text-white mb-8 tracking-tight">Edit Video Details</h2>
+    <div class="bg-white rounded-3xl border border-zinc-200 p-8 shadow-xl">
+        <h2 class="text-xl font-black text-zinc-900 mb-8 tracking-tight">Edit Video Details</h2>
         
         <form action="" method="post" class="space-y-6">
             <input type="hidden" name="action" value="update">
             
             <div>
-                <label class="block text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2 px-1">Title</label>
+                <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2 px-1">Title</label>
                 <input type="text" name="title" value="<?php echo htmlspecialchars($video['title']); ?>" required
-                    class="w-full px-5 py-3.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm">
+                    class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-zinc-900 focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm">
             </div>
             
             <div>
-                <label class="block text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2 px-1">Description</label>
+                <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2 px-1">Description</label>
                 <textarea name="description" rows="4"
-                    class="w-full px-5 py-3.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm"><?php echo htmlspecialchars($video['description']); ?></textarea>
+                    class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-zinc-900 focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm"><?php echo htmlspecialchars($video['description']); ?></textarea>
             </div>
             
             <div>
-                <label class="block text-[10px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2 px-1">YouTube URL / Embed Code</label>
+                <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2 px-1">YouTube URL / Embed Code</label>
                 <input type="text" name="youtube_url" value="<?php echo htmlspecialchars($video['youtube_url']); ?>" required
-                    class="w-full px-5 py-3.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-zinc-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm">
-                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2 px-1">Supports full iframe tags or clean YouTube links.</p>
+                    class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-zinc-900 font-mono text-sm focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm">
+                <p class="text-[10px] text-zinc-400 mt-2 px-1">Supports full iframe tags or clean YouTube links.</p>
             </div>
             
-            <div class="flex items-center justify-end gap-10 pt-8 mt-4 border-t border-zinc-100 dark:border-zinc-800">
-                <a href="videos.php" class="text-xs font-black uppercase text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition">
+            <div class="flex items-center justify-end gap-10 pt-8 mt-4 border-t border-zinc-100">
+                <a href="videos.php" class="text-xs font-black uppercase text-zinc-400 hover:text-zinc-900 transition">
                     Discard Changes
                 </a>
                 <button type="submit" class="px-8 py-4 bg-rose-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-rose-700 transition shadow-lg shadow-rose-600/20 active:scale-[0.98]">
@@ -88,9 +88,9 @@ include 'header.php';
     </div>
     
     <!-- Video Preview -->
-    <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-xl flex flex-col">
-        <h2 class="text-xl font-black text-zinc-900 dark:text-white mb-8 tracking-tight">Live Preview</h2>
-        <div class="aspect-video bg-zinc-100 dark:bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-inner flex-grow flex items-center justify-center">
+    <div class="bg-white rounded-3xl border border-zinc-200 p-8 shadow-xl flex flex-col">
+        <h2 class="text-xl font-black text-zinc-900 mb-8 tracking-tight">Live Preview</h2>
+        <div class="aspect-video bg-zinc-100 rounded-2xl overflow-hidden border border-zinc-200 shadow-inner flex-grow flex items-center justify-center">
             <?php if ($youtube_id || strpos($video['youtube_url'], '<iframe') !== false): ?>
                 <div class="w-full h-full [&_iframe]:w-full [&_iframe]:h-full object-cover">
                     <?php 
