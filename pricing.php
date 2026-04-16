@@ -2,6 +2,11 @@
 session_start();
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
+
+$is_pro = false;
+if (isset($_SESSION['user_id'])) {
+    $is_pro = is_pro_user($_SESSION['user_id']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +69,7 @@ require_once 'includes/functions.php';
                     <div class="mb-8">
                         <h2 class="text-2xl font-bold text-zinc-900 mb-2">Free</h2>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-bold text-zinc-900">$0</span>
+                            <span class="text-5xl font-bold text-zinc-900">₹0</span>
                             <span class="text-zinc-500">/month</span>
                         </div>
                         <p class="text-zinc-500 mt-2">Perfect for getting started</p>
@@ -106,7 +111,7 @@ require_once 'includes/functions.php';
                     </ul>
                     
                     <button class="w-full py-4 bg-zinc-100 text-zinc-600 font-semibold rounded-xl cursor-default">
-                        Current Plan
+                        <?php echo $is_pro ? 'Legacy Plan' : 'Current Plan'; ?>
                     </button>
                 </div>
 
@@ -127,7 +132,7 @@ require_once 'includes/functions.php';
                     <div class="relative z-10 mb-8">
                         <h2 class="text-2xl font-bold text-white mb-2">Pro</h2>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-bold text-white">$5</span>
+                            <span class="text-5xl font-bold text-white">₹499</span>
                             <span class="text-indigo-200">/month</span>
                         </div>
                         <p class="text-indigo-200 mt-2">For serious learners</p>
@@ -176,9 +181,17 @@ require_once 'includes/functions.php';
                         </li>
                     </ul>
                     
-                    <button class="relative z-10 w-full py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">
-                        Upgrade to Pro
-                    </button>
+                    <?php if ($is_pro): ?>
+                        <button class="relative z-10 w-full py-4 bg-white/20 text-white font-semibold rounded-xl cursor-default backdrop-blur">
+                            Active Plan
+                        </button>
+                    <?php else: ?>
+                        <form action="checkout.php" method="POST">
+                            <button type="submit" class="relative z-10 w-full py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg">
+                                Upgrade to Pro
+                            </button>
+                        </form>
+                    <?php endif; ?>
                 </div>
 
             </div>

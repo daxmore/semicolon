@@ -42,7 +42,15 @@ if (!function_exists('render_comments')) {
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-2 flex-wrap">
-                            <span class="font-bold text-zinc-900"><?php echo htmlspecialchars($comment['username']); ?></span>
+                            <span class="font-bold text-zinc-900 flex items-center gap-1">
+                                <?php echo htmlspecialchars($comment['username']); ?>
+                                <?php if (isset($comment['is_pro']) && $comment['is_pro']): ?>
+                                    <span class="inline-flex items-center bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-tight" title="Semicolon Pro Member">
+                                        <svg class="w-2.5 h-2.5 mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                        Pro
+                                    </span>
+                                <?php endif; ?>
+                            </span>
                             <?php if ($is_accepted): ?>
                                 <span class="inline-flex items-center gap-1 text-[10px] md:text-xs font-bold px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md shadow-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>

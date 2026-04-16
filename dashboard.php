@@ -35,6 +35,10 @@ $posts_stmt = $conn->prepare("SELECT cp.*, (SELECT COUNT(*) FROM community_comme
 $posts_stmt->bind_param('i', $user_id);
 $posts_stmt->execute();
 $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// Subscription status
+$is_pro = is_pro_user($user_id);
+$subscription = $is_pro ? get_user_subscription($user_id) : null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,9 +93,16 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     <a href="auth/logout.php" class="px-5 py-2.5 border border-zinc-200 rounded-xl text-zinc-700 hover:bg-zinc-50 transition font-medium">
                         Logout
                     </a>
-                    <a href="pricing.php" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-medium">
-                        Upgrade to Pro
-                    </a>
+                    <?php if ($is_pro): ?>
+                        <div class="px-5 py-2.5 bg-indigo-50 border border-indigo-200 rounded-xl text-indigo-700 font-medium flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                            Active Plan: Pro
+                        </div>
+                    <?php else: ?>
+                        <a href="pricing.php" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-medium">
+                            Upgrade to Pro
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -327,28 +338,128 @@ $user_posts = $posts_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         <?php endif; ?>
                     </div>
 
-                    <!-- Account Status -->
-                    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white">
+                    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white shadow-xl shadow-indigo-500/20">
                         <h3 class="font-bold mb-4 text-white">Account Status</h3>
                         <div class="space-y-3 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-indigo-200">Plan</span>
-                                <span class="font-medium">Free Tier</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-indigo-200">Member Since</span>
-                                <span class="font-medium"><?php echo date('M Y', strtotime($user['created_at'] ?? 'now')); ?></span>
-                            </div>
+                            <?php if ($subscription): ?>
+                                <div class="flex justify-between items-center opacity-80 border-b border-white/10 pb-2">
+                                    <span>Plan</span>
+                                    <span class="font-bold"><?php echo $subscription['status'] === 'paid' ? 'Pro Subscription' : 'Pro (Cancelled)'; ?></span>
+                                </div>
+                                <div class="flex justify-between items-center opacity-80 border-b border-white/10 pb-2">
+                                    <span>Purchased On</span>
+                                    <span class="font-bold"><?php echo date('M d, Y', strtotime($subscription['created_at'])); ?></span>
+                                </div>
+                                <div class="flex justify-between items-center opacity-80 border-b border-white/10 pb-2">
+                                    <span>Status</span>
+                                    <?php if ($subscription['status'] === 'paid'): ?>
+                                        <span class="font-bold uppercase text-[10px] bg-green-500/30 px-2 py-0.5 rounded leading-none flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                                            Active
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="font-bold uppercase text-[10px] bg-red-500/30 px-2 py-0.5 rounded leading-none flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                            Cancelled
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <?php if ($subscription['status'] === 'paid'): ?>
+                                    <button onclick="showCancelModal()" class="block w-full text-center py-3 bg-red-500/20 hover:bg-red-500/40 text-red-100 font-semibold rounded-xl mt-6 border border-red-500/30 transition-all text-xs">
+                                        Cancel Subscription
+                                    </button>
+                                <?php else: ?>
+                                    <a href="pricing.php" class="block w-full text-center py-3 bg-white text-indigo-600 font-semibold rounded-xl mt-6 hover:bg-indigo-50 transition shadow-lg">
+                                        Renew Pro Plan
+                                    </a>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <div class="flex justify-between items-center opacity-80 border-b border-white/10 pb-2">
+                                    <span>Plan</span>
+                                    <span class="font-bold">Free Tier</span>
+                                </div>
+                                <div class="flex justify-between items-center opacity-80 pb-2">
+                                    <span>Member Since</span>
+                                    <span class="font-bold"><?php echo date('M Y', strtotime($user['created_at'] ?? 'now')); ?></span>
+                                </div>
+                                <a href="pricing.php" class="block w-full text-center py-3 bg-white text-indigo-600 font-semibold rounded-xl mt-6 hover:bg-indigo-50 transition shadow-lg">
+                                    Upgrade to Pro
+                                </a>
+                            <?php endif; ?>
                         </div>
-                        <a href="pricing.php" class="block w-full text-center py-3 bg-white text-indigo-600 font-semibold rounded-xl mt-4 hover:bg-indigo-50 transition">
-                            Upgrade to Pro
-                        </a>
                     </div>
                 </div>
 
             </div>
         </div>
     </section>
+
+    <!-- Cancellation Confirmation Modal -->
+    <div id="cancelModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm transition-opacity" onclick="hideCancelModal()"></div>
+        
+        <!-- Modal Card -->
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modalCard">
+            <div class="relative p-8 text-center text-zinc-900">
+                <!-- Icon -->
+                <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-2">Giving up on Pro?</h3>
+                <p class="text-zinc-500 mb-8 px-4">
+                    Your skills won't grow themselves… but we respect the confidence. Ready to go back to basic? 😉
+                </p>
+
+                <div class="flex flex-col gap-3">
+                    <a href="cancel_subscription.php" class="w-full py-4 bg-zinc-900 text-white font-bold rounded-2xl hover:bg-black transition shadow-lg shadow-zinc-900/20">
+                        Yes, Cancel My Plan
+                    </a>
+                    <button onclick="hideCancelModal()" class="w-full py-4 bg-zinc-100 text-zinc-600 font-bold rounded-2xl hover:bg-zinc-200 transition">
+                        No, Keep Pro Benefits
+                    </button>
+                </div>
+                
+                <p class="text-[10px] text-zinc-400 mt-6 uppercase tracking-widest font-bold">
+                    Semicolon Pro Quality Guarantee
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showCancelModal() {
+        const modal = document.getElementById('cancelModal');
+        const card = document.getElementById('modalCard');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // Trigger animation
+        setTimeout(() => {
+            card.classList.remove('scale-95', 'opacity-0');
+            card.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function hideCancelModal() {
+        const modal = document.getElementById('cancelModal');
+        const card = document.getElementById('modalCard');
+        
+        card.classList.remove('scale-100', 'opacity-100');
+        card.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }, 300);
+    }
+    </script>
 
     <?php include 'includes/footer.php'; ?>
 </body>

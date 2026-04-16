@@ -326,6 +326,18 @@ function record_view($user_id, $resource_type, $resource_id)
     return $stmt->execute();
 }
 
+/**
+ * Log a download event (Pro users only)
+ */
+function record_download($user_id, $resource_type, $resource_id)
+{
+    global $conn;
+    $sql = "INSERT INTO downloads (user_id, resource_type, resource_id) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('isi', $user_id, $resource_type, $resource_id);
+    return $stmt->execute();
+}
+
 function get_user_history($user_id, $limit = null, $offset = null)
 {
     global $conn;
@@ -444,8 +456,44 @@ function get_reaction_stats($resource_type, $resource_id)
 }
 
 function is_pro_user($user_id) {
-    // Placeholder logic. In future check pro_plans subscription.
-    return false; 
+    global $conn;
+    $stmt = $conn->prepare("SELECT is_pro FROM users WHERE id = ?");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        return (bool)$row['is_pro'];
+    }
+    return false;
+}
+function get_user_subscription($user_id) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT * FROM subscriptions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+function cancel_subscription($user_id) {
+    global $conn;
+    $conn->begin_transaction();
+    try {
+        // Update user status
+        $stmt1 = $conn->prepare("UPDATE users SET is_pro = 0 WHERE id = ?");
+        $stmt1->bind_param('i', $user_id);
+        $stmt1->execute();
+
+        // Update latest subscription status
+        $stmt2 = $conn->prepare("UPDATE subscriptions SET status = 'cancelled' WHERE user_id = ? AND status = 'paid' ORDER BY created_at DESC LIMIT 1");
+        $stmt2->bind_param('i', $user_id);
+        $stmt2->execute();
+
+        $conn->commit();
+        return true;
+    } catch (Exception $e) {
+        $conn->rollback();
+        return false;
+    }
 }
 function create_notification($user_id, $title, $message, $type = 'system', $action_url = null)
 {
@@ -457,22 +505,20 @@ function create_notification($user_id, $title, $message, $type = 'system', $acti
     $success = $stmt->execute();
     
     if ($success) {
-        // Fetch user email
-        $user_sql = "SELECT email FROM users WHERE id = ?";
-        $user_stmt = $conn->prepare($user_sql);
-        $user_stmt->bind_param('i', $user_id);
-        $user_stmt->execute();
-        $user_res = $user_stmt->get_result();
+        // Fetch user info
+        $user = get_user_by_id($user_id);
         
-        if ($user_row = $user_res->fetch_assoc()) {
-            $to = $user_row['email'];
+        if ($user) {
+            $to = $user['email'];
+            $username = $user['username'] ?? 'there';
             
             // Construct the base URL dynamically
             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
             $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
             
-            // Assume the project is hosted under /semicolon folder currently. Adjust as needed.
-            $base_dir = '/semicolon'; 
+            // Try to detect base directory if on localhost
+            $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+            $base_dir = (strpos($host, 'localhost') !== false) ? '/semicolon' : '';
             $base_url = $protocol . "://" . $host . $base_dir;
             
             $url = $action_url ? $base_url . '/' . ltrim($action_url, '/') : $base_url . '/dashboard.php';
@@ -481,6 +527,7 @@ function create_notification($user_id, $title, $message, $type = 'system', $acti
             if (file_exists($template_path)) {
                 $html = file_get_contents($template_path);
                 
+                $html = str_replace('{{USER_NAME}}', htmlspecialchars($username), $html);
                 $html = str_replace('{{TITLE}}', htmlspecialchars($title), $html);
                 $html = str_replace('{{MESSAGE}}', htmlspecialchars($message), $html);
                 $html = str_replace('{{ACTION_URL}}', htmlspecialchars($url), $html);
@@ -691,7 +738,7 @@ function check_badge_unlocks($user_id) {
             
             // Create a notification for the badge unlock
             $message = "Congratulations! You've unlocked the '" . htmlspecialchars($badge['badge_name']) . "' badge by reaching " . $current_xp . " XP!";
-            create_notification($user_id, "badge_unlocked", $message, "profile.php#badges");
+            create_notification($user_id, "Badge Unlocked!", $message, "badge", "profile.php#badges");
             
             // Toast notification
             if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];

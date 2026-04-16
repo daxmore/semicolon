@@ -522,21 +522,39 @@ $badges = get_user_badges($user_id);
                     </div>
 
                     <!-- Account Status -->
-                    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white">
-                        <h3 class="font-bold mb-4 text-white">Account Status</h3>
-                        <div class="space-y-3 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-indigo-200">Plan</span>
-                                <span class="font-medium">Free Tier</span>
+                    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white shadow-lg">
+                        <h3 class="font-bold mb-4 text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zM9 10a1 1 0 00-1 1v2a1 1 0 102 0v-2a1 1 0 00-1-1zm1-4a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>
+                            Account Status
+                        </h3>
+                        <?php $is_pro = is_pro_user($user_id); ?>
+                        <div class="space-y-4 text-sm mt-2">
+                            <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                <span class="text-indigo-200">Current Plan</span>
+                                <span class="font-bold flex items-center gap-1.5">
+                                    <?php if ($is_pro): ?>
+                                        <span class="w-2 h-2 rounded-full bg-indigo-300 animate-pulse"></span>
+                                        Semicolon Pro
+                                    <?php else: ?>
+                                        Free Tier
+                                    <?php endif; ?>
+                                </span>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-indigo-200">Status</span>
-                                <span class="font-medium"><?php echo ucfirst($user['status'] ?? 'Active'); ?></span>
+                            <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                <span class="text-indigo-200">Account Status</span>
+                                <span class="font-medium px-2 py-0.5 bg-white/10 rounded-md"><?php echo ucfirst($user['status'] ?? 'Active'); ?></span>
                             </div>
                         </div>
-                        <a href="pricing.php" class="block w-full text-center py-3 bg-white text-indigo-600 font-semibold rounded-xl mt-4 hover:bg-indigo-50 transition">
-                            Upgrade to Pro
-                        </a>
+
+                        <?php if ($is_pro): ?>
+                            <button onclick="showCancelModal()" class="block w-full text-center py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold rounded-xl mt-6 transition backdrop-blur-sm">
+                                Manage Subscription
+                            </button>
+                        <?php else: ?>
+                            <a href="pricing.php" class="block w-full text-center py-3 bg-white text-indigo-600 font-bold rounded-xl mt-6 hover:bg-indigo-50 transition shadow-md">
+                                Upgrade to Pro
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -712,9 +730,64 @@ $badges = get_user_badges($user_id);
         </div>
     </div>
 
+    <!-- Cancellation Modal (New Logic) -->
+    <div id="cancelModal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="hideCancelModal()"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="cancelModalContent">
+                <div class="p-8 text-center">
+                    <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-2xl font-bold mb-2">Giving up on Pro?</h3>
+                    <p class="text-zinc-500 mb-8 px-4">
+                        Your skills won't grow themselves… but we respect the confidence. Ready to go back to basic? 😉
+                    </p>
+
+                    <div class="flex flex-col gap-3">
+                        <a href="cancel_subscription.php" class="w-full py-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl transition shadow-lg shadow-rose-200">
+                            Yes, Cancel My Plan
+                        </a>
+                        <button onclick="hideCancelModal()" class="w-full py-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-bold rounded-2xl transition">
+                            No, Keep Pro Benefits
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-zinc-50 py-4 px-8 border-t border-zinc-100">
+                    <p class="text-[10px] text-zinc-400 text-center uppercase tracking-widest font-bold">You will lose access to all premium downloads & resources instantly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include 'includes/footer.php'; ?>
 
     <script>
+        function showCancelModal() {
+            const modal = document.getElementById('cancelModal');
+            const content = document.getElementById('cancelModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideCancelModal() {
+            const modal = document.getElementById('cancelModal');
+            const content = document.getElementById('cancelModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
         function openEditModal() {
             document.getElementById('editModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -725,13 +798,14 @@ $badges = get_user_badges($user_id);
             document.body.style.overflow = '';
         }
         
-        // Close modal on Escape key
+        // Close modals on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeEditModal();
+                hideCancelModal();
             }
         });
-
+        
         // Password confirmation validation
         document.querySelector('form').addEventListener('submit', function(e) {
             const newPassword = document.getElementById('new_password').value;

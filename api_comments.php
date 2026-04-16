@@ -32,7 +32,7 @@ $post_res = $stmt->get_result()->fetch_assoc();
 $post_user_id = $post_res ? $post_res['user_id'] : 0;
 
 // Fetch all comments (same logic as community_post_detail.php so tree builds correctly)
-$comments_stmt = $conn->prepare("SELECT cc.*, u.username, u.avatar_url FROM community_comments cc JOIN users u ON cc.user_id = u.id WHERE cc.post_id = ? ORDER BY cc.is_accepted DESC, cc.upvotes DESC, cc.created_at ASC");
+$comments_stmt = $conn->prepare("SELECT cc.*, u.username, u.avatar_url, u.is_pro FROM community_comments cc JOIN users u ON cc.user_id = u.id WHERE cc.post_id = ? ORDER BY cc.is_accepted DESC, cc.upvotes DESC, cc.created_at ASC");
 $comments_stmt->bind_param('i', $post_id);
 $comments_stmt->execute();
 $all_comments = $comments_stmt->get_result()->fetch_all(MYSQLI_ASSOC);

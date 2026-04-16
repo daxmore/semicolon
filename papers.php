@@ -168,13 +168,18 @@ $papers = get_papers($selected_category, $year, $search_query);
                                     <?php echo htmlspecialchars($paper['title']); ?>
                                 </h3>
                                 
+                                <?php 
+                                $is_pro = is_pro_user($_SESSION['user_id']);
+                                $dl_link = $is_pro ? "download.php?token=" . $paper['token'] : "pricing.php";
+                                ?>
                                 <div class="flex gap-3">
                                     <a href="view.php?token=<?php echo $paper['token']; ?>" 
                                        class="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl text-center transition">
                                         View Paper
                                     </a>
-                                    <a href="pricing.php" 
-                                       class="py-2.5 px-4 border border-zinc-200 hover:border-zinc-300 text-zinc-700 text-sm font-medium rounded-xl transition flex items-center gap-2">
+                                    <a href="<?php echo $dl_link; ?>" 
+                                       class="py-2.5 px-4 border border-zinc-200 hover:border-zinc-300 text-zinc-700 text-sm font-medium rounded-xl transition flex items-center gap-2"
+                                       title="<?php echo $is_pro ? 'Download PDF' : 'Upgrade to Pro to Download'; ?>">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                         </svg>

@@ -1,0 +1,21 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Sensitive Configuration
+includes/db.php
+includes/stripe_config.php
+
+# Private Assets & Uploads
+private/
+uploads/
+
+# Development Tools & Scratch
+scratch/
+.env
+
+# System Files
+.DS_Store
+Thumbs.db
+*.log
+error_log
