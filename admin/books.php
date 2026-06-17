@@ -166,7 +166,11 @@ include 'header.php';
         </div>
         <div>
             <label class="block text-sm font-medium text-zinc-700 mb-1">Subject</label>
-            <input type="text" name="subject" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+            <select name="subject" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                <?php foreach (get_system_categories() as $cat): ?>
+                    <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
         <div>
             <label class="block text-sm font-medium text-zinc-700 mb-1">Difficulty</label>

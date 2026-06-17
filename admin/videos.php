@@ -13,13 +13,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = $_POST['title'];
         $description = $_POST['description'];
         $youtube_url = $_POST['youtube_url'];
+        $category = $_POST['category'];
         
         $slug = generate_slug($title);
         $slug .= '-' . substr(md5(uniqid()), 0, 5);
         $token = generate_token();
 
-        $stmt = $conn->prepare("INSERT INTO videos (title, description, youtube_url, slug, token) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $title, $description, $youtube_url, $slug, $token);
+        $stmt = $conn->prepare("INSERT INTO videos (title, description, youtube_url, category, slug, token) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssss", $title, $description, $youtube_url, $category, $slug, $token);
         $stmt->execute();
         
         if (!isset($_SESSION['toasts'])) $_SESSION['toasts'] = [];
@@ -77,6 +78,14 @@ include 'header.php';
         <div>
             <label class="block text-sm font-medium text-zinc-700 mb-1">Description</label>
             <textarea name="description" rows="3" class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-rose-500 outline-none transition"></textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">Subject</label>
+            <select name="category" required class="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-rose-500 outline-none transition">
+                <?php foreach (get_system_categories() as $cat): ?>
+                    <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
         <div>
             <label class="block text-sm font-medium text-zinc-700 mb-1">YouTube Embed Code (Iframe)</label>

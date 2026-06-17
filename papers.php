@@ -157,7 +157,7 @@ $papers = get_papers($selected_category, $year, $search_query);
                                 <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full"></div>
                                 <div class="relative z-10 flex items-center justify-between">
                                     <span class="inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-medium text-white">
-                                        <?php echo htmlspecialchars($paper['category'] ?? $paper['subject']); ?>
+                                        <?php echo htmlspecialchars($paper['subject']); ?>
                                     </span>
                                     <span class="text-white/80 text-sm font-mono"><?php echo htmlspecialchars($paper['year']); ?></span>
                                 </div>

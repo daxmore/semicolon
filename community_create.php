@@ -8,11 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
-$categories = [
-    'Frontend', 'Backend', 'Full Stack', 'App Dev', 'Game Dev', 
-    'UI/UX Design', 'Graphic Design', 'Video Editing', 'Motion Graphics', 
-    'Cloud Computing', 'General Tech'
-];
+$categories = get_system_categories();
 
 $pre_selected_category = $_GET['category'] ?? '';
 $error = '';

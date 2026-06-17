@@ -63,8 +63,11 @@ include 'header.php';
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2 px-1">Subject</label>
-                <input type="text" name="subject" value="<?php echo htmlspecialchars($book['subject']); ?>" required
-                    class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm">
+                <select name="subject" required class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-zinc-900 focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm appearance-none">
+                    <?php foreach (get_system_categories() as $cat): ?>
+                        <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $book['subject'] === $cat ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div>
                 <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2 px-1">Difficulty</label>

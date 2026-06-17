@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (empty($password)) {
         $errors[] = 'Password is required.';
-    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/', $password)) {
+    } elseif (!is_valid_password_format($password)) {
         $errors[] = 'Password must be 6+ chars with at least one uppercase letter, one number, and one symbol.';
     }
 

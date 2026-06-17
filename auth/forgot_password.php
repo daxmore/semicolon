@@ -59,13 +59,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (strlen($new_password) < 6) {
                 $error = "Password must be at least 6 characters.";
                 $step = 3;
+            } elseif (!is_valid_password_format($new_password)) {
+                $error = "Password must be 6+ chars with at least one uppercase letter, one number, and one symbol.";
+                $step = 3;
             } elseif ($new_password !== $confirm_password) {
                 $error = "Passwords do not match.";
                 $step = 3;
             } else {
-                $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-                $stmt->bind_param("si", $new_password, $user_id);
-                if ($stmt->execute()) {
+                if (update_user_password($user_id, $new_password)) {
                     $success = "Password reset successfully! You can now log in.";
                     $step = 4;
                     // Clear session

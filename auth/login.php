@@ -17,14 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($password)) {
         $errors[] = 'Password is required.';
-    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/', $password)) {
-        $errors[] = 'Invalid password format.';
     }
 
     if (empty($errors)) {
         $user = getUserByUsername($username);
 
-        if ($user && $password === $user['password']) {
+        if ($user && verify_user_password($user, $password)) {
             // Check if user is banned
             if (isset($user['status']) && $user['status'] === 'banned') {
                 $errors[] = 'Your account has been suspended. Please contact support.';

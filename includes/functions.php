@@ -65,9 +65,10 @@ function get_books($category = null, $semester = null, $search_query = null)
         $params[] = &$semester;
     }
     if ($search_query) {
-        $sql .= " AND (title LIKE ? OR author LIKE ? OR description LIKE ?)";
+        $sql .= " AND (title LIKE ? OR author LIKE ? OR description LIKE ? OR subject LIKE ?)";
         $search = "%$search_query%";
-        $types .= 'sss';
+        $types .= 'ssss';
+        $params[] = &$search;
         $params[] = &$search;
         $params[] = &$search;
         $params[] = &$search;
@@ -265,12 +266,64 @@ function get_user_by_id($user_id)
     return $result->fetch_assoc();
 }
 
+function hash_password($password)
+{
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+function is_valid_password_format($password)
+{
+    return is_string($password) && preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/', $password) === 1;
+}
+
+function is_password_hash($value)
+{
+    return is_string($value) && password_get_info($value)['algo'] !== null;
+}
+
+function update_user_password($user_id, $password)
+{
+    global $conn;
+    $hashed_password = hash_password($password);
+    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+    $stmt->bind_param('si', $hashed_password, $user_id);
+    return $stmt->execute();
+}
+
+function verify_user_password($user, $password)
+{
+    if (!$user || !isset($user['password'])) {
+        return false;
+    }
+
+    $stored_password = $user['password'];
+
+    if (is_password_hash($stored_password)) {
+        $is_valid = password_verify($password, $stored_password);
+
+        if ($is_valid && password_needs_rehash($stored_password, PASSWORD_DEFAULT)) {
+            update_user_password((int) $user['id'], $password);
+        }
+
+        return $is_valid;
+    }
+
+    if (!hash_equals((string) $stored_password, (string) $password)) {
+        return false;
+    }
+
+    // Seamlessly upgrade legacy plaintext passwords after a successful login.
+    update_user_password((int) $user['id'], $password);
+    return true;
+}
+
 function createUser($username, $email, $password, $avatar_url = null, $security_question = null, $security_answer = null)
 {
     global $conn;
+    $hashed_password = hash_password($password);
     $sql = "INSERT INTO users (username, email, password, avatar_url, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssssss', $username, $email, $password, $avatar_url, $security_question, $security_answer);
+    $stmt->bind_param('ssssss', $username, $email, $hashed_password, $avatar_url, $security_question, $security_answer);
     return $stmt->execute();
 }
 
@@ -652,44 +705,32 @@ function update_user_level($user_id) {
  * @param int $amount Amount of XP to grant
  * @return bool True if XP was fully or partially granted
  */
-function add_user_xp($user_id, $amount, $ignore_cap = false) {
+function add_user_xp($user_id, $amount, $ignore_cap = true) {
     global $conn;
-    $max_daily_xp = 100;
     
-    if (!$ignore_cap) {
-        // Check how much XP the user has earned today
-        $stmt = $conn->prepare("SELECT daily_xp_earned, last_activity_date FROM users WHERE id = ?");
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($row = $result->fetch_assoc()) {
-            $today = date('Y-m-d');
-            $current_daily_xp = 0;
-            
-            // Reset daily XP if it's a new day
-            if ($row['last_activity_date'] === $today) {
-                $current_daily_xp = (int)$row['daily_xp_earned'];
-            }
-            
-            // Check if cap reached
-            if ($current_daily_xp >= $max_daily_xp) {
-                return false; // Cap reached
-            }
-            
-            // Calculate allowed XP
-            $amount = min($amount, $max_daily_xp - $current_daily_xp);
-        }
-    }
+    // Fetch user data to check for day reset
+    $stmt = $conn->prepare("SELECT last_activity_date FROM users WHERE id = ?");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
     
+    if (!$row) return false;
     if ($amount <= 0) return false;
     
     $today = date('Y-m-d');
+    $is_new_day = ($row['last_activity_date'] !== $today);
     
-    // Update user XP
-    $sql = "UPDATE users SET xp_total = xp_total + ?, xp_weekly = xp_weekly + ?, daily_xp_earned = daily_xp_earned + ?, last_activity_date = ? WHERE id = ?";
-    $upd_stmt = $conn->prepare($sql);
-    $upd_stmt->bind_param('iiisi', $amount, $amount, $amount, $today, $user_id);
+    // Update user XP (No more daily cap)
+    if ($is_new_day) {
+        $sql = "UPDATE users SET xp_total = xp_total + ?, xp_weekly = xp_weekly + ?, daily_xp_earned = ?, last_activity_date = ? WHERE id = ?";
+        $upd_stmt = $conn->prepare($sql);
+        $upd_stmt->bind_param('iiisi', $amount, $amount, $amount, $today, $user_id);
+    } else {
+        $sql = "UPDATE users SET xp_total = xp_total + ?, xp_weekly = xp_weekly + ?, daily_xp_earned = daily_xp_earned + ?, last_activity_date = ? WHERE id = ?";
+        $upd_stmt = $conn->prepare($sql);
+        $upd_stmt->bind_param('iiisi', $amount, $amount, $amount, $today, $user_id);
+    }
     $success = $upd_stmt->execute();
         
     if ($success) {
@@ -774,7 +815,7 @@ function update_daily_streak($user_id) {
             $new_streak = $row['daily_streak'] + 1; // Increment streak
         }
         
-        $upd = $conn->prepare("UPDATE users SET daily_streak = ?, last_activity_date = ? WHERE id = ?");
+        $upd = $conn->prepare("UPDATE users SET daily_streak = ?, last_activity_date = ?, daily_xp_earned = 0 WHERE id = ?");
         $upd->bind_param('isi', $new_streak, $today, $user_id);
         $upd->execute();
         

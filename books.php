@@ -132,7 +132,7 @@ $books = get_books($selected_category, null, $search_query);
                                 <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px]"></div>
                                 <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full"></div>
                                 <span class="relative z-10 inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-medium text-white">
-                                    <?php echo htmlspecialchars($book['category']); ?>
+                                    <?php echo htmlspecialchars($book['subject']); ?>
                                 </span>
                             </div>
                             

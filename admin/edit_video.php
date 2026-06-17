@@ -25,10 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $title = $_POST['title'];
     $description = $_POST['description'];
     $youtube_url = $_POST['youtube_url'];
+    $category = $_POST['category'];
     
-    $sql = "UPDATE videos SET title = ?, description = ?, youtube_url = ? WHERE id = ?";
+    $sql = "UPDATE videos SET title = ?, description = ?, youtube_url = ?, category = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('sssi', $title, $description, $youtube_url, $id);
+    $stmt->bind_param('ssssi', $title, $description, $youtube_url, $category, $id);
     $stmt->execute();
     header('Location: videos.php');
     exit();
@@ -67,6 +68,15 @@ include 'header.php';
                 <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2 px-1">Description</label>
                 <textarea name="description" rows="4"
                     class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-zinc-900 focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm"><?php echo htmlspecialchars($video['description']); ?></textarea>
+            </div>
+            
+            <div>
+                <label class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2 px-1">Subject</label>
+                <select name="category" required class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-zinc-900 focus:ring-2 focus:ring-rose-500 outline-none transition shadow-sm appearance-none">
+                    <?php foreach (get_system_categories() as $cat): ?>
+                        <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo ($video['category'] ?? '') === $cat ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             
             <div>

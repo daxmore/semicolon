@@ -31,43 +31,66 @@ $l_stmt->bind_param('i', $level_id);
 $l_stmt->execute();
 $level = $l_stmt->get_result()->fetch_assoc();
 
-// Enforce daily XP limit check before allowing the exam
-$stmt_xp = $conn->prepare("SELECT daily_xp_earned, last_activity_date FROM users WHERE id = ?");
-$stmt_xp->bind_param('i', $user_id);
-$stmt_xp->execute();
-$user_xp_data = $stmt_xp->get_result()->fetch_assoc();
-$today = date('Y-m-d');
-$current_daily_xp = 0;
-if ($user_xp_data['last_activity_date'] === $today) {
-    $current_daily_xp = (int)$user_xp_data['daily_xp_earned'];
-}
-$is_xp_capped = $current_daily_xp >= 100;
+$is_xp_capped = false;
 
-// Hardcoded multiple questions for demonstration
-$dummy_questions = [
-    [
-        'id' => 1,
-        'text' => "Which of the following describes the purpose of " . htmlspecialchars($skill['name']) . " in modern architecture?",
-        'options' => [
-            ['id' => 1, 'text' => "It manages database migrations exclusively."],
-            ['id' => 2, 'text' => "It is primarily used for styling and CSS pre-processing."],
-            ['id' => 3, 'text' => "It provides structural logic or UI rendering depending on its ecosystem."],
-            ['id' => 4, 'text' => "It serves as a hardware abstraction layer."]
-        ],
-        'correct' => 3
-    ],
-    [
-        'id' => 2,
-        'text' => "What is a key benefit of mastering " . htmlspecialchars($skill['name']) . "?",
-        'options' => [
-            ['id' => 1, 'text' => "Increased reliance on legacy systems."],
-            ['id' => 2, 'text' => "Better performance, scalability, and maintainability."],
-            ['id' => 3, 'text' => "It entirely eliminates the need for testing."],
-            ['id' => 4, 'text' => "It restricts you to a single deployment platform."]
-        ],
-        'correct' => 2
-    ]
-];
+// Fetch real questions from database
+$q_stmt = $conn->prepare("SELECT * FROM questions WHERE skill_id = ? AND level_id = ? ORDER BY id ASC");
+$q_stmt->bind_param('ii', $skill_id, $level_id);
+$q_stmt->execute();
+$q_res = $q_stmt->get_result();
+
+$real_questions = [];
+while ($q_row = $q_res->fetch_assoc()) {
+    $question_id = $q_row['id'];
+    
+    // Fetch options for this question
+    $opt_stmt = $conn->prepare("SELECT * FROM options WHERE question_id = ?");
+    $opt_stmt->bind_param('i', $question_id);
+    $opt_stmt->execute();
+    $opt_res = $opt_stmt->get_result();
+    
+    $options = [];
+    $correct_id = 0;
+    while ($opt_row = $opt_res->fetch_assoc()) {
+        $options[] = [
+            'id' => $opt_row['id'],
+            'text' => $opt_row['option_text']
+        ];
+        if ($opt_row['is_correct']) {
+            $correct_id = $opt_row['id'];
+        }
+    }
+    
+    if (!empty($options)) {
+        $real_questions[] = [
+            'id' => $question_id,
+            'text' => $q_row['question_text'],
+            'options' => $options,
+            'correct' => $correct_id,
+            'xp' => $q_row['xp_reward']
+        ];
+    }
+}
+
+// Fallback to dummy if none found (optional, but let's use dummy if DB is empty for now to avoid broken UI)
+if (empty($real_questions)) {
+    $real_questions = [
+        [
+            'id' => 1,
+            'text' => "Which of the following describes the purpose of " . htmlspecialchars($skill['name'] ?? 'this skill') . " in modern architecture?",
+            'options' => [
+                ['id' => 1, 'text' => "It manages database migrations exclusively."],
+                ['id' => 2, 'text' => "It is primarily used for styling and CSS pre-processing."],
+                ['id' => 3, 'text' => "It provides structural logic or UI rendering depending on its ecosystem."],
+                ['id' => 4, 'text' => "It serves as a hardware abstraction layer."]
+            ],
+            'correct' => 3,
+            'xp' => 10
+        ]
+    ];
+}
+
+$questions = $real_questions;
 
 // Initialize quiz session state
 if (!isset($_SESSION['quiz_state']) || $_SESSION['quiz_state']['skill_id'] !== $skill_id || $_SESSION['quiz_state']['level_id'] !== $level_id) {
@@ -76,7 +99,7 @@ if (!isset($_SESSION['quiz_state']) || $_SESSION['quiz_state']['skill_id'] !== $
         'level_id' => $level_id,
         'current_q_index' => 0,
         'correct_answers' => 0,
-        'total_questions' => count($dummy_questions),
+        'total_questions' => count($questions),
         'completed' => false
     ];
 }
@@ -89,7 +112,7 @@ $reward_xp = 50; // XP per passing
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$state['completed'] && !$is_xp_capped) {
     $answer = isset($_POST['answer']) ? intval($_POST['answer']) : 0;
     
-    $current_q = $dummy_questions[$state['current_q_index']];
+    $current_q = $questions[$state['current_q_index']];
     if ($answer == $current_q['correct']) {
         $state['correct_answers']++;
     }
@@ -205,21 +228,7 @@ if (isset($_GET['retry'])) {
                 <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider"><?php echo htmlspecialchars($level['level_name']); ?> Tier</span>
             </div>
 
-            <?php if ($is_xp_capped): ?>
-                <div class="py-8 animate-in zoom-in duration-500">
-                    <div class="w-24 h-24 mx-auto bg-amber-50 rounded-full flex items-center justify-center mb-6 shadow-sm border border-amber-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    </div>
-                    <h2 class="text-3xl font-black text-slate-900 mb-2 tracking-tight">Daily Limit Reached</h2>
-                    <p class="text-slate-600 font-medium text-lg mb-8 px-4">
-                        You have already earned the maximum 100 XP for today. Come back tomorrow to continue training!
-                    </p>
-                    <a href="skill_detail.php?id=<?php echo $skill_id; ?>" class="inline-flex items-center justify-center px-8 py-4 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-colors shadow-md">
-                        Return to Academy
-                    </a>
-                </div>
-
-            <?php elseif ($state['completed']): 
+            <?php if ($state['completed']): 
                 $passed = ($state['correct_answers'] === $state['total_questions']);
             ?>
                 
@@ -256,7 +265,7 @@ if (isset($_GET['retry'])) {
                 </div>
 
             <?php else: 
-                $current_q = $dummy_questions[$state['current_q_index']];
+                $current_q = $questions[$state['current_q_index']];
             ?>
 
                 <div class="text-left">

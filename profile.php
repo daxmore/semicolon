@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     // Validate current password ONLY if trying to change password
     if (!empty($new_password)) {
-        if (empty($current_password) || $current_password !== $current_user['password']) {
+        if (empty($current_password) || !verify_user_password($current_user, $current_password)) {
             $message = 'Current password is required and must be correct to change your password.';
             $message_type = 'error';
         }
@@ -125,11 +125,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     if (strlen($new_password) < 6) {
                         $message = 'New password must be at least 6 characters.';
                         $message_type = 'error';
+                    } elseif (!is_valid_password_format($new_password)) {
+                        $message = 'New password must be 6+ chars with at least one uppercase letter, one number, and one symbol.';
+                        $message_type = 'error';
                     } elseif ($new_password !== $confirm_password) {
                         $message = 'New passwords do not match.';
                         $message_type = 'error';
                     } else {
-                        $hashed_password = $new_password;
+                        $hashed_password = hash_password($new_password);
                         $update_sql .= ", password = ?";
                         $params[] = $hashed_password;
                         $types .= "s";
