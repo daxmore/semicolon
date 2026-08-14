@@ -1,21 +1,27 @@
-# Dependencies
-vendor/
-node_modules/
-
-# Sensitive Configuration
-includes/db.php
-includes/stripe_config.php
-
-# Private Assets & Uploads
-private/
-uploads/
-
-# Development Tools & Scratch
-scratch/
-.env
-
-# System Files
-.DS_Store
-Thumbs.db
+# Logs
+logs
 *.log
-error_log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# old code folder
+core-php-code-old/
