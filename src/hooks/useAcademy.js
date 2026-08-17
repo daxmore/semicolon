@@ -42,7 +42,7 @@ export function useSkillDetail(skillId) {
 }
 
 /**
- * Fetch user progress on a skill
+ * Fetch user progress on a single skill
  */
 export function useUserSkillProgress(userId, skillId) {
   return useQuery({
@@ -57,6 +57,25 @@ export function useUserSkillProgress(userId, skillId) {
       return data?.[0] || null;
     },
     enabled: !!userId && !!skillId,
+  });
+}
+
+/**
+ * Fetch user progress across all skills
+ */
+export function useUserSkillsProgress(userId) {
+  return useQuery({
+    queryKey: ['user_skills_progress_all', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      const { data } = await axiosClient.get(
+        `/rest/v1/user_skill_progress?user_id=eq.${userId}&select=*`
+      );
+
+      return data || [];
+    },
+    enabled: !!userId,
   });
 }
 

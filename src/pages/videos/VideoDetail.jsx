@@ -29,23 +29,44 @@ export default function VideoDetail() {
     }
 
     try {
-      await axiosClient.post(
-        '/rest/v1/reactions',
-        {
+      // Check if a reaction already exists
+      const { data: existing } = await axiosClient.get(
+        `/rest/v1/reactions?user_id=eq.${user.id}&resource_type=eq.video&resource_id=eq.${video.id}&select=id,is_helpful`
+      );
+
+      if (existing && existing.length > 0) {
+        const current = existing[0];
+        if (current.is_helpful === isHelpful) {
+          // Same button clicked — remove reaction
+          await axiosClient.delete(`/rest/v1/reactions?id=eq.${current.id}`);
+          setReaction(null);
+          setToast('Feedback removed.');
+        } else {
+          // Different button — update reaction
+          await axiosClient.patch(
+            `/rest/v1/reactions?id=eq.${current.id}`,
+            { is_helpful: isHelpful }
+          );
+          setReaction(isHelpful ? 'helpful' : 'not_helpful');
+          setToast('Feedback updated!');
+        }
+      } else {
+        // No existing reaction — insert new
+        await axiosClient.post('/rest/v1/reactions', {
           user_id: user.id,
           resource_type: 'video',
           resource_id: video.id,
           is_helpful: isHelpful,
-        },
-        {
-          headers: { Prefer: 'resolution=merge-duplicates' },
-        }
-      );
-      setReaction(isHelpful ? 'helpful' : 'not_helpful');
-      setToast('Thank you for your feedback!');
+        });
+        setReaction(isHelpful ? 'helpful' : 'not_helpful');
+        setToast('Thank you for your feedback!');
+      }
+
       setTimeout(() => setToast(''), 3000);
     } catch (err) {
       console.error(err);
+      setToast('Something went wrong.');
+      setTimeout(() => setToast(''), 3000);
     }
   };
 
@@ -84,9 +105,10 @@ export default function VideoDetail() {
         Back to Video Academy
       </Link>
 
+      {/* Subtle toast */}
       {toast && (
-        <div className="mb-6 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4" />
+        <div className="toast-enter fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 bg-white border border-zinc-200 rounded-xl shadow-lg text-xs font-medium text-zinc-800">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
           {toast}
         </div>
       )}

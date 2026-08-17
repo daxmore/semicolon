@@ -23,5 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Supabase temp files
+supabase/.temp/
+
 # old code folder
 core-php-code-old/

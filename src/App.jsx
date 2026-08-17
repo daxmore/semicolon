@@ -63,6 +63,7 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminRequests from './pages/admin/AdminRequests';
 import AdminBadges from './pages/admin/AdminBadges';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminSkills from './pages/admin/AdminSkills';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -80,7 +81,12 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Layout */}
+            {/* Standalone Auth Routes (without global Header/Footer) */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+            {/* Public and App Layout */}
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
@@ -90,11 +96,6 @@ export default function App() {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/checkout/cancel" element={<CheckoutCancel />} />
-
-              {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
 
               {/* Public Resource Browsing */}
               <Route path="/books" element={<BooksList />} />
@@ -149,6 +150,7 @@ export default function App() {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="badges" element={<AdminBadges />} />
                 <Route path="quizzes" element={<AdminQuizzes />} />
+                <Route path="skills" element={<AdminSkills />} />
               </Route>
             </Route>
 

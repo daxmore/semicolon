@@ -1,26 +1,38 @@
 import React, { useState } from 'react';
 import { useAdminUsers, useGamificationMutations } from '../../hooks/useGamification';
-import { useAuth } from '../../contexts/AuthContext';
-import { Users, Search, Shield, Award, CheckCircle2, XCircle } from 'lucide-react';
+import { Search, CheckCircle2, ShieldOff, Shield, Trash2, Crown } from 'lucide-react';
 
 export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState('');
-  const { user: currentAuthUser } = useAuth();
+  const [confirmDelete, setConfirmDelete] = useState(null); // userId to confirm
   const { data: usersList, isLoading } = useAdminUsers();
-  const { toggleUserProStatus, changeUserRole } = useGamificationMutations();
+  const { toggleUserProStatus, banUser, deleteUser } = useGamificationMutations();
 
-  const filtered = usersList?.filter(
-    (u) =>
-      u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = usersList
+    ?.filter((u) => u.role !== 'admin')
+    .filter(
+      (u) =>
+        u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+  const handleDelete = (userId) => {
+    if (confirmDelete === userId) {
+      deleteUser.mutate(userId);
+      setConfirmDelete(null);
+    } else {
+      setConfirmDelete(userId);
+      // auto-reset after 3s if not confirmed
+      setTimeout(() => setConfirmDelete(null), 3000);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-zinc-900">User Management</h2>
-          <p className="text-xs text-zinc-500">View developer accounts, toggle Pro subscriptions, and manage admin privileges.</p>
+          <p className="text-xs text-zinc-500">View user accounts and manage Pro subscriptions, bans, and deletions.</p>
         </div>
       </div>
 
@@ -45,8 +57,7 @@ export default function AdminUsers() {
           <table className="w-full text-left text-xs">
             <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold uppercase tracking-wider">
               <tr>
-                <th className="px-6 py-3.5">Developer</th>
-                <th className="px-6 py-3.5">Role</th>
+                <th className="px-6 py-3.5">User</th>
                 <th className="px-6 py-3.5">RPG Stats</th>
                 <th className="px-6 py-3.5">Pro Status</th>
                 <th className="px-6 py-3.5 text-right">Actions</th>
@@ -55,13 +66,13 @@ export default function AdminUsers() {
             <tbody className="divide-y divide-zinc-200 text-zinc-800">
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-zinc-400">
+                  <td colSpan="4" className="px-6 py-8 text-center text-zinc-400">
                     Loading users...
                   </td>
                 </tr>
               ) : filtered && filtered.length > 0 ? (
                 filtered.map((u) => (
-                  <tr key={u.id} className="hover:bg-zinc-50/80 transition">
+                  <tr key={u.id} className={`hover:bg-zinc-50/80 transition ${u.is_banned ? 'opacity-60' : ''}`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center overflow-hidden shrink-0">
@@ -72,22 +83,15 @@ export default function AdminUsers() {
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-zinc-900">{u.username}</p>
+                          <p className="font-bold text-zinc-900 flex items-center gap-1.5">
+                            {u.username}
+                            {u.is_banned && (
+                              <span className="text-[9px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Banned</span>
+                            )}
+                          </p>
                           <p className="text-[11px] text-zinc-400">{u.email}</p>
                         </div>
                       </div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <select
-                        value={u.role || 'user'}
-                        disabled={u.id === currentAuthUser?.id}
-                        onChange={(e) => changeUserRole.mutate({ userId: u.id, role: e.target.value })}
-                        className="px-2 py-1 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold uppercase tracking-wider focus:outline-none"
-                      >
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                      </select>
                     </td>
 
                     <td className="px-6 py-4">
@@ -109,24 +113,57 @@ export default function AdminUsers() {
                       )}
                     </td>
 
-                    <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => toggleUserProStatus.mutate({ userId: u.id, isPro: u.is_pro })}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                          u.is_pro
-                            ? 'bg-rose-50 text-rose-700 hover:bg-rose-100'
-                            : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                        }`}
-                      >
-                        {u.is_pro ? 'Revoke Pro' : 'Grant Pro'}
-                      </button>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-1">
+                        {/* Grant / Revoke Pro */}
+                        <button
+                          title={u.is_pro ? 'Revoke Pro' : 'Grant Pro'}
+                          onClick={() => toggleUserProStatus.mutate({ userId: u.id, isPro: u.is_pro })}
+                          className={`p-1.5 rounded-lg transition ${
+                            u.is_pro
+                              ? 'text-violet-600 bg-violet-50 hover:bg-violet-100'
+                              : 'text-zinc-400 bg-zinc-50 hover:bg-violet-50 hover:text-violet-600'
+                          }`}
+                        >
+                          <Crown className="h-3.5 w-3.5" fill={u.is_pro ? 'currentColor' : 'none'} />
+                        </button>
+
+                        {/* Ban / Unban */}
+                        <button
+                          title={u.is_banned ? 'Unban User' : 'Ban User'}
+                          onClick={() => banUser.mutate({ userId: u.id, isBanned: u.is_banned })}
+                          className={`p-1.5 rounded-lg transition ${
+                            u.is_banned
+                              ? 'text-green-600 bg-green-50 hover:bg-green-100'
+                              : 'text-orange-500 bg-orange-50 hover:bg-orange-100'
+                          }`}
+                        >
+                          {u.is_banned
+                            ? <Shield className="h-3.5 w-3.5" />
+                            : <ShieldOff className="h-3.5 w-3.5" />
+                          }
+                        </button>
+
+                        {/* Delete */}
+                        <button
+                          title={confirmDelete === u.id ? 'Click again to confirm delete' : 'Delete User'}
+                          onClick={() => handleDelete(u.id)}
+                          className={`p-1.5 rounded-lg transition ${
+                            confirmDelete === u.id
+                              ? 'text-white bg-red-500 hover:bg-red-600 animate-pulse'
+                              : 'text-red-400 bg-red-50 hover:bg-red-100'
+                          }`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-zinc-500">
-                    No users matching criteria.
+                  <td colSpan="4" className="px-6 py-8 text-center text-zinc-500">
+                    No users found.
                   </td>
                 </tr>
               )}

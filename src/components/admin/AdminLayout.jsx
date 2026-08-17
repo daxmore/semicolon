@@ -12,7 +12,8 @@ import {
   Users, 
   Award, 
   LogOut, 
-  ArrowLeft
+  ArrowLeft,
+  Layers
 } from 'lucide-react';
 import Logo from '../common/Logo';
 
@@ -36,6 +37,7 @@ export default function AdminLayout() {
     { label: 'Requests', path: '/admin/requests', icon: HelpCircle, section: 'Management' },
     { label: 'Users', path: '/admin/users', icon: Users, section: 'Management' },
     { label: 'Badges', path: '/admin/badges', icon: Award, section: 'Gamification' },
+    { label: 'Skills', path: '/admin/skills', icon: Layers, section: 'Gamification' },
     { label: 'Quizzes', path: '/admin/quizzes', icon: HelpCircle, section: 'Gamification' },
   ];
 

@@ -161,6 +161,28 @@ export function useGamificationMutations() {
     },
   });
 
+  const banUser = useMutation({
+    mutationFn: async ({ userId, isBanned }) => {
+      await axiosClient.patch(`/rest/v1/profiles?id=eq.${userId}`, {
+        is_banned: !isBanned,
+      });
+      return { userId, isBanned: !isBanned };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin_users'] });
+    },
+  });
+
+  const deleteUser = useMutation({
+    mutationFn: async (userId) => {
+      await axiosClient.delete(`/rest/v1/profiles?id=eq.${userId}`);
+      return userId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin_users'] });
+    },
+  });
+
   return {
     toggleEquipBadge,
     createBadge,
@@ -168,5 +190,7 @@ export function useGamificationMutations() {
     deleteBadge,
     toggleUserProStatus,
     changeUserRole,
+    banUser,
+    deleteUser,
   };
 }

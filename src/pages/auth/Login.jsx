@@ -4,8 +4,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAuth } from '../../contexts/AuthContext';
-import { Eye, EyeOff, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
 import Logo from '../../components/common/Logo';
+import { BookOpen } from 'lucide-react';
 
 const schema = yup.object({
   email: yup.string().email('Please enter a valid email address').required('Email is required'),
@@ -15,7 +15,6 @@ const schema = yup.object({
 export default function Login() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -35,118 +34,142 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err) {
       console.error(err);
-      setServerError(err.message || 'Invalid email or password. Please try again.');
+      setServerError(err.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-bg-primary">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl border border-zinc-200/80 shadow-xl shadow-zinc-200/40">
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <Logo />
-          </div>
-          <h2 className="text-2xl font-bold font-heading text-zinc-900 tracking-tight">
-            Welcome back
-          </h2>
-          <p className="text-xs text-zinc-500">
-            Sign in to continue your learning journey and track your streaks.
-          </p>
-        </div>
-
-        {serverError && (
-          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200/80 flex items-start gap-2.5 text-xs text-rose-700 animate-in fade-in">
-            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-rose-500" />
-            <span>{serverError}</span>
-          </div>
-        )}
-
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+    <div className="antialiased bg-zinc-100 min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex min-h-[600px] border border-zinc-200">
+        
+        {/* Left Side - Form */}
+        <div className="w-full lg:w-1/2 p-10 lg:p-16 flex flex-col justify-between">
           <div>
-            <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
-              Email address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                <Mail className="h-4 w-4" />
-              </div>
-              <input
-                type="email"
-                {...register('email')}
-                placeholder="developer@example.com"
-                className={`w-full pl-9 pr-4 py-2.5 bg-zinc-50/50 border rounded-xl text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition ${
-                  errors.email ? 'border-rose-300 bg-rose-50/30' : 'border-zinc-200'
-                }`}
-              />
+            {/* Logo */}
+            <div className="mb-8">
+              <Logo className="h-7 w-auto" />
             </div>
-            {errors.email && (
-              <p className="mt-1 text-[11px] text-rose-600 font-medium">{errors.email.message}</p>
+            
+            {/* Icon + Title side by side */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0 text-white shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-zinc-900 font-heading">Welcome Back</h1>
+                <p className="text-zinc-500 text-xs mt-0.5">Sign in to your account</p>
+              </div>
+            </div>
+
+            {/* Error Messages */}
+            {serverError && (
+              <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs">
+                <p>{serverError}</p>
+              </div>
             )}
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold text-zinc-700">
-                Password
-              </label>
-              <Link
-                to="/forgot-password"
-                className="text-[11px] font-medium text-indigo-600 hover:text-indigo-700 transition"
-              >
-                Forgot password?
-              </Link>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                <Lock className="h-4 w-4" />
+            {/* Separator */}
+            <div className="w-10 h-px bg-zinc-200 mb-6"></div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div>
+                <label className="block text-xs font-medium text-zinc-600 mb-1">Username</label>
+                <input 
+                  type="text" 
+                  {...register('email')}
+                  required
+                  className="input-underline w-full text-zinc-900 text-sm"
+                  placeholder="Enter your username"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-[11px] mt-1">{errors.email.message}</p>
+                )}
               </div>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                {...register('password')}
-                placeholder="••••••••••••"
-                className={`w-full pl-9 pr-10 py-2.5 bg-zinc-50/50 border rounded-xl text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition ${
-                  errors.password ? 'border-rose-300 bg-rose-50/30' : 'border-zinc-200'
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600"
+              
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-medium text-zinc-600">Password</label>
+                  <Link to="/forgot-password" className="text-xs text-zinc-500 hover:text-indigo-600">Forgot?</Link>
+                </div>
+                <input 
+                  type="password" 
+                  {...register('password')}
+                  required
+                  className="input-underline w-full text-zinc-900 text-sm"
+                  placeholder="Enter your password"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-[11px] mt-1">{errors.password.message}</p>
+                )}
+              </div>
+              
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full transition-colors mt-6 disabled:opacity-50 text-sm cursor-pointer shadow-md"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {loading ? 'Signing in...' : 'Sign in'}
               </button>
-            </div>
-            {errors.password && (
-              <p className="mt-1 text-[11px] text-rose-600 font-medium">{errors.password.message}</p>
-            )}
+            </form>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-xl shadow-md shadow-indigo-500/20 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>Sign in</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="pt-4 border-t border-zinc-100 text-center">
-          <p className="text-xs text-zinc-500">
-            Don't have an account?{' '}
-            <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-700 transition">
-              Create an account
-            </Link>
+          <p className="mt-8 text-center text-zinc-500 text-xs">
+            Don't have an account? <Link to="/signup" className="text-zinc-900 font-medium hover:text-indigo-600">Sign up</Link>
           </p>
         </div>
+        
+        {/* Right Side - Branding */}
+        <div className="hidden lg:flex lg:w-1/2 indigo-gradient relative overflow-hidden p-12 flex-col justify-between">
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl"></div>
+          
+          <div></div>
+          
+          {/* Main headline */}
+          <div className="relative z-10 my-auto">
+            <h2 className="font-serif text-5xl text-white leading-tight">
+              <span className="italic">Enter</span><br />
+              <span className="italic">the Future</span><br />
+              <span className="font-semibold">of Learning,</span><br />
+              <span className="font-semibold">today</span>
+            </h2>
+          </div>
+          
+          {/* Floating Card Container */}
+          <div className="relative z-10 card-float w-fit">
+            <div className="bg-white rounded-2xl p-5 shadow-2xl w-64">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 text-white">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-zinc-900 font-heading">847</p>
+                  <p className="text-[11px] text-zinc-500">Total Resources</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                  <span className="text-zinc-600">Active Learners</span>
+                </div>
+                <span className="font-bold text-zinc-900">5,234</span>
+              </div>
+            </div>
+            
+            {/* Small floating bottom right icon button */}
+            <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

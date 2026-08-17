@@ -222,7 +222,7 @@ export default function AdminQuizzes() {
                     <option value="">Select Level Tier</option>
                     {levels?.map((lvl) => (
                       <option key={lvl.id} value={lvl.id}>
-                        {lvl.level_name} (Order {lvl.unlock_order})
+                        {lvl.level_name}
                       </option>
                     ))}
                   </select>
