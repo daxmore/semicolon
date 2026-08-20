@@ -135,9 +135,10 @@ export default function VideosList() {
                       ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
                       : null;
                     return (
-                      <div
+                      <Link
                         key={video.id}
-                        className="card-reveal bg-white rounded-2xl border border-zinc-100 hover:border-rose-200 hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col justify-between"
+                        to={`/videos/${video.id}`}
+                        className="card-reveal bg-white rounded-2xl border border-zinc-100 hover:border-rose-300 hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col justify-between cursor-pointer"
                         style={{ animationDelay: `${idx * 60}ms` }}
                       >
                         {/* Video Thumbnail */}
@@ -174,15 +175,14 @@ export default function VideosList() {
                           </div>
                           
                           <div className="pt-2">
-                            <Link
-                              to={`/videos/${video.id}`}
-                              className="w-full block py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl text-center transition"
+                            <span
+                              className="w-full block py-2.5 bg-rose-600 group-hover:bg-rose-700 text-white text-sm font-semibold rounded-xl text-center shadow-xs transition"
                             >
                               Watch Tutorial
-                            </Link>
+                            </span>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>

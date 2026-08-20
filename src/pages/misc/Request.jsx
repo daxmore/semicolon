@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserRequests, useRequestMutations } from '../../hooks/useRequests';
 import { SYSTEM_CATEGORIES } from '../../lib/utils';
+import { CheckCircle2, Sparkles, AlertCircle, ArrowRight, BookOpen, FileText, Video, Send } from 'lucide-react';
 
 const schema = yup.object({
   material_type: yup.string().required('Material type is required'),
@@ -18,8 +20,10 @@ export default function Request() {
   const { user } = useAuth();
   const { createRequest } = useRequestMutations();
   const [selectedType, setSelectedType] = useState('book');
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedTitle, setSubmittedTitle] = useState('');
+  const [toast, setToast] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const {
     register,
@@ -39,24 +43,26 @@ export default function Request() {
 
   const onSubmit = async (values) => {
     try {
-      setMessage('');
+      setErrorMessage('');
+      const targetTitle = values.title;
       await createRequest.mutateAsync({
         user_id: user?.id,
         material_type: selectedType || values.material_type,
         community_category: values.community_category || null,
-        title: values.title,
+        title: targetTitle,
         author_publisher: values.author_publisher || null,
         details: values.details || null,
         status: 'pending',
       });
 
+      setSubmittedTitle(targetTitle);
+      setIsSubmitted(true);
+      setToast('Material request submitted successfully!');
+      setTimeout(() => setToast(''), 4000);
       reset();
-      setMessage("Your request has been submitted successfully! We'll review it soon.");
-      setMessageType('success');
     } catch (err) {
       console.error(err);
-      setMessage('Failed to submit your request. Please try again.');
-      setMessageType('error');
+      setErrorMessage(err.message || 'Failed to submit your request. Please try again.');
     }
   };
 
@@ -131,40 +137,77 @@ export default function Request() {
         </div>
       </section>
 
-      {/* Form Section */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 pb-24 relative z-10">
-        {/* Alert Messages */}
-        {message && (
-          <div className={`rounded-2xl p-5 mb-8 animate-slideUp ${messageType === 'success' ? 'bg-emerald-50 border-2 border-emerald-200' : 'bg-red-50 border-2 border-red-200'}`}>
-            <div className="flex items-center gap-4">
-              {messageType === 'success' ? (
-                <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              ) : (
-                <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-              )}
-              <div>
-                <p className={`font-semibold ${messageType === 'success' ? 'text-emerald-800' : 'text-red-800'}`}>
-                  {messageType === 'success' ? 'Request Submitted!' : 'Something went wrong'}
-                </p>
-                <p className={`text-sm ${messageType === 'success' ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {message}
-                </p>
-              </div>
+      {/* Floating Toast Alert */}
+      {toast && (
+        <div className="fixed top-20 right-6 z-50 p-4 bg-emerald-600 text-white rounded-2xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
+          <CheckCircle2 className="h-5 w-5 shrink-0" />
+          <span className="text-xs font-semibold">{toast}</span>
+          <button onClick={() => setToast('')} className="ml-2 text-white/80 hover:text-white font-bold">
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Form / Success Section */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 pb-24 relative z-10">
+        {/* Error Alert */}
+        {errorMessage && (
+          <div className="rounded-2xl p-5 mb-8 bg-rose-50 border-2 border-rose-200 flex items-center gap-4 animate-in fade-in">
+            <div className="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600 shrink-0">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-rose-900 text-xs">Submission Failed</p>
+              <p className="text-xs text-rose-700">{errorMessage}</p>
             </div>
           </div>
         )}
 
-        {/* Main Form Card */}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="glass-card rounded-3xl shadow-2xl shadow-purple-500/10 overflow-hidden">
+        {/* Success Confirmation Card */}
+        {isSubmitted ? (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 text-center space-y-6 shadow-2xl shadow-purple-500/10 border border-emerald-200 animate-in fade-in zoom-in-95">
+            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+              <CheckCircle2 className="h-8 w-8" />
+            </div>
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">
+                <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+                Submitted to Admin Team
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 font-heading">
+                Request Received!
+              </h2>
+              <p className="text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
+                Thank you for your suggestion! We've registered your request for{' '}
+                <strong className="text-zinc-900 font-semibold">"{submittedTitle}"</strong>.
+                Our team reviews all submissions within 24–48 hours.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 max-w-md mx-auto">
+              <button
+                onClick={() => {
+                  setIsSubmitted(false);
+                  setSubmittedTitle('');
+                  reset();
+                }}
+                className="w-full sm:w-auto px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/20 transition cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Send className="h-3.5 w-3.5" />
+                Request Another Material
+              </button>
+              <Link
+                to="/history"
+                className="w-full sm:w-auto px-6 py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-xl text-xs font-semibold transition text-center"
+              >
+                View in History
+              </Link>
+            </div>
+          </div>
+        ) : (
+          /* Main Form Card */
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="glass-card rounded-3xl shadow-2xl shadow-purple-500/10 overflow-hidden bg-white border border-zinc-200/80">
             
             {/* Material Type Section */}
             <div className="p-8 md:p-10 border-b border-zinc-100">
@@ -318,6 +361,7 @@ export default function Request() {
             </div>
           </div>
         </form>
+      )}
         
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">

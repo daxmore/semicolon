@@ -7,14 +7,27 @@ import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 export default function AdminRequests() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [requestToDelete, setRequestToDelete] = useState(null);
+  const [toast, setToast] = useState('');
   const { data: requestsList, isLoading } = useAdminRequests(statusFilter);
   const { updateRequestStatus, deleteRequest } = useRequestMutations();
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      await updateRequestStatus.mutateAsync({ id, status });
+      setToast(`Request successfully marked as ${status.toUpperCase()}!`);
+      setTimeout(() => setToast(''), 3000);
+    } catch (err) {
+      console.error('Failed to update request status:', err);
+    }
+  };
 
   const confirmDeleteRequest = async () => {
     if (!requestToDelete) return;
     try {
       await deleteRequest.mutateAsync(requestToDelete.id);
       setRequestToDelete(null);
+      setToast('Material request deleted.');
+      setTimeout(() => setToast(''), 3000);
     } catch (err) {
       console.error('Failed to delete request:', err);
     }
@@ -22,6 +35,19 @@ export default function AdminRequests() {
 
   return (
     <div className="space-y-6">
+      {/* Toast Alert */}
+      {toast && (
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold flex items-center justify-between shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+            <span>{toast}</span>
+          </div>
+          <button onClick={() => setToast('')} className="text-emerald-500 hover:text-emerald-700 font-bold px-1">
+            ✕
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-zinc-900">Manage Material Requests</h2>
@@ -59,7 +85,7 @@ export default function AdminRequests() {
             <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-3.5">Material</th>
-                <th className="px-6 py-3.5">Type & Category</th>
+                <th className="px-6 py-3.5">Type &amp; Category</th>
                 <th className="px-6 py-3.5">Requested By</th>
                 <th className="px-6 py-3.5">Status</th>
                 <th className="px-6 py-3.5 text-right">Actions</th>
@@ -117,18 +143,26 @@ export default function AdminRequests() {
 
                     <td className="px-6 py-4 text-right space-x-2">
                       <button
-                        onClick={() =>
-                          updateRequestStatus.mutate({ id: req.id, status: 'approved' })
-                        }
-                        className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg font-semibold transition"
+                        onClick={() => handleStatusChange(req.id, 'approved')}
+                        disabled={req.status === 'approved' || updateRequestStatus.isPending}
+                        className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
+                          req.status === 'approved'
+                            ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed opacity-60'
+                            : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 active:bg-emerald-200'
+                        }`}
+                        title={req.status === 'approved' ? 'Already approved' : 'Approve request'}
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() =>
-                          updateRequestStatus.mutate({ id: req.id, status: 'rejected' })
-                        }
-                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg font-semibold transition"
+                        onClick={() => handleStatusChange(req.id, 'rejected')}
+                        disabled={req.status === 'rejected' || updateRequestStatus.isPending}
+                        className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
+                          req.status === 'rejected'
+                            ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed opacity-60'
+                            : 'bg-rose-50 hover:bg-rose-100 text-rose-700 active:bg-rose-200'
+                        }`}
+                        title={req.status === 'rejected' ? 'Already rejected' : 'Reject request'}
                       >
                         Reject
                       </button>

@@ -160,7 +160,13 @@ export default function PapersList() {
                     return (
                       <div
                         key={paper.id}
-                        className="card-reveal bg-white rounded-2xl border border-zinc-100 hover:border-teal-200 hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col justify-between"
+                        onClick={(e) => {
+                          // If download button was not clicked, navigate to paper detail
+                          if (!e.target.closest('.download-btn')) {
+                            navigate(`/papers/${paper.id}`);
+                          }
+                        }}
+                        className="card-reveal bg-white rounded-2xl border border-zinc-100 hover:border-teal-300 hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col justify-between cursor-pointer"
                         style={{ animationDelay: `${idx * 60}ms` }}
                       >
                         {/* Cover/Header */}
@@ -189,16 +195,16 @@ export default function PapersList() {
                           </div>
                           
                           <div className="flex gap-3 pt-2">
-                            <Link
-                              to={`/papers/${paper.id}`}
-                              className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl text-center transition"
+                            <span
+                              className="flex-1 py-2.5 bg-teal-600 group-hover:bg-teal-700 text-white text-sm font-semibold rounded-xl text-center shadow-xs transition"
                             >
                               Read Paper
-                            </Link>
+                            </span>
                             <Link
                               to={dlLink}
+                              onClick={(e) => e.stopPropagation()}
                               target={isPro && paper.pdf_url ? "_blank" : "_self"}
-                              className="py-2.5 px-4 border border-zinc-200 hover:border-zinc-300 text-zinc-700 text-sm font-medium rounded-xl transition flex items-center gap-2"
+                              className="download-btn py-2.5 px-4 border border-zinc-200 hover:border-zinc-300 text-zinc-700 text-sm font-medium rounded-xl transition flex items-center gap-2 z-10"
                               title={isPro ? 'Download PDF' : 'Upgrade to Pro to Download'}
                             >
                               <Download className="h-4 w-4" />
