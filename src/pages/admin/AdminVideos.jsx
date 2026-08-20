@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useVideos, useVideoMutations } from '../../hooks/useVideos';
 import { SYSTEM_CATEGORIES, generateSlug, generateToken, getYoutubeId } from '../../lib/utils';
 import { Video, Plus, Trash2, Edit3, X, Search, Play } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminVideos() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState(null);
+  const [videoToDelete, setVideoToDelete] = useState(null);
 
   const { data: videos, isLoading } = useVideos({ search: searchTerm });
   const { createVideo, updateVideo, deleteVideo } = useVideoMutations();
@@ -64,9 +66,13 @@ export default function AdminVideos() {
     }
   };
 
-  const handleDelete = async (id, title) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      await deleteVideo.mutateAsync(id);
+  const confirmDeleteVideo = async () => {
+    if (!videoToDelete) return;
+    try {
+      await deleteVideo.mutateAsync(videoToDelete.id);
+      setVideoToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete video:', err);
     }
   };
 
@@ -114,29 +120,27 @@ export default function AdminVideos() {
               {isLoading ? (
                 <tr>
                   <td colSpan="4" className="px-6 py-8 text-center text-zinc-400">
-                    Loading videos...
+                    Loading video tutorials...
                   </td>
                 </tr>
               ) : videos && videos.length > 0 ? (
                 videos.map((v) => {
-                  const ytId = getYoutubeId(v.youtube_url);
+                  const yId = getYoutubeId(v.youtube_url);
                   return (
                     <tr key={v.id} className="hover:bg-zinc-50/80 transition">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-16 h-10 bg-zinc-900 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
-                            {ytId ? (
-                              <img
-                                src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Play className="h-4 w-4 text-white/50" />
-                            )}
-                          </div>
-                          <span className="font-semibold text-zinc-900 max-w-xs truncate">{v.title}</span>
+                      <td className="px-6 py-4 font-semibold text-zinc-900 flex items-center gap-3">
+                        <div className="w-12 h-8 rounded-lg bg-zinc-900 relative flex items-center justify-center shrink-0 overflow-hidden">
+                          {yId ? (
+                            <img
+                              src={`https://img.youtube.com/vi/${yId}/hqdefault.jpg`}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Play className="h-3 w-3 text-white" />
+                          )}
                         </div>
+                        <span className="max-w-xs truncate">{v.title}</span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-100 font-medium">
@@ -155,8 +159,8 @@ export default function AdminVideos() {
                           <Edit3 className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(v.id, v.title)}
-                          className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
+                          onClick={() => setVideoToDelete(v)}
+                          className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
                           title="Delete Video"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -260,6 +264,16 @@ export default function AdminVideos() {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        isOpen={!!videoToDelete}
+        onClose={() => setVideoToDelete(null)}
+        onConfirm={confirmDeleteVideo}
+        title="Delete Video Tutorial"
+        itemName={videoToDelete?.title || ''}
+        message="Are you sure you want to remove this video tutorial? This action cannot be undone."
+        isLoading={deleteVideo.isPending}
+      />
     </div>
   );
 }

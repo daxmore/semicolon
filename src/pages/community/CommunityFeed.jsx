@@ -234,7 +234,7 @@ export default function CommunityFeed() {
                             <ArrowUp className={`h-6 w-6 ${hasUpvoted ? 'fill-amber-500' : 'group-hover:text-amber-500'}`} />
                           </button>
                           <span className="text-sm font-bold text-zinc-900 my-1">
-                            {post.upvotes || 0}
+                            {Math.max(0, (post.upvotes || 0) - (post.downvotes || 0))}
                           </span>
                           <button
                             onClick={(e) => handleVote(e, post, 'downvote')}
@@ -297,7 +297,9 @@ export default function CommunityFeed() {
                               <button onClick={(e) => handleVote(e, post, 'upvote')}>
                                 <ArrowUp className={`h-4 w-4 ${hasUpvoted ? 'text-amber-500' : ''}`} />
                               </button>
-                              <span className="text-xs font-bold">{post.upvotes || 0}</span>
+                              <span className="text-xs font-bold">
+                                {Math.max(0, (post.upvotes || 0) - (post.downvotes || 0))}
+                              </span>
                               <button onClick={(e) => handleVote(e, post, 'downvote')}>
                                 <ArrowDown className={`h-4 w-4 ${hasDownvoted ? 'text-blue-500' : ''}`} />
                               </button>

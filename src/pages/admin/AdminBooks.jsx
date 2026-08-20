@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useBooks, useBookMutations } from '../../hooks/useBooks';
 import { SYSTEM_CATEGORIES, generateSlug, generateToken } from '../../lib/utils';
 import { BookOpen, Plus, Trash2, Edit3, X, Check, Search, AlertCircle } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminBooks() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
+  const [bookToDelete, setBookToDelete] = useState(null);
 
   const { data: books, isLoading } = useBooks({ search: searchTerm });
   const { createBook, updateBook, deleteBook } = useBookMutations();
@@ -70,9 +72,13 @@ export default function AdminBooks() {
     }
   };
 
-  const handleDelete = async (id, title) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      await deleteBook.mutateAsync(id);
+  const confirmDeleteBook = async () => {
+    if (!bookToDelete) return;
+    try {
+      await deleteBook.mutateAsync(bookToDelete.id);
+      setBookToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete book:', err);
     }
   };
 
@@ -151,8 +157,8 @@ export default function AdminBooks() {
                         <Edit3 className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(b.id, b.title)}
-                        className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
+                        onClick={() => setBookToDelete(b)}
+                        className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
                         title="Delete Book"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -286,6 +292,18 @@ export default function AdminBooks() {
           </div>
         </div>
       )}
+
+      {/* Delete Book Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!bookToDelete}
+        onClose={() => setBookToDelete(null)}
+        onConfirm={confirmDeleteBook}
+        title="Delete Book"
+        itemName={bookToDelete?.title || ''}
+        message="Are you sure you want to remove this book from the library catalog? This action cannot be undone."
+        isLoading={deleteBook.isPending}
+      />
     </div>
   );
 }
+

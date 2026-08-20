@@ -2,16 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { axiosClient } from '../../lib/axiosClient';
-import { 
-  Users, 
-  BookOpen, 
-  FileText, 
-  Video, 
-  MessageSquare, 
-  AlertTriangle, 
-  HelpCircle, 
-  Award, 
-  TrendingUp, 
+import {
+  Users,
+  BookOpen,
+  FileText,
+  Video,
+  MessageSquare,
+  AlertTriangle,
+  HelpCircle,
+  Award,
+  TrendingUp,
   ShieldCheck,
   ArrowRight
 } from 'lucide-react';
@@ -30,7 +30,7 @@ export default function AdminDashboard() {
         requestsRes,
         subsRes,
       ] = await Promise.all([
-        axiosClient.get('/rest/v1/profiles?select=id,is_pro'),
+        axiosClient.get('/rest/v1/profiles?role=neq.admin&select=id,is_pro'),
         axiosClient.get('/rest/v1/books?select=id'),
         axiosClient.get('/rest/v1/papers?select=id'),
         axiosClient.get('/rest/v1/videos?select=id'),
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
   });
 
   const cards = [
-    { label: 'Total Developers', value: stats?.totalUsers || 0, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50', link: '/admin/users' },
+    { label: 'Total User', value: stats?.totalUsers || 0, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50', link: '/admin/users' },
     { label: 'Pro Members', value: stats?.proUsers || 0, icon: ShieldCheck, color: 'text-amber-600', bg: 'bg-amber-50', link: '/admin/users' },
     { label: 'Total Books', value: stats?.totalBooks || 0, icon: BookOpen, color: 'text-indigo-600', bg: 'bg-indigo-50', link: '/admin/books' },
     { label: 'Research Papers', value: stats?.totalPapers || 0, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50', link: '/admin/papers' },

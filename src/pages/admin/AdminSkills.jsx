@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosClient } from '../../lib/axiosClient';
 import { Plus, Trash2, X, ChevronDown, ChevronRight, Layers } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 // ── Fixed tier definitions ────────────────────────────────────────────────────
 const DEFAULT_TIERS = [
@@ -69,6 +70,7 @@ export default function AdminSkills() {
 
   const [expandedSkill, setExpandedSkill] = useState(null);
   const [showSkillModal, setShowSkillModal] = useState(false);
+  const [skillToDelete, setSkillToDelete] = useState(null);
   const [skillForm, setSkillForm] = useState({ name: '', description: '', icon_svg: '' });
 
   // ── Mutations ─────────────────────────────────────────────────────────────
@@ -101,7 +103,10 @@ export default function AdminSkills() {
 
   const deleteSkill = useMutation({
     mutationFn: async (id) => axiosClient.delete(`/rest/v1/skills?id=eq.${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin_skills_full'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin_skills_full'] });
+      setSkillToDelete(null);
+    },
   });
 
   // ── Handlers ──────────────────────────────────────────────────────────────
@@ -149,10 +154,7 @@ export default function AdminSkills() {
               skill={skill}
               expanded={expandedSkill === skill.id}
               onToggle={() => setExpandedSkill(expandedSkill === skill.id ? null : skill.id)}
-              onDelete={() => {
-                if (window.confirm(`Delete "${skill.name}" and all its tiers/questions?`))
-                  deleteSkill.mutate(skill.id);
-              }}
+              onDelete={() => setSkillToDelete(skill)}
             />
           ))
         )}
@@ -257,6 +259,17 @@ export default function AdminSkills() {
           </div>
         </div>
       )}
+
+      {/* Delete Skill Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!skillToDelete}
+        onClose={() => setSkillToDelete(null)}
+        onConfirm={confirmDeleteSkill}
+        title="Delete Developer Skill"
+        itemName={skillToDelete?.name || ''}
+        message="Are you sure you want to delete this skill? All associated skill tiers, quiz questions, MCQ options, and user progress will be permanently deleted."
+        isLoading={deleteSkill.isPending}
+      />
     </div>
   );
 }

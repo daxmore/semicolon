@@ -13,6 +13,7 @@ CREATE TABLE public.profiles (
     avatar_url TEXT,
     role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
     is_pro BOOLEAN NOT NULL DEFAULT FALSE,
+    is_banned BOOLEAN NOT NULL DEFAULT FALSE,
     security_question TEXT,
     security_answer TEXT,
     -- RPG / Gamification fields

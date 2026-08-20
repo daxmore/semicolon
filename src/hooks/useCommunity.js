@@ -32,7 +32,7 @@ export function useCommunityPosts({ category, sort = 'new', search } = {}) {
  */
 export function useCommunityPost(postId) {
   return useQuery({
-    queryKey: ['community_post', postId],
+    queryKey: ['community_post', String(postId)],
     queryFn: async () => {
       if (!postId) return null;
 
@@ -51,7 +51,7 @@ export function useCommunityPost(postId) {
  */
 export function useCommunityComments(postId) {
   return useQuery({
-    queryKey: ['community_comments', postId],
+    queryKey: ['community_comments', String(postId)],
     queryFn: async () => {
       if (!postId) return [];
 
@@ -68,22 +68,28 @@ export function useCommunityComments(postId) {
  * Fetch current user's reaction for a post or list of posts
  */
 export function useUserReactions(userId, postIds = []) {
+  const idsKey = Array.isArray(postIds) ? postIds.map(String).sort().join(',') : String(postIds);
   return useQuery({
-    queryKey: ['user_reactions', userId, postIds],
+    queryKey: ['user_reactions', userId, idsKey],
     queryFn: async () => {
-      if (!userId || postIds.length === 0) return {};
+      if (!userId || !postIds || (Array.isArray(postIds) && postIds.length === 0)) return {};
+
+      const list = Array.isArray(postIds) ? postIds : [postIds];
+      const cleanIds = list.map(Number).filter(Boolean);
+      if (cleanIds.length === 0) return {};
 
       const { data } = await axiosClient.get(
-        `/rest/v1/community_reactions?user_id=eq.${userId}&post_id=in.(${postIds.join(',')})&select=post_id,reaction_type`
+        `/rest/v1/community_reactions?user_id=eq.${userId}&post_id=in.(${cleanIds.join(',')})&select=post_id,reaction_type`
       );
 
       const map = {};
       data?.forEach((r) => {
         map[r.post_id] = r.reaction_type;
+        map[String(r.post_id)] = r.reaction_type;
       });
       return map;
     },
-    enabled: !!userId && postIds.length > 0,
+    enabled: !!userId && (Array.isArray(postIds) ? postIds.length > 0 : !!postIds),
   });
 }
 
@@ -105,6 +111,7 @@ export function useCommunityMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['community_posts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 
@@ -116,6 +123,7 @@ export function useCommunityMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['community_posts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 
@@ -130,7 +138,9 @@ export function useCommunityMutations() {
       return data[0];
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['community_comments', variables.post_id] });
+      queryClient.invalidateQueries({ queryKey: ['community_comments'] });
+      queryClient.invalidateQueries({ queryKey: ['community_comments', String(variables.post_id)] });
+      queryClient.invalidateQueries({ queryKey: ['community_post', String(variables.post_id)] });
     },
   });
 
@@ -144,7 +154,8 @@ export function useCommunityMutations() {
       return { commentId, postId, newStatus };
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['community_comments', variables.postId] });
+      queryClient.invalidateQueries({ queryKey: ['community_comments'] });
+      queryClient.invalidateQueries({ queryKey: ['community_comments', String(variables.postId)] });
     },
   });
 
@@ -155,18 +166,19 @@ export function useCommunityMutations() {
       return { commentId, postId };
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['community_comments', variables.postId] });
+      queryClient.invalidateQueries({ queryKey: ['community_comments'] });
+      queryClient.invalidateQueries({ queryKey: ['community_comments', String(variables.postId)] });
     },
   });
 
-  // Vote Post
+  // Vote Post (with instant optimistic update)
   const votePost = useMutation({
     mutationFn: async ({ postId, userId, type, currentReaction, currentUpvotes, currentDownvotes }) => {
       let newUpvotes = currentUpvotes;
       let newDownvotes = currentDownvotes;
 
       if (currentReaction === type) {
-        // Toggle OFF
+        // Toggle OFF (unvote)
         await axiosClient.delete(
           `/rest/v1/community_reactions?user_id=eq.${userId}&post_id=eq.${postId}`
         );
@@ -196,17 +208,62 @@ export function useCommunityMutations() {
         if (type === 'downvote') newDownvotes += 1;
       }
 
-      // Update denormalized count on community_posts
+      // Update count on community_posts table
       await axiosClient.patch(`/rest/v1/community_posts?id=eq.${postId}`, {
         upvotes: newUpvotes,
         downvotes: newDownvotes,
       });
 
-      return { postId };
+      return { postId, newUpvotes, newDownvotes };
     },
-    onSuccess: (_, variables) => {
+    onMutate: async ({ postId, type, currentReaction, currentUpvotes, currentDownvotes }) => {
+      let newUpvotes = currentUpvotes;
+      let newDownvotes = currentDownvotes;
+      let nextReaction = type;
+
+      if (currentReaction === type) {
+        nextReaction = null;
+        if (type === 'upvote') newUpvotes = Math.max(0, newUpvotes - 1);
+        if (type === 'downvote') newDownvotes = Math.max(0, newDownvotes - 1);
+      } else if (currentReaction) {
+        if (type === 'upvote') {
+          newUpvotes += 1;
+          newDownvotes = Math.max(0, newDownvotes - 1);
+        } else {
+          newDownvotes += 1;
+          newUpvotes = Math.max(0, newUpvotes - 1);
+        }
+      } else {
+        if (type === 'upvote') newUpvotes += 1;
+        if (type === 'downvote') newDownvotes += 1;
+      }
+
+      // Optimistically update single post view
+      queryClient.setQueryData(['community_post', String(postId)], (old) => {
+        if (!old) return old;
+        return { ...old, upvotes: newUpvotes, downvotes: newDownvotes };
+      });
+
+      // Optimistically update community feed posts list
+      queryClient.setQueriesData({ queryKey: ['community_posts'] }, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((p) =>
+          String(p.id) === String(postId)
+            ? { ...p, upvotes: newUpvotes, downvotes: newDownvotes }
+            : p
+        );
+      });
+
+      // Optimistically update reaction status
+      queryClient.setQueriesData({ queryKey: ['user_reactions'] }, (old) => {
+        if (!old) return { [postId]: nextReaction, [String(postId)]: nextReaction };
+        return { ...old, [postId]: nextReaction, [String(postId)]: nextReaction };
+      });
+    },
+    onSettled: (_, __, variables) => {
       queryClient.invalidateQueries({ queryKey: ['community_posts'] });
-      queryClient.invalidateQueries({ queryKey: ['community_post', variables.postId] });
+      queryClient.invalidateQueries({ queryKey: ['community_post'] });
+      queryClient.invalidateQueries({ queryKey: ['community_post', String(variables.postId)] });
       queryClient.invalidateQueries({ queryKey: ['user_reactions'] });
     },
   });

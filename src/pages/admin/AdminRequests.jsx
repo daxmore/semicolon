@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import { useAdminRequests, useRequestMutations } from '../../hooks/useRequests';
 import { timeAgo } from '../../lib/utils';
 import { HelpCircle, CheckCircle, XCircle, Trash2, Search, Filter } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminRequests() {
   const [statusFilter, setStatusFilter] = useState('all');
+  const [requestToDelete, setRequestToDelete] = useState(null);
   const { data: requestsList, isLoading } = useAdminRequests(statusFilter);
   const { updateRequestStatus, deleteRequest } = useRequestMutations();
 
-  const handleDelete = async (id, title) => {
-    if (window.confirm(`Delete request "${title}"?`)) {
-      await deleteRequest.mutateAsync(id);
+  const confirmDeleteRequest = async () => {
+    if (!requestToDelete) return;
+    try {
+      await deleteRequest.mutateAsync(requestToDelete.id);
+      setRequestToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete request:', err);
     }
   };
 
@@ -127,9 +133,9 @@ export default function AdminRequests() {
                         Reject
                       </button>
                       <button
-                        onClick={() => handleDelete(req.id, req.title)}
-                        className="p-1 text-zinc-400 hover:text-rose-600 rounded"
-                        title="Delete"
+                        onClick={() => setRequestToDelete(req)}
+                        className="p-1 text-zinc-400 hover:text-rose-600 rounded transition cursor-pointer"
+                        title="Delete Request"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -147,6 +153,18 @@ export default function AdminRequests() {
           </table>
         </div>
       </div>
+
+      {/* Delete Request Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!requestToDelete}
+        onClose={() => setRequestToDelete(null)}
+        onConfirm={confirmDeleteRequest}
+        title="Delete Material Request"
+        itemName={requestToDelete?.title || ''}
+        message="Are you sure you want to permanently delete this material request?"
+        isLoading={deleteRequest.isPending}
+      />
     </div>
   );
 }
+

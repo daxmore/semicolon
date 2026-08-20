@@ -61,6 +61,7 @@ export function useVideoMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['videos'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 
@@ -84,6 +85,7 @@ export function useVideoMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['videos'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 

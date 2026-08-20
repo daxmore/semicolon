@@ -13,7 +13,7 @@ const schema = yup.object({
 });
 
 export default function Login() {
-  const { signIn } = useAuth();
+  const { signIn, bannedNotice, clearBannedNotice } = useAuth();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export default function Login() {
       setServerError('');
       setLoading(true);
       await signIn(values.email, values.password);
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error(err);
       setServerError(err.message || 'Invalid email or password.');
@@ -65,9 +65,28 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Error Messages */}
-            {serverError && (
-              <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs">
+            {/* Banned User Notice */}
+            {bannedNotice && (
+              <div className="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs flex items-start gap-2.5 shadow-xs">
+                <div className="w-5 h-5 rounded-full bg-rose-200 text-rose-700 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                  !
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-rose-900">Account Suspended</p>
+                  <p className="text-rose-700 mt-0.5">{bannedNotice}</p>
+                </div>
+                <button
+                  onClick={clearBannedNotice}
+                  className="text-rose-400 hover:text-rose-700 text-xs font-bold px-1"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Error Messages (Only shown when no bannedNotice is active) */}
+            {serverError && !bannedNotice && (
+              <div className="mb-4 p-3.5 bg-rose-50 border-l-4 border-rose-500 text-rose-700 text-xs rounded-r-xl">
                 <p>{serverError}</p>
               </div>
             )}

@@ -5,7 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 
 import Layout from './components/common/Layout';
 import AdminLayout from './components/admin/AdminLayout';
-import { ProtectedRoute, AdminRoute } from './components/common/RouteGuards';
+import { ProtectedRoute, AdminRoute, GuestRoute } from './components/common/RouteGuards';
 
 // Public & Static Pages
 import Home from './pages/Home';
@@ -70,7 +70,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
-      staleTime: 1000 * 60 * 5, // 5 mins
+      staleTime: 0,
     },
   },
 });
@@ -81,10 +81,12 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Standalone Auth Routes (without global Header/Footer) */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
+            {/* Standalone Auth Routes (Only for Guests / Not Logged In) */}
+            <Route element={<GuestRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+            </Route>
 
             {/* Public and App Layout */}
             <Route element={<Layout />}>
@@ -97,27 +99,24 @@ export default function App() {
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/checkout/cancel" element={<CheckoutCancel />} />
 
-              {/* Public Resource Browsing */}
-              <Route path="/books" element={<BooksList />} />
-              <Route path="/books/:id" element={<BookDetail />} />
-              <Route path="/papers" element={<PapersList />} />
-              <Route path="/papers/:id" element={<PaperDetail />} />
-              <Route path="/videos" element={<VideosList />} />
-              <Route path="/videos/:id" element={<VideoDetail />} />
-
-              {/* Community Feed */}
+              {/* Community Feed & Leaderboard */}
               <Route path="/community" element={<CommunityFeed />} />
               <Route path="/community/post/:id" element={<PostDetail />} />
-
-              {/* Public Leaderboard */}
               <Route path="/leaderboard" element={<Leaderboard />} />
 
-              {/* Secure Token Viewer & Downloader */}
-              <Route path="/view" element={<MaterialViewer />} />
-              <Route path="/download" element={<DownloadHandler />} />
-
-              {/* Protected User Routes */}
+              {/* Protected User & Resource Routes (Login Required) */}
               <Route element={<ProtectedRoute />}>
+                {/* Resources (Books, Papers, Videos, Viewer, Downloader) */}
+                <Route path="/books" element={<BooksList />} />
+                <Route path="/books/:id" element={<BookDetail />} />
+                <Route path="/papers" element={<PapersList />} />
+                <Route path="/papers/:id" element={<PaperDetail />} />
+                <Route path="/videos" element={<VideosList />} />
+                <Route path="/videos/:id" element={<VideoDetail />} />
+                <Route path="/view" element={<MaterialViewer />} />
+                <Route path="/download" element={<DownloadHandler />} />
+
+                {/* User Dashboard & Settings */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/notifications" element={<Notifications />} />

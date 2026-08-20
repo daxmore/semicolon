@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { usePapers, usePaperMutations } from '../../hooks/usePapers';
 import { SYSTEM_CATEGORIES, generateSlug, generateToken } from '../../lib/utils';
 import { FileText, Plus, Trash2, Edit3, X, Search } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminPapers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingPaper, setEditingPaper] = useState(null);
+  const [paperToDelete, setPaperToDelete] = useState(null);
 
   const { data: papers, isLoading } = usePapers({ search: searchTerm });
   const { createPaper, updatePaper, deletePaper } = usePaperMutations();
@@ -64,9 +66,13 @@ export default function AdminPapers() {
     }
   };
 
-  const handleDelete = async (id, title) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      await deletePaper.mutateAsync(id);
+  const confirmDeletePaper = async () => {
+    if (!paperToDelete) return;
+    try {
+      await deletePaper.mutateAsync(paperToDelete.id);
+      setPaperToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete paper:', err);
     }
   };
 
@@ -114,13 +120,13 @@ export default function AdminPapers() {
               {isLoading ? (
                 <tr>
                   <td colSpan="4" className="px-6 py-8 text-center text-zinc-400">
-                    Loading papers...
+                    Loading research papers...
                   </td>
                 </tr>
               ) : papers && papers.length > 0 ? (
                 papers.map((p) => (
                   <tr key={p.id} className="hover:bg-zinc-50/80 transition">
-                    <td className="px-6 py-4 font-semibold text-zinc-900 max-w-md truncate">
+                    <td className="px-6 py-4 font-semibold text-zinc-900 max-w-xs truncate">
                       {p.title}
                     </td>
                     <td className="px-6 py-4">
@@ -128,7 +134,7 @@ export default function AdminPapers() {
                         {p.subject}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-medium text-zinc-600">{p.year}</td>
+                    <td className="px-6 py-4 text-zinc-500">{p.year}</td>
                     <td className="px-6 py-4 text-right space-x-2">
                       <button
                         onClick={() => openEditModal(p)}
@@ -138,8 +144,8 @@ export default function AdminPapers() {
                         <Edit3 className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(p.id, p.title)}
-                        className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
+                        onClick={() => setPaperToDelete(p)}
+                        className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
                         title="Delete Paper"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -245,6 +251,18 @@ export default function AdminPapers() {
           </div>
         </div>
       )}
+
+      {/* Delete Paper Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!paperToDelete}
+        onClose={() => setPaperToDelete(null)}
+        onConfirm={confirmDeletePaper}
+        title="Delete Research Paper"
+        itemName={paperToDelete?.title || ''}
+        message="Are you sure you want to remove this research paper from the library? This action cannot be undone."
+        isLoading={deletePaper.isPending}
+      />
     </div>
   );
 }
+

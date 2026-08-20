@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBadges, useGamificationMutations } from '../../hooks/useGamification';
 import { Award, Plus, Trash2, Edit3, X, Search } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminBadges() {
   const { data: badges, isLoading } = useBadges();
@@ -8,6 +9,7 @@ export default function AdminBadges() {
 
   const [showModal, setShowModal] = useState(false);
   const [editingBadge, setEditingBadge] = useState(null);
+  const [badgeToDelete, setBadgeToDelete] = useState(null);
 
   const [formData, setFormData] = useState({
     badge_name: '',
@@ -58,9 +60,13 @@ export default function AdminBadges() {
     }
   };
 
-  const handleDelete = async (id, name) => {
-    if (window.confirm(`Delete badge "${name}"?`)) {
-      await deleteBadge.mutateAsync(id);
+  const confirmDeleteBadge = async () => {
+    if (!badgeToDelete) return;
+    try {
+      await deleteBadge.mutateAsync(badgeToDelete.id);
+      setBadgeToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete badge:', err);
     }
   };
 
@@ -79,52 +85,49 @@ export default function AdminBadges() {
         </button>
       </div>
 
-      {/* Badges Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoading ? (
-          [1, 2, 3].map((n) => (
-            <div key={n} className="bg-white p-6 rounded-2xl border border-zinc-200 animate-pulse h-48"></div>
-          ))
+          <div className="col-span-full py-8 text-center text-xs text-zinc-400">
+            Loading badges...
+          </div>
         ) : badges && badges.length > 0 ? (
           badges.map((b) => (
             <div
               key={b.id}
-              className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition"
+              className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm flex items-start justify-between gap-3"
             >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-600">
-                    {b.svg_icon ? (
-                      <div dangerouslySetInnerHTML={{ __html: b.svg_icon }} className="w-6 h-6" />
-                    ) : (
-                      <Award className="h-6 w-6" />
-                    )}
-                  </div>
-                  <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                    {b.required_xp} XP Req.
-                  </span>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                  {b.svg_icon ? (
+                    <div
+                      className="w-6 h-6 flex items-center justify-center"
+                      dangerouslySetInnerHTML={{ __html: b.svg_icon }}
+                    />
+                  ) : (
+                    <Award className="h-5 w-5" />
+                  )}
                 </div>
-
-                <div className="space-y-1">
-                  <h3 className="font-bold text-sm text-zinc-900">{b.badge_name}</h3>
-                  <p className="text-xs text-zinc-500 line-clamp-2">{b.description}</p>
+                <div>
+                  <h4 className="font-bold text-xs text-zinc-900">{b.badge_name}</h4>
+                  <p className="text-[11px] text-amber-600 font-semibold">{b.required_xp} XP Required</p>
+                  <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">{b.description || 'No description'}</p>
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-zinc-100 flex items-center justify-end gap-2 text-xs">
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => openEditModal(b)}
-                  className="p-1.5 text-zinc-500 hover:text-indigo-600 rounded-lg hover:bg-zinc-100 transition"
+                  className="p-1.5 text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 rounded-lg"
                   title="Edit Badge"
                 >
-                  <Edit3 className="h-4 w-4" />
+                  <Edit3 className="h-3.5 w-3.5" />
                 </button>
                 <button
-                  onClick={() => handleDelete(b.id, b.badge_name)}
-                  className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
+                  onClick={() => setBadgeToDelete(b)}
+                  className="p-1.5 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
                   title="Delete Badge"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -215,6 +218,18 @@ export default function AdminBadges() {
           </div>
         </div>
       )}
+
+      {/* Delete Badge Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!badgeToDelete}
+        onClose={() => setBadgeToDelete(null)}
+        onConfirm={confirmDeleteBadge}
+        title="Delete Badge"
+        itemName={badgeToDelete?.badge_name || ''}
+        message="Are you sure you want to delete this badge? Users who have earned it will lose this badge."
+        isLoading={deleteBadge.isPending}
+      />
     </div>
   );
 }
+

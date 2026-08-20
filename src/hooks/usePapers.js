@@ -64,6 +64,7 @@ export function usePaperMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['papers'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 
@@ -87,6 +88,7 @@ export function usePaperMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['papers'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 

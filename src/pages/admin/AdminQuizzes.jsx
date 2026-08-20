@@ -3,10 +3,12 @@ import { useSkills, useQuizMutations } from '../../hooks/useAcademy';
 import { axiosClient } from '../../lib/axiosClient';
 import { useQuery } from '@tanstack/react-query';
 import { HelpCircle, Plus, Trash2, X, Search, Check, AlertCircle } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminQuizzes() {
   const [selectedSkill, setSelectedSkill] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState(null);
 
   const { data: skills } = useSkills();
   const { createQuestion, deleteQuestion } = useQuizMutations();
@@ -82,9 +84,13 @@ export default function AdminQuizzes() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Delete this question and its options?')) {
-      await deleteQuestion.mutateAsync(id);
+  const confirmDeleteQuestion = async () => {
+    if (!questionToDelete) return;
+    try {
+      await deleteQuestion.mutateAsync(questionToDelete.id);
+      setQuestionToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete question:', err);
     }
   };
 
@@ -157,8 +163,8 @@ export default function AdminQuizzes() {
                     <td className="px-6 py-4 font-bold text-amber-600">+{q.xp_reward} XP</td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => handleDelete(q.id)}
-                        className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
+                        onClick={() => setQuestionToDelete(q)}
+                        className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
                         title="Delete Question"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -212,17 +218,17 @@ export default function AdminQuizzes() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-zinc-700 mb-1">Level Tier</label>
+                  <label className="block font-semibold text-zinc-700 mb-1">Skill Level</label>
                   <select
                     required
                     value={formData.level_id}
                     onChange={(e) => setFormData({ ...formData, level_id: e.target.value })}
                     className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   >
-                    <option value="">Select Level Tier</option>
-                    {levels?.map((lvl) => (
-                      <option key={lvl.id} value={lvl.id}>
-                        {lvl.level_name}
+                    <option value="">Select Level</option>
+                    {levels?.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.level_name} (Order: {l.unlock_order})
                       </option>
                     ))}
                   </select>
@@ -230,32 +236,19 @@ export default function AdminQuizzes() {
               </div>
 
               <div>
-                <label className="block font-semibold text-zinc-700 mb-1">Question Prompt</label>
+                <label className="block font-semibold text-zinc-700 mb-1">Question Text</label>
                 <textarea
-                  required
                   rows="2"
+                  required
                   value={formData.question_text}
                   onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
-                  placeholder="What is the time complexity of lookup in a hash table on average?"
+                  placeholder="What is the output of typeof NaN in JavaScript?"
                   className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
 
-              <div>
-                <label className="block font-semibold text-zinc-700 mb-1">XP Reward</label>
-                <input
-                  type="number"
-                  min="5"
-                  max="100"
-                  value={formData.xp_reward}
-                  onChange={(e) => setFormData({ ...formData, xp_reward: parseInt(e.target.value, 10) })}
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                />
-              </div>
-
-              {/* Options */}
-              <div className="space-y-2 pt-2 border-t border-zinc-100">
-                <label className="block font-semibold text-zinc-700">Options & Correct Answer</label>
+              <div className="space-y-2">
+                <label className="block font-semibold text-zinc-700">Options (Select the correct answer)</label>
                 {formData.options.map((opt, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <input
@@ -263,20 +256,48 @@ export default function AdminQuizzes() {
                       name="correct_option"
                       checked={formData.correct_index === idx}
                       onChange={() => setFormData({ ...formData, correct_index: idx })}
-                      className="text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                      title="Mark as correct answer"
+                      className="text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                     />
-                    <span className="font-bold text-zinc-500 w-4">{String.fromCharCode(65 + idx)}</span>
                     <input
                       type="text"
-                      required
-                      placeholder={`Option ${String.fromCharCode(65 + idx)} text`}
+                      required={idx < 2}
                       value={opt}
-                      onChange={(e) => handleOptionChange(idx, e.target.value)}
-                      className="flex-1 px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      onChange={(e) => {
+                        const next = [...formData.options];
+                        next[idx] = e.target.value;
+                        setFormData({ ...formData, options: next });
+                      }}
+                      placeholder={`Option ${idx + 1}`}
+                      className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                     />
                   </div>
                 ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-semibold text-zinc-700 mb-1">XP Reward</label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={formData.xp_reward}
+                    onChange={(e) => setFormData({ ...formData, xp_reward: e.target.value })}
+                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-zinc-700 mb-1">Difficulty</label>
+                  <select
+                    value={formData.difficulty}
+                    onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-4 border-t border-zinc-100">
@@ -299,6 +320,17 @@ export default function AdminQuizzes() {
           </div>
         </div>
       )}
+
+      {/* Delete Question Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!questionToDelete}
+        onClose={() => setQuestionToDelete(null)}
+        onConfirm={confirmDeleteQuestion}
+        title="Delete Quiz Question"
+        itemName={questionToDelete?.question_text || ''}
+        message="Are you sure you want to delete this question and all its MCQ options? This action cannot be undone."
+        isLoading={deleteQuestion.isPending}
+      />
     </div>
   );
 }

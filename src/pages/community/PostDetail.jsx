@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { timeAgo, calculateLevel } from '../../lib/utils';
 import { axiosClient } from '../../lib/axiosClient';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 import { 
   ArrowLeft, 
   ArrowUp, 
@@ -49,6 +50,10 @@ export default function PostDetail() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportTarget, setReportTarget] = useState(null); // { type: 'post'|'comment', id: number }
   const [toast, setToast] = useState('');
+  
+  // Deletion modals
+  const [showDeletePostModal, setShowDeletePostModal] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
 
   // Handle post vote
   const handleVote = (type) => {
@@ -117,7 +122,7 @@ export default function PostDetail() {
     }
   };
 
-  // Submit nested reply
+  // Submit nested reply (+10 XP)
   const handleAddReply = async (parentId) => {
     if (!user) {
       navigate('/login');
@@ -142,10 +147,23 @@ export default function PostDetail() {
     }
   };
 
-  const handleDeletePost = async () => {
-    if (window.confirm('Are you sure you want to delete this discussion?')) {
+  const confirmDeletePost = async () => {
+    try {
       await deletePost.mutateAsync(post.id);
+      setShowDeletePostModal(false);
       navigate('/community');
+    } catch (err) {
+      console.error('Failed to delete post:', err);
+    }
+  };
+
+  const confirmDeleteComment = async () => {
+    if (!commentToDelete) return;
+    try {
+      await deleteComment.mutateAsync({ commentId: commentToDelete.id, postId: post.id });
+      setCommentToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete comment:', err);
     }
   };
 
@@ -194,9 +212,9 @@ export default function PostDetail() {
   const canManagePost = isPostAuthor || isAdmin;
   const author = post.profiles;
   const currentReaction = userReactions?.[post.id];
-  const netVotes = (post.upvotes || 0) - (post.downvotes || 0);
+  const netVotes = Math.max(0, (post.upvotes || 0) - (post.downvotes || 0));
 
-  // Group comments into threaded hierarchy
+  // Group comments into threaded hierarchy by parent_id
   const commentsByParent = {};
   comments?.forEach((c) => {
     const pId = c.parent_id || 0;
@@ -216,7 +234,7 @@ export default function PostDetail() {
       </Link>
 
       {toast && (
-        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2 animate-in fade-in">
           <CheckCircle2 className="h-4 w-4" />
           {toast}
         </div>
@@ -298,16 +316,20 @@ export default function PostDetail() {
             <div className="flex items-center justify-between pt-4 border-t border-zinc-100 text-xs text-zinc-500">
               <span className="flex items-center gap-1.5 font-semibold">
                 <MessageSquare className="h-4 w-4" />
-                {comments?.length || 0} Answers
+                {comments?.length || 0} Answers / Replies
               </span>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
+                    if (!user) {
+                      navigate('/login');
+                      return;
+                    }
                     setReportTarget({ type: 'post', id: post.id });
                     setShowReportModal(true);
                   }}
-                  className="hover:text-rose-600 p-1.5 rounded-lg hover:bg-zinc-100 transition flex items-center gap-1"
+                  className="hover:text-rose-600 p-1.5 rounded-lg hover:bg-zinc-100 transition flex items-center gap-1 cursor-pointer"
                   title="Report Post"
                 >
                   <Flag className="h-3.5 w-3.5" />
@@ -316,8 +338,8 @@ export default function PostDetail() {
 
                 {canManagePost && (
                   <button
-                    onClick={handleDeletePost}
-                    className="text-rose-600 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition flex items-center gap-1 font-semibold"
+                    onClick={() => setShowDeletePostModal(true)}
+                    className="text-rose-600 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition flex items-center gap-1 font-semibold cursor-pointer"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     <span>Delete</span>
@@ -329,37 +351,60 @@ export default function PostDetail() {
         </div>
       </div>
 
-      {/* Write Comment Box */}
-      <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-sm space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
-          Your Answer or Solution (+10 XP)
-        </h3>
-        <form onSubmit={handleAddComment} className="space-y-3">
-          <textarea
-            rows="3"
-            required
-            placeholder={user ? "Write a helpful, technical answer..." : "Please log in to answer..."}
-            disabled={!user}
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            className="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition"
-          />
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={!user || !commentText.trim()}
-              className="px-5 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-amber-600/20 transition flex items-center gap-1.5"
+      {/* Write Comment Box / Guest Login Prompt */}
+      {user ? (
+        <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-sm space-y-4">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+            Your Answer or Solution (+10 XP)
+          </h3>
+          <form onSubmit={handleAddComment} className="space-y-3">
+            <textarea
+              rows="3"
+              required
+              placeholder="Write a helpful, technical answer..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              className="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition"
+            />
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={!commentText.trim() || addComment.isPending}
+                className="px-5 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-amber-600/20 transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Send className="h-3.5 w-3.5" />
+                {addComment.isPending ? 'Posting...' : 'Post Answer'}
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : (
+        <div className="bg-amber-50/50 border border-amber-200/80 rounded-2xl p-6 text-center space-y-3 shadow-xs">
+          <h3 className="text-sm font-bold text-zinc-900">Join the Discussion</h3>
+          <p className="text-xs text-zinc-600 max-w-md mx-auto">
+            Log in or create a free developer account to answer questions, reply in thread chains, vote, and earn XP.
+          </p>
+          <div className="flex items-center justify-center gap-3 pt-1">
+            <Link
+              to="/login"
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold shadow-xs transition"
             >
-              <Send className="h-3.5 w-3.5" /> Post Answer
-            </button>
+              Sign In to Answer
+            </Link>
+            <Link
+              to="/signup"
+              className="px-4 py-2 bg-white hover:bg-zinc-50 border border-zinc-200 text-zinc-700 rounded-xl text-xs font-semibold transition"
+            >
+              Create Account
+            </Link>
           </div>
-        </form>
-      </div>
+        </div>
+      )}
 
       {/* Threaded Comments Section */}
       <div className="space-y-4">
         <h2 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-          <span>Discussion Thread</span>
+          <span>Discussion Thread Chain</span>
           <span className="text-xs text-zinc-400 font-normal">({comments?.length || 0})</span>
         </h2>
 
@@ -378,7 +423,7 @@ export default function PostDetail() {
                 postAuthorId={post.user_id}
                 currentUserId={user?.id}
                 isAdmin={isAdmin}
-                childrenComments={commentsByParent[comment.id] || []}
+                commentsByParent={commentsByParent}
                 replyParentId={replyParentId}
                 setReplyParentId={setReplyParentId}
                 replyText={replyText}
@@ -387,10 +432,12 @@ export default function PostDetail() {
                 onAcceptAnswer={(commentId, currentStatus) =>
                   toggleAcceptAnswer.mutate({ commentId, postId: post.id, currentStatus })
                 }
-                onDeleteComment={(commentId) =>
-                  deleteComment.mutate({ commentId, postId: post.id })
-                }
-                onReport={(commentId) => {
+                onDeleteComment={(commentItem) => setCommentToDelete(commentItem)}
+                onReport={(commentId, isGuestTrigger) => {
+                  if (!user || isGuestTrigger) {
+                    navigate('/login');
+                    return;
+                  }
                   setReportTarget({ type: 'comment', id: commentId });
                   setShowReportModal(true);
                 }}
@@ -440,17 +487,39 @@ export default function PostDetail() {
           </div>
         </div>
       )}
+
+      {/* Delete Post Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={showDeletePostModal}
+        onClose={() => setShowDeletePostModal(false)}
+        onConfirm={confirmDeletePost}
+        title="Delete Discussion Post"
+        itemName={post?.title || ''}
+        message="Are you sure you want to delete this discussion? All comments and replies will be permanently removed."
+        isLoading={deletePost.isPending}
+      />
+
+      {/* Delete Comment Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!commentToDelete}
+        onClose={() => setCommentToDelete(null)}
+        onConfirm={confirmDeleteComment}
+        title="Delete Comment / Reply"
+        itemName={commentToDelete ? `"${commentToDelete.content.slice(0, 40)}..."` : ''}
+        message="Are you sure you want to delete this comment? Nested replies underneath will also be deleted."
+        isLoading={deleteComment.isPending}
+      />
     </div>
   );
 }
 
-// Single Threaded Comment Card Component
+// Full Recursive Threaded Comment Card Component Supporting Multi-Level Chains
 function CommentCard({
   comment,
   postAuthorId,
   currentUserId,
   isAdmin,
-  childrenComments,
+  commentsByParent = {},
   replyParentId,
   setReplyParentId,
   replyText,
@@ -459,18 +528,20 @@ function CommentCard({
   onAcceptAnswer,
   onDeleteComment,
   onReport,
+  depth = 0,
 }) {
   const isPostAuthor = currentUserId === postAuthorId;
   const isCommentAuthor = currentUserId === comment.user_id;
   const canDelete = isCommentAuthor || isAdmin;
   const author = comment.profiles;
+  const childList = commentsByParent[comment.id] || [];
 
   return (
     <div
-      className={`p-5 rounded-2xl border transition space-y-3 ${
+      className={`p-4 sm:p-5 rounded-2xl border transition space-y-3 ${
         comment.is_accepted
           ? 'bg-emerald-50/40 border-emerald-300 shadow-sm'
-          : 'bg-white border-zinc-200/80'
+          : 'bg-white border-zinc-200/80 shadow-xs'
       }`}
     >
       {/* Accepted Answer Badge */}
@@ -484,12 +555,18 @@ function CommentCard({
       {/* Comment Header */}
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[10px]">
-            {(author?.username || 'U').charAt(0).toUpperCase()}
+          <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[10px] shrink-0 overflow-hidden">
+            {author?.avatar_url ? (
+              <img src={author.avatar_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span>{(author?.username || 'U').charAt(0).toUpperCase()}</span>
+            )}
           </div>
           <span className="font-semibold text-zinc-900">{author?.username}</span>
           {author?.is_pro && (
-            <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1 rounded">PRO</span>
+            <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded border border-amber-200">
+              PRO
+            </span>
           )}
           <span className="text-zinc-400">•</span>
           <span className="text-zinc-400">{timeAgo(comment.created_at)}</span>
@@ -499,7 +576,7 @@ function CommentCard({
         {isPostAuthor && (
           <button
             onClick={() => onAcceptAnswer(comment.id, comment.is_accepted)}
-            className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition flex items-center gap-1 ${
+            className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition flex items-center gap-1 cursor-pointer ${
               comment.is_accepted
                 ? 'bg-emerald-600 text-white border-emerald-600'
                 : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300'
@@ -517,22 +594,36 @@ function CommentCard({
       {/* Action Footer */}
       <div className="flex items-center gap-4 text-xs text-zinc-500 pt-2 border-t border-zinc-100">
         <button
-          onClick={() =>
-            setReplyParentId(replyParentId === comment.id ? null : comment.id)
-          }
-          className="font-semibold hover:text-amber-600 flex items-center gap-1"
+          onClick={() => {
+            if (!currentUserId) {
+              onReport(null, true); // trigger guest login
+              return;
+            }
+            setReplyParentId(replyParentId === comment.id ? null : comment.id);
+            setReplyText('');
+          }}
+          className="font-semibold hover:text-amber-600 flex items-center gap-1 cursor-pointer"
         >
           <CornerDownRight className="h-3.5 w-3.5" /> Reply
         </button>
 
-        <button onClick={() => onReport(comment.id)} className="hover:text-rose-600">
+        <button
+          onClick={() => {
+            if (!currentUserId) {
+              onReport(null, true); // trigger guest login
+              return;
+            }
+            onReport(comment.id);
+          }}
+          className="hover:text-rose-600 cursor-pointer"
+        >
           Report
         </button>
 
         {canDelete && (
           <button
-            onClick={() => onDeleteComment(comment.id)}
-            className="text-rose-600 hover:text-rose-700 ml-auto font-semibold"
+            onClick={() => onDeleteComment(comment)}
+            className="text-rose-600 hover:text-rose-700 ml-auto font-semibold cursor-pointer"
           >
             Delete
           </button>
@@ -541,24 +632,28 @@ function CommentCard({
 
       {/* Reply input form */}
       {replyParentId === comment.id && (
-        <div className="pt-2 pl-4 border-l-2 border-amber-400 space-y-2">
+        <div className="pt-2 pl-3 sm:pl-4 border-l-2 border-amber-400 space-y-2 animate-in fade-in">
           <textarea
             rows="2"
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Write a reply..."
-            className="w-full p-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+            placeholder={`Replying to @${author?.username || 'user'}...`}
+            className="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600"
           />
           <div className="flex justify-end gap-2">
             <button
-              onClick={() => setReplyParentId(null)}
-              className="px-3 py-1 text-xs text-zinc-500 hover:bg-zinc-100 rounded-lg"
+              onClick={() => {
+                setReplyParentId(null);
+                setReplyText('');
+              }}
+              className="px-3 py-1.5 text-xs text-zinc-500 hover:bg-zinc-100 rounded-lg cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={() => onReplySubmit(comment.id)}
-              className="px-4 py-1 bg-amber-600 text-white rounded-lg text-xs font-semibold shadow-sm"
+              disabled={!replyText.trim()}
+              className="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-sm transition cursor-pointer"
             >
               Reply
             </button>
@@ -566,17 +661,17 @@ function CommentCard({
         </div>
       )}
 
-      {/* Nested Child Replies */}
-      {childrenComments.length > 0 && (
-        <div className="mt-3 pl-4 border-l-2 border-zinc-200 space-y-3 pt-2">
-          {childrenComments.map((child) => (
+      {/* Recursive Nested Child Replies (Chain Threading) */}
+      {childList.length > 0 && (
+        <div className="mt-3 pl-3 sm:pl-5 border-l-2 border-indigo-200 space-y-3 pt-2">
+          {childList.map((child) => (
             <CommentCard
               key={child.id}
               comment={child}
               postAuthorId={postAuthorId}
               currentUserId={currentUserId}
               isAdmin={isAdmin}
-              childrenComments={[]}
+              commentsByParent={commentsByParent}
               replyParentId={replyParentId}
               setReplyParentId={setReplyParentId}
               replyText={replyText}
@@ -585,6 +680,7 @@ function CommentCard({
               onAcceptAnswer={onAcceptAnswer}
               onDeleteComment={onDeleteComment}
               onReport={onReport}
+              depth={depth + 1}
             />
           ))}
         </div>
@@ -592,3 +688,4 @@ function CommentCard({
     </div>
   );
 }
+

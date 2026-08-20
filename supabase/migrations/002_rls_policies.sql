@@ -70,6 +70,12 @@ CREATE POLICY "profiles_insert_trigger"
     TO authenticated
     WITH CHECK (id = auth.uid());
 
+-- Admins can delete any profile
+CREATE POLICY "profiles_delete_admin"
+    ON public.profiles FOR DELETE
+    TO authenticated
+    USING (public.is_admin());
+
 -- ═══════════════════════════════════════════════
 -- BOOKS
 -- ═══════════════════════════════════════════════
@@ -165,6 +171,13 @@ CREATE POLICY "community_posts_update_own"
     ON public.community_posts FOR UPDATE
     TO authenticated
     USING (user_id = auth.uid());
+
+-- All authenticated users can update vote counts on posts
+CREATE POLICY "community_posts_update_votes"
+    ON public.community_posts FOR UPDATE
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
 
 -- Admins can update any post
 CREATE POLICY "community_posts_update_admin"
@@ -570,3 +583,42 @@ CREATE POLICY "material_requests_delete_admin"
     ON public.material_requests FOR DELETE
     TO authenticated
     USING (public.is_admin());
+
+-- ═══════════════════════════════════════════════
+-- AUTOMATIC VOTE SYNC TRIGGER
+-- ═══════════════════════════════════════════════
+
+CREATE OR REPLACE FUNCTION public.handle_community_post_vote()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        IF NEW.reaction_type = 'upvote' THEN
+            UPDATE public.community_posts SET upvotes = COALESCE(upvotes, 0) + 1 WHERE id = NEW.post_id;
+        ELSIF NEW.reaction_type = 'downvote' THEN
+            UPDATE public.community_posts SET downvotes = COALESCE(downvotes, 0) + 1 WHERE id = NEW.post_id;
+        END IF;
+    ELSIF (TG_OP = 'DELETE') THEN
+        IF OLD.reaction_type = 'upvote' THEN
+            UPDATE public.community_posts SET upvotes = GREATEST(0, COALESCE(upvotes, 0) - 1) WHERE id = OLD.post_id;
+        ELSIF OLD.reaction_type = 'downvote' THEN
+            UPDATE public.community_posts SET downvotes = GREATEST(0, COALESCE(downvotes, 0) - 1) WHERE id = OLD.post_id;
+        END IF;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        IF OLD.reaction_type = 'upvote' AND NEW.reaction_type = 'downvote' THEN
+            UPDATE public.community_posts SET upvotes = GREATEST(0, COALESCE(upvotes, 0) - 1), downvotes = COALESCE(downvotes, 0) + 1 WHERE id = NEW.post_id;
+        ELSIF OLD.reaction_type = 'downvote' AND NEW.reaction_type = 'upvote' THEN
+            UPDATE public.community_posts SET downvotes = GREATEST(0, COALESCE(downvotes, 0) - 1), upvotes = COALESCE(upvotes, 0) + 1 WHERE id = NEW.post_id;
+        END IF;
+    END IF;
+    RETURN NULL;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_community_post_vote ON public.community_reactions;
+CREATE TRIGGER trg_community_post_vote
+AFTER INSERT OR UPDATE OR DELETE ON public.community_reactions
+FOR EACH ROW EXECUTE FUNCTION public.handle_community_post_vote();
+

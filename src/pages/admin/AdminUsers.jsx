@@ -1,29 +1,28 @@
 import React, { useState } from 'react';
 import { useAdminUsers, useGamificationMutations } from '../../hooks/useGamification';
 import { Search, CheckCircle2, ShieldOff, Shield, Trash2, Crown } from 'lucide-react';
+import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState(null); // userId to confirm
+  const [userToDelete, setUserToDelete] = useState(null); // user object to confirm deletion
   const { data: usersList, isLoading } = useAdminUsers();
   const { toggleUserProStatus, banUser, deleteUser } = useGamificationMutations();
 
   const filtered = usersList
-    ?.filter((u) => u.role !== 'admin')
-    .filter(
+    ?.filter(
       (u) =>
         u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const handleDelete = (userId) => {
-    if (confirmDelete === userId) {
-      deleteUser.mutate(userId);
-      setConfirmDelete(null);
-    } else {
-      setConfirmDelete(userId);
-      // auto-reset after 3s if not confirmed
-      setTimeout(() => setConfirmDelete(null), 3000);
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      await deleteUser.mutateAsync(userToDelete.id);
+      setUserToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete user:', err);
     }
   };
 
@@ -146,13 +145,9 @@ export default function AdminUsers() {
 
                         {/* Delete */}
                         <button
-                          title={confirmDelete === u.id ? 'Click again to confirm delete' : 'Delete User'}
-                          onClick={() => handleDelete(u.id)}
-                          className={`p-1.5 rounded-lg transition ${
-                            confirmDelete === u.id
-                              ? 'text-white bg-red-500 hover:bg-red-600 animate-pulse'
-                              : 'text-red-400 bg-red-50 hover:bg-red-100'
-                          }`}
+                          title="Delete User"
+                          onClick={() => setUserToDelete(u)}
+                          className="p-1.5 rounded-lg text-red-400 bg-red-50 hover:bg-red-100 hover:text-red-600 transition cursor-pointer"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -171,6 +166,18 @@ export default function AdminUsers() {
           </table>
         </div>
       </div>
+
+      {/* Delete User Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!userToDelete}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={confirmDeleteUser}
+        title="Delete User Account"
+        itemName={userToDelete ? `${userToDelete.username} (${userToDelete.email})` : ''}
+        message="Are you sure you want to permanently delete this user account? All their profile data, XP, activity history, and comments will be wiped."
+        isLoading={deleteUser.isPending}
+      />
     </div>
   );
 }
+

@@ -111,7 +111,7 @@ export default function Signup() {
           .eq('id', data.user.id);
       }
 
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error(err);
       setServerError(err.message || 'Error creating account. Please try again.');

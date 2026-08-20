@@ -65,6 +65,7 @@ export function useBookMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 
@@ -88,6 +89,7 @@ export function useBookMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 

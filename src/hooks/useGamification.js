@@ -71,7 +71,7 @@ export function useAdminUsers() {
   return useQuery({
     queryKey: ['admin_users'],
     queryFn: async () => {
-      const { data } = await axiosClient.get('/rest/v1/profiles?select=*&order=created_at.desc');
+      const { data } = await axiosClient.get('/rest/v1/profiles?role=neq.admin&select=*&order=created_at.desc');
       return data || [];
     },
   });
@@ -146,6 +146,7 @@ export function useGamificationMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin_users'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 
@@ -180,6 +181,7 @@ export function useGamificationMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin_users'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_overview_stats'] });
     },
   });
 
