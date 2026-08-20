@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 
 import Layout from './components/common/Layout';
 import AdminLayout from './components/admin/AdminLayout';
@@ -79,84 +80,86 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Standalone Auth Routes (Only for Guests / Not Logged In) */}
-            <Route element={<GuestRoute />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-            </Route>
-
-            {/* Public and App Layout */}
-            <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/search" element={<GlobalSearch />} />
-              
-              {/* Pricing & Checkout */}
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/checkout/success" element={<CheckoutSuccess />} />
-              <Route path="/checkout/cancel" element={<CheckoutCancel />} />
-
-              {/* Community Feed & Leaderboard */}
-              <Route path="/community" element={<CommunityFeed />} />
-              <Route path="/community/post/:id" element={<PostDetail />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-
-              {/* Protected User & Resource Routes (Login Required) */}
-              <Route element={<ProtectedRoute />}>
-                {/* Resources (Books, Papers, Videos, Viewer, Downloader) */}
-                <Route path="/books" element={<BooksList />} />
-                <Route path="/books/:id" element={<BookDetail />} />
-                <Route path="/papers" element={<PapersList />} />
-                <Route path="/papers/:id" element={<PaperDetail />} />
-                <Route path="/videos" element={<VideosList />} />
-                <Route path="/videos/:id" element={<VideoDetail />} />
-                <Route path="/view" element={<MaterialViewer />} />
-                <Route path="/download" element={<DownloadHandler />} />
-
-                {/* User Dashboard & Settings */}
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/history" element={<UserHistory />} />
-                
-                {/* Academy */}
-                <Route path="/academy" element={<Academy />} />
-                <Route path="/academy/skill/:id" element={<SkillDetail />} />
-                <Route path="/academy/quiz" element={<Quiz />} />
-                <Route path="/academy/certificate" element={<Certificate />} />
-                
-                {/* Community Create */}
-                <Route path="/community/new" element={<CreatePost />} />
-
-                {/* Material Request */}
-                <Route path="/request" element={<Request />} />
+        <ToastProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Standalone Auth Routes (Only for Guests / Not Logged In) */}
+              <Route element={<GuestRoute />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
               </Route>
-            </Route>
 
-            {/* Protected Admin Routes */}
-            <Route element={<AdminRoute />}>
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="books" element={<AdminBooks />} />
-                <Route path="papers" element={<AdminPapers />} />
-                <Route path="videos" element={<AdminVideos />} />
-                <Route path="community" element={<CommunityFeed />} />
-                <Route path="reports" element={<AdminReports />} />
-                <Route path="requests" element={<AdminRequests />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="badges" element={<AdminBadges />} />
-                <Route path="quizzes" element={<AdminQuizzes />} />
-                <Route path="skills" element={<AdminSkills />} />
+              {/* Public and App Layout */}
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/search" element={<GlobalSearch />} />
+                
+                {/* Pricing & Checkout */}
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/checkout/success" element={<CheckoutSuccess />} />
+                <Route path="/checkout/cancel" element={<CheckoutCancel />} />
+
+                {/* Community Feed & Leaderboard */}
+                <Route path="/community" element={<CommunityFeed />} />
+                <Route path="/community/post/:id" element={<PostDetail />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+
+                {/* Protected User & Resource Routes (Login Required) */}
+                <Route element={<ProtectedRoute />}>
+                  {/* Resources (Books, Papers, Videos, Viewer, Downloader) */}
+                  <Route path="/books" element={<BooksList />} />
+                  <Route path="/books/:id" element={<BookDetail />} />
+                  <Route path="/papers" element={<PapersList />} />
+                  <Route path="/papers/:id" element={<PaperDetail />} />
+                  <Route path="/videos" element={<VideosList />} />
+                  <Route path="/videos/:id" element={<VideoDetail />} />
+                  <Route path="/view" element={<MaterialViewer />} />
+                  <Route path="/download" element={<DownloadHandler />} />
+
+                  {/* User Dashboard & Settings */}
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/history" element={<UserHistory />} />
+                  
+                  {/* Academy */}
+                  <Route path="/academy" element={<Academy />} />
+                  <Route path="/academy/skill/:id" element={<SkillDetail />} />
+                  <Route path="/academy/quiz" element={<Quiz />} />
+                  <Route path="/academy/certificate" element={<Certificate />} />
+                  
+                  {/* Community Create */}
+                  <Route path="/community/new" element={<CreatePost />} />
+
+                  {/* Material Request */}
+                  <Route path="/request" element={<Request />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
+              {/* Protected Admin Routes */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="books" element={<AdminBooks />} />
+                  <Route path="papers" element={<AdminPapers />} />
+                  <Route path="videos" element={<AdminVideos />} />
+                  <Route path="community" element={<CommunityFeed />} />
+                  <Route path="reports" element={<AdminReports />} />
+                  <Route path="requests" element={<AdminRequests />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="badges" element={<AdminBadges />} />
+                  <Route path="quizzes" element={<AdminQuizzes />} />
+                  <Route path="skills" element={<AdminSkills />} />
+                </Route>
+              </Route>
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

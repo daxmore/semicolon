@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useUserRequests, useRequestMutations } from '../../hooks/useRequests';
 import { SYSTEM_CATEGORIES } from '../../lib/utils';
 import { CheckCircle2, Sparkles, AlertCircle, ArrowRight, BookOpen, FileText, Video, Send } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext';
 
 const schema = yup.object({
   material_type: yup.string().required('Material type is required'),
@@ -18,11 +19,11 @@ const schema = yup.object({
 
 export default function Request() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const { createRequest } = useRequestMutations();
   const [selectedType, setSelectedType] = useState('book');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedTitle, setSubmittedTitle] = useState('');
-  const [toast, setToast] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const {
@@ -57,12 +58,12 @@ export default function Request() {
 
       setSubmittedTitle(targetTitle);
       setIsSubmitted(true);
-      setToast('Material request submitted successfully!');
-      setTimeout(() => setToast(''), 4000);
+      showToast('Material request submitted successfully!');
       reset();
     } catch (err) {
       console.error(err);
       setErrorMessage(err.message || 'Failed to submit your request. Please try again.');
+      showToast('Failed to submit request', 'error');
     }
   };
 
@@ -136,17 +137,6 @@ export default function Request() {
           </svg>
         </div>
       </section>
-
-      {/* Floating Toast Alert */}
-      {toast && (
-        <div className="fixed top-20 right-6 z-50 p-4 bg-emerald-600 text-white rounded-2xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
-          <CheckCircle2 className="h-5 w-5 shrink-0" />
-          <span className="text-xs font-semibold">{toast}</span>
-          <button onClick={() => setToast('')} className="ml-2 text-white/80 hover:text-white font-bold">
-            ✕
-          </button>
-        </div>
-      )}
 
       {/* Form / Success Section */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 pb-24 relative z-10">

@@ -7,6 +7,7 @@ import {
   useCommunityMutations 
 } from '../../hooks/useCommunity';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 import { timeAgo, calculateLevel } from '../../lib/utils';
 import { axiosClient } from '../../lib/axiosClient';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
@@ -29,6 +30,7 @@ export default function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, profile, isAdmin, refreshProfile } = useAuth();
+  const { showToast } = useToast();
 
   const { data: post, isLoading: postLoading, error: postError } = useCommunityPost(id);
   const { data: comments, isLoading: commentsLoading } = useCommunityComments(id);
@@ -49,7 +51,6 @@ export default function PostDetail() {
   const [reportReason, setReportReason] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportTarget, setReportTarget] = useState(null); // { type: 'post'|'comment', id: number }
-  const [toast, setToast] = useState('');
   
   // Deletion modals
   const [showDeletePostModal, setShowDeletePostModal] = useState(false);
@@ -115,10 +116,10 @@ export default function PostDetail() {
 
       await refreshProfile();
       setCommentText('');
-      setToast('Comment posted! +10 XP');
-      setTimeout(() => setToast(''), 3000);
+      showToast('Comment posted! +10 XP');
     } catch (err) {
       console.error(err);
+      showToast('Failed to post comment', 'error');
     }
   };
 
@@ -140,10 +141,10 @@ export default function PostDetail() {
 
       setReplyText('');
       setReplyParentId(null);
-      setToast('Reply posted! +10 XP');
-      setTimeout(() => setToast(''), 3000);
+      showToast('Reply posted! +10 XP');
     } catch (err) {
       console.error(err);
+      showToast('Failed to post reply', 'error');
     }
   };
 
@@ -151,9 +152,11 @@ export default function PostDetail() {
     try {
       await deletePost.mutateAsync(post.id);
       setShowDeletePostModal(false);
+      showToast('Discussion post deleted.');
       navigate('/community');
     } catch (err) {
       console.error('Failed to delete post:', err);
+      showToast('Failed to delete post', 'error');
     }
   };
 
@@ -162,8 +165,10 @@ export default function PostDetail() {
     try {
       await deleteComment.mutateAsync({ commentId: commentToDelete.id, postId: post.id });
       setCommentToDelete(null);
+      showToast('Comment deleted.');
     } catch (err) {
       console.error('Failed to delete comment:', err);
+      showToast('Failed to delete comment', 'error');
     }
   };
 
@@ -180,10 +185,10 @@ export default function PostDetail() {
       });
       setShowReportModal(false);
       setReportReason('');
-      setToast('Report submitted for moderation.');
-      setTimeout(() => setToast(''), 3000);
+      showToast('Report submitted for moderation.');
     } catch (err) {
       console.error(err);
+      showToast('Failed to submit report', 'error');
     }
   };
 
@@ -192,53 +197,38 @@ export default function PostDetail() {
       <div className="max-w-4xl mx-auto px-4 py-16 animate-pulse space-y-6">
         <div className="h-6 bg-zinc-200 rounded w-1/4"></div>
         <div className="h-48 bg-zinc-100 rounded-2xl"></div>
+        <div className="h-32 bg-zinc-100 rounded-2xl"></div>
       </div>
     );
   }
 
   if (postError || !post) {
     return (
-      <div className="max-w-md mx-auto px-4 py-16 text-center space-y-3">
-        <AlertCircle className="h-8 w-8 text-rose-500 mx-auto" />
+      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+          <AlertCircle className="h-6 w-6" />
+        </div>
         <h2 className="text-base font-bold text-zinc-900">Discussion Not Found</h2>
-        <Link to="/community" className="text-xs text-amber-600 font-semibold">
-          &larr; Back to Community Feed
+        <p className="text-xs text-zinc-500">The discussion post you are looking for has been removed or does not exist.</p>
+        <Link
+          to="/community"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs font-semibold shadow-sm transition"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to Discussions
         </Link>
       </div>
     );
   }
 
-  const isPostAuthor = user?.id === post.user_id;
-  const canManagePost = isPostAuthor || isAdmin;
-  const author = post.profiles;
-  const currentReaction = userReactions?.[post.id];
-  const netVotes = Math.max(0, (post.upvotes || 0) - (post.downvotes || 0));
-
-  // Group comments into threaded hierarchy by parent_id
-  const commentsByParent = {};
-  comments?.forEach((c) => {
-    const pId = c.parent_id || 0;
-    if (!commentsByParent[pId]) commentsByParent[pId] = [];
-    commentsByParent[pId].push(c);
-  });
-
-  const rootComments = commentsByParent[0] || [];
-
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      {/* Back Link */}
       <Link
         to="/community"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-amber-600 transition"
       >
         <ArrowLeft className="h-3.5 w-3.5" /> Back to Discussions
       </Link>
-
-      {toast && (
-        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="h-4 w-4" />
-          {toast}
-        </div>
-      )}
 
       {/* Main Post Card */}
       <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 sm:p-8 shadow-sm space-y-6">

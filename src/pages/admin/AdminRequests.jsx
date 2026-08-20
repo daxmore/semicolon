@@ -3,21 +3,22 @@ import { useAdminRequests, useRequestMutations } from '../../hooks/useRequests';
 import { timeAgo } from '../../lib/utils';
 import { HelpCircle, CheckCircle, XCircle, Trash2, Search, Filter } from 'lucide-react';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
+import { useToast } from '../../contexts/ToastContext';
 
 export default function AdminRequests() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [requestToDelete, setRequestToDelete] = useState(null);
-  const [toast, setToast] = useState('');
+  const { showToast } = useToast();
   const { data: requestsList, isLoading } = useAdminRequests(statusFilter);
   const { updateRequestStatus, deleteRequest } = useRequestMutations();
 
   const handleStatusChange = async (id, status) => {
     try {
       await updateRequestStatus.mutateAsync({ id, status });
-      setToast(`Request successfully marked as ${status.toUpperCase()}!`);
-      setTimeout(() => setToast(''), 3000);
+      showToast(`Request successfully marked as ${status.toUpperCase()}!`);
     } catch (err) {
       console.error('Failed to update request status:', err);
+      showToast('Failed to update status', 'error');
     }
   };
 
@@ -26,27 +27,15 @@ export default function AdminRequests() {
     try {
       await deleteRequest.mutateAsync(requestToDelete.id);
       setRequestToDelete(null);
-      setToast('Material request deleted.');
-      setTimeout(() => setToast(''), 3000);
+      showToast('Material request deleted.');
     } catch (err) {
       console.error('Failed to delete request:', err);
+      showToast('Failed to delete request', 'error');
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Toast Alert */}
-      {toast && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold flex items-center justify-between shadow-xs animate-in fade-in">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
-            <span>{toast}</span>
-          </div>
-          <button onClick={() => setToast('')} className="text-emerald-500 hover:text-emerald-700 font-bold px-1">
-            ✕
-          </button>
-        </div>
-      )}
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

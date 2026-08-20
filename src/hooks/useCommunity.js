@@ -171,32 +171,20 @@ export function useCommunityMutations() {
     },
   });
 
-  // Vote Post (with instant optimistic update)
+  // Vote Post (with instant optimistic update & exact DB sync)
   const votePost = useMutation({
-    mutationFn: async ({ postId, userId, type, currentReaction, currentUpvotes, currentDownvotes }) => {
-      let newUpvotes = currentUpvotes;
-      let newDownvotes = currentDownvotes;
-
+    mutationFn: async ({ postId, userId, type, currentReaction }) => {
       if (currentReaction === type) {
         // Toggle OFF (unvote)
         await axiosClient.delete(
           `/rest/v1/community_reactions?user_id=eq.${userId}&post_id=eq.${postId}`
         );
-        if (type === 'upvote') newUpvotes = Math.max(0, newUpvotes - 1);
-        if (type === 'downvote') newDownvotes = Math.max(0, newDownvotes - 1);
       } else if (currentReaction) {
         // Switch Vote
         await axiosClient.patch(
           `/rest/v1/community_reactions?user_id=eq.${userId}&post_id=eq.${postId}`,
           { reaction_type: type }
         );
-        if (type === 'upvote') {
-          newUpvotes += 1;
-          newDownvotes = Math.max(0, newDownvotes - 1);
-        } else {
-          newDownvotes += 1;
-          newUpvotes = Math.max(0, newUpvotes - 1);
-        }
       } else {
         // New Vote
         await axiosClient.post('/rest/v1/community_reactions', {
@@ -204,28 +192,35 @@ export function useCommunityMutations() {
           post_id: postId,
           reaction_type: type,
         });
-        if (type === 'upvote') newUpvotes += 1;
-        if (type === 'downvote') newDownvotes += 1;
       }
 
-      // Update count on community_posts table
+      // Re-calculate true counts directly from community_reactions to ensure 100% database accuracy
+      const { data: allReactions } = await axiosClient.get(
+        `/rest/v1/community_reactions?post_id=eq.${postId}&select=reaction_type`
+      );
+
+      const exactUpvotes = allReactions?.filter((r) => r.reaction_type === 'upvote').length || 0;
+      const exactDownvotes = allReactions?.filter((r) => r.reaction_type === 'downvote').length || 0;
+
       await axiosClient.patch(`/rest/v1/community_posts?id=eq.${postId}`, {
-        upvotes: newUpvotes,
-        downvotes: newDownvotes,
+        upvotes: exactUpvotes,
+        downvotes: exactDownvotes,
       });
 
-      return { postId, newUpvotes, newDownvotes };
+      return { postId, upvotes: exactUpvotes, downvotes: exactDownvotes };
     },
     onMutate: async ({ postId, type, currentReaction, currentUpvotes, currentDownvotes }) => {
-      let newUpvotes = currentUpvotes;
-      let newDownvotes = currentDownvotes;
+      let newUpvotes = currentUpvotes || 0;
+      let newDownvotes = currentDownvotes || 0;
       let nextReaction = type;
 
       if (currentReaction === type) {
+        // Unvoting
         nextReaction = null;
         if (type === 'upvote') newUpvotes = Math.max(0, newUpvotes - 1);
         if (type === 'downvote') newDownvotes = Math.max(0, newDownvotes - 1);
       } else if (currentReaction) {
+        // Switching vote
         if (type === 'upvote') {
           newUpvotes += 1;
           newDownvotes = Math.max(0, newDownvotes - 1);
@@ -234,6 +229,7 @@ export function useCommunityMutations() {
           newUpvotes = Math.max(0, newUpvotes - 1);
         }
       } else {
+        // New vote
         if (type === 'upvote') newUpvotes += 1;
         if (type === 'downvote') newDownvotes += 1;
       }
