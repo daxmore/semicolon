@@ -32,9 +32,13 @@ const DEFAULT_TOPIC_REQUESTS = [
 // Helper to get local stored categories
 export function getStoredCategories() {
   try {
-    const custom = JSON.parse(localStorage.getItem(CATEGORIES_STORAGE_KEY) || '[]');
-    const set = new Set([...SYSTEM_CATEGORIES, ...custom]);
-    return Array.from(set);
+    const custom = localStorage.getItem(CATEGORIES_STORAGE_KEY);
+    if (custom) {
+      const parsed = JSON.parse(custom);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+    localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(SYSTEM_CATEGORIES));
+    return SYSTEM_CATEGORIES;
   } catch {
     return SYSTEM_CATEGORIES;
   }
@@ -64,15 +68,14 @@ export function useCommunityCategories() {
         const { data } = await axiosClient.get('/rest/v1/categories?select=*&order=name.asc');
         if (data && data.length > 0) {
           const names = data.map((c) => c.name);
-          const combined = Array.from(new Set([...SYSTEM_CATEGORIES, ...names]));
-          return combined;
+          return names;
         }
       } catch (err) {
         // Fallback to local persisted store
       }
       return getStoredCategories();
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
   });
 }
 
@@ -102,138 +105,155 @@ export function useTopicRequests() {
 export function useCategoryMutations() {
   const queryClient = useQueryClient();
 
-  const addCategory = useMutation({
-    mutationFn: async (categoryName) => {
-      const trimmed = categoryName.trim();
-      if (!trimmed) throw new Error('Category name cannot be empty');
-
-      // Try remote table insert
-      try {
-        await axiosClient.post('/rest/v1/categories', { name: trimmed });
-      } catch {
-        // Fallback to local storage
-      }
-
-      const current = JSON.parse(localStorage.getItem(CATEGORIES_STORAGE_KEY) || '[]');
-      if (!current.includes(trimmed)) {
-        current.push(trimmed);
-        localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(current));
-      }
-      return trimmed;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['community_categories'] });
-    },
-  });
-
-  const deleteCategory = useMutation({
-    mutationFn: async (categoryName) => {
-      try {
-        await axiosClient.delete(`/rest/v1/categories?name=eq.${categoryName}`);
-      } catch {
-        // Fallback to local storage
-      }
-      const current = JSON.parse(localStorage.getItem(CATEGORIES_STORAGE_KEY) || '[]');
-      const filtered = current.filter((c) => c !== categoryName);
-      localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(filtered));
-      return categoryName;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['community_categories'] });
-    },
-  });
-
-  const submitTopicRequest = useMutation({
-    mutationFn: async ({ topic_name, reason, purpose, user_id, username }) => {
-      const newReq = {
-        id: Date.now(),
-        topic_name: topic_name.trim(),
-        reason: reason.trim(),
-        purpose: purpose.trim(),
-        user_id: user_id || null,
-        username: username || 'User',
-        status: 'pending',
-        created_at: new Date().toISOString(),
-      };
-
-      try {
-        await axiosClient.post('/rest/v1/topic_requests', newReq);
-      } catch {
-        // Local persistence fallback
-        const existing = getStoredTopicRequests();
-        const updated = [newReq, ...existing];
-        localStorage.setItem(TOPIC_REQUESTS_KEY, JSON.stringify(updated));
-      }
-
-      return newReq;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['topic_requests'] });
-    },
-  });
-
-  const updateTopicRequestStatus = useMutation({
-    mutationFn: async ({ id, status, note, user_id, topic_name }) => {
-      // 1. Update topic request status
-      try {
-        await axiosClient.patch(`/rest/v1/topic_requests?id=eq.${id}`, { status, admin_note: note });
-      } catch {
-        const existing = getStoredTopicRequests();
-        const updated = existing.map((r) =>
-          r.id === id ? { ...r, status, admin_note: note } : r
-        );
-        localStorage.setItem(TOPIC_REQUESTS_KEY, JSON.stringify(updated));
-      }
-
-      // 2. If approved, automatically add to categories list
-      if (status === 'approved' && topic_name) {
-        const current = JSON.parse(localStorage.getItem(CATEGORIES_STORAGE_KEY) || '[]');
-        if (!current.includes(topic_name)) {
-          current.push(topic_name);
-          localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(current));
-        }
-      }
-
-      // 3. Send Notification to User
-      if (user_id) {
-        const defaultTitle =
-          status === 'approved'
-            ? `Community Request Approved: "${topic_name}"`
-            : `Community Request Declined: "${topic_name}"`;
-
-        const defaultMessage =
-          note?.trim() ||
-          (status === 'approved'
-            ? `Great news! Your request to add the "${topic_name}" community topic has been approved and is now active.`
-            : `Thank you for your suggestion. After review, the request for "${topic_name}" was not approved at this time.`);
+  return {
+    addCategory: useMutation({
+      mutationFn: async (categoryName) => {
+        const trimmed = categoryName.trim();
+        if (!trimmed) throw new Error('Category name cannot be empty');
 
         try {
-          await axiosClient.post('/rest/v1/notifications', {
-            user_id: user_id,
-            type: 'system',
-            title: defaultTitle,
-            message: defaultMessage,
-            link: status === 'approved' ? `/community?category=${encodeURIComponent(topic_name)}` : '/community',
-            is_read: false,
-          });
-        } catch (notifErr) {
-          console.warn('Failed to send notification via Supabase:', notifErr);
+          await axiosClient.post('/rest/v1/categories', { name: trimmed });
+        } catch {
+          // Fallback
         }
-      }
 
-      return { id, status };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['topic_requests'] });
-      queryClient.invalidateQueries({ queryKey: ['community_categories'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-    },
-  });
+        const current = getStoredCategories();
+        if (!current.includes(trimmed)) {
+          const updated = [...current, trimmed];
+          localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(updated));
+        }
+        return trimmed;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['community_categories'] });
+      },
+    }),
 
-  return {
-    addCategory,
-    deleteCategory,
-    submitTopicRequest,
-    updateTopicRequestStatus,
+    updateCategory: useMutation({
+      mutationFn: async ({ oldName, newName }) => {
+        const trimmed = newName.trim();
+        if (!trimmed) throw new Error('Category name cannot be empty');
+
+        try {
+          await axiosClient.patch(`/rest/v1/categories?name=eq.${oldName}`, { name: trimmed });
+        } catch {
+          // Fallback
+        }
+
+        const current = getStoredCategories();
+        const updated = current.map((c) => (c === oldName ? trimmed : c));
+        localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(updated));
+        return { oldName, newName: trimmed };
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['community_categories'] });
+      },
+    }),
+
+    deleteCategory: useMutation({
+      mutationFn: async (categoryName) => {
+        try {
+          await axiosClient.delete(`/rest/v1/categories?name=eq.${categoryName}`);
+        } catch {
+          // Fallback
+        }
+
+        const current = getStoredCategories();
+        const updated = current.filter((c) => c !== categoryName);
+        localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(updated));
+        return categoryName;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['community_categories'] });
+      },
+    }),
+
+    submitTopicRequest: useMutation({
+      mutationFn: async ({ topic_name, reason, purpose, user_id, username }) => {
+        const newReq = {
+          id: Date.now(),
+          topic_name: topic_name.trim(),
+          reason: reason.trim(),
+          purpose: purpose.trim(),
+          user_id: user_id || null,
+          username: username || 'User',
+          status: 'pending',
+          created_at: new Date().toISOString(),
+        };
+
+        try {
+          await axiosClient.post('/rest/v1/topic_requests', newReq);
+        } catch {
+          const existing = getStoredTopicRequests();
+          const updated = [newReq, ...existing];
+          localStorage.setItem(TOPIC_REQUESTS_KEY, JSON.stringify(updated));
+        }
+
+        return newReq;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['topic_requests'] });
+      },
+    }),
+
+    updateTopicRequestStatus: useMutation({
+      mutationFn: async ({ id, status, note, user_id, topic_name }) => {
+        // 1. Update topic request status
+        try {
+          await axiosClient.patch(`/rest/v1/topic_requests?id=eq.${id}`, { status, admin_note: note });
+        } catch {
+          // Fallback
+        }
+
+        const existing = getStoredTopicRequests();
+        const updated = existing.map((r) =>
+          String(r.id) === String(id) ? { ...r, status, admin_note: note } : r
+        );
+        localStorage.setItem(TOPIC_REQUESTS_KEY, JSON.stringify(updated));
+
+        // 2. If approved, automatically add to categories list
+        if (status === 'approved' && topic_name) {
+          const current = getStoredCategories();
+          if (!current.includes(topic_name)) {
+            const newCats = [...current, topic_name];
+            localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(newCats));
+          }
+        }
+
+        // 3. Send Notification to User
+        if (user_id) {
+          const defaultTitle =
+            status === 'approved'
+              ? `Community Request Approved: "${topic_name}"`
+              : `Community Request Declined: "${topic_name}"`;
+
+          const defaultMessage =
+            note?.trim() ||
+            (status === 'approved'
+              ? `Great news! Your request to add the "${topic_name}" community topic has been approved and is now active.`
+              : `Thank you for your suggestion. After review, the request for "${topic_name}" was not approved at this time.`);
+
+          try {
+            await axiosClient.post('/rest/v1/notifications', {
+              user_id: user_id,
+              type: 'system',
+              title: defaultTitle,
+              message: defaultMessage,
+              link: status === 'approved' ? `/community?category=${encodeURIComponent(topic_name)}` : '/community',
+              is_read: false,
+            });
+          } catch (notifErr) {
+            console.warn('Failed to send notification via Supabase:', notifErr);
+          }
+        }
+
+        return { id, status };
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['topic_requests'] });
+        queryClient.invalidateQueries({ queryKey: ['community_categories'] });
+        queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      },
+    }),
   };
 }

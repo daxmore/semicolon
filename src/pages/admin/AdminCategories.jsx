@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCommunityCategories, useTopicRequests, useCategoryMutations } from '../../hooks/useCategories';
-import { Plus, Trash2, CheckCircle, XCircle, Search, Filter, Layers, MessageSquare, Send, X, HelpCircle } from 'lucide-react';
+import { Plus, Trash2, Edit2, CheckCircle, XCircle, Search, Filter, Layers, MessageSquare, Send, X, HelpCircle } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 import { timeAgo } from '../../lib/utils';
@@ -8,13 +8,16 @@ import { timeAgo } from '../../lib/utils';
 export default function AdminCategories() {
   const { data: categories, isLoading: loadingCats } = useCommunityCategories();
   const { data: topicRequests, isLoading: loadingReqs } = useTopicRequests();
-  const { addCategory, deleteCategory, updateTopicRequestStatus } = useCategoryMutations();
+  const { addCategory, updateCategory, deleteCategory, updateTopicRequestStatus } = useCategoryMutations();
   const { showToast } = useToast();
 
   const [activeTab, setActiveTab] = useState('topics'); // 'topics' | 'requests'
   const [newCategoryName, setNewCategoryName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+
+  // Edit category modal state
+  const [editingCategory, setEditingCategory] = useState(null); // { oldName: '', newName: '' }
 
   // Decision & Note modal for user topic requests
   const [pendingAction, setPendingAction] = useState(null); // { req, status: 'approved'|'rejected', note: '' }
@@ -40,6 +43,22 @@ export default function AdminCategories() {
       setCategoryToDelete(null);
     } catch (err) {
       showToast('Failed to delete category', 'error');
+    }
+  };
+
+  const handleSaveEditCategory = async (e) => {
+    e.preventDefault();
+    if (!editingCategory || !editingCategory.newName.trim()) return;
+
+    try {
+      await updateCategory.mutateAsync({
+        oldName: editingCategory.oldName,
+        newName: editingCategory.newName.trim(),
+      });
+      showToast(`Topic updated to "${editingCategory.newName.trim()}"!`);
+      setEditingCategory(null);
+    } catch (err) {
+      showToast(err.message || 'Failed to update category', 'error');
     }
   };
 
@@ -172,13 +191,24 @@ export default function AdminCategories() {
                 className="bg-white p-4 rounded-xl border border-zinc-200 shadow-xs flex items-center justify-between hover:border-indigo-200 transition group"
               >
                 <span className="text-xs font-semibold text-zinc-900 truncate">{cat}</span>
-                <button
-                  onClick={() => setCategoryToDelete(cat)}
-                  className="p-1 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer opacity-80 group-hover:opacity-100"
-                  title="Delete category"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setEditingCategory({ oldName: cat, newName: cat })}
+                    className="p-1 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition cursor-pointer opacity-80 group-hover:opacity-100"
+                    title="Edit topic name"
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCategoryToDelete(cat)}
+                    className="p-1 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer opacity-80 group-hover:opacity-100"
+                    title="Delete category"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -244,7 +274,12 @@ export default function AdminCategories() {
                           {req.status === 'pending' ? (
                             <>
                               <button
-                                onClick={() => handleOpenActionModal(req, 'approved')}
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleOpenActionModal(req, 'approved');
+                                }}
                                 disabled={updateTopicRequestStatus.isPending}
                                 className="px-2.5 py-1 rounded-lg font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 active:bg-emerald-200 transition cursor-pointer"
                                 title="Approve topic and notify user"
@@ -252,7 +287,12 @@ export default function AdminCategories() {
                                 Approve & Add
                               </button>
                               <button
-                                onClick={() => handleOpenActionModal(req, 'rejected')}
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleOpenActionModal(req, 'rejected');
+                                }}
                                 disabled={updateTopicRequestStatus.isPending}
                                 className="px-2.5 py-1 rounded-lg font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 active:bg-rose-200 transition cursor-pointer"
                                 title="Reject topic and notify user"
@@ -359,6 +399,63 @@ export default function AdminCategories() {
                     : pendingAction.status === 'approved'
                     ? 'Approve, Add & Notify'
                     : 'Reject & Notify'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Category Modal */}
+      {editingCategory && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-zinc-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                  <Edit2 className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-zinc-900">Edit Community Topic</h3>
+                  <p className="text-[11px] text-zinc-400">Rename "{editingCategory.oldName}"</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingCategory(null)}
+                className="p-1 text-zinc-400 hover:text-zinc-600 cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditCategory} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-zinc-700 mb-1">Topic Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editingCategory.newName}
+                  onChange={(e) => setEditingCategory({ ...editingCategory, newName: e.target.value })}
+                  placeholder="Enter topic name..."
+                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-xs text-zinc-800"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingCategory(null)}
+                  className="px-4 py-2 border border-zinc-200 rounded-xl text-zinc-600 font-semibold hover:bg-zinc-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={updateCategory.isPending}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition disabled:opacity-60 cursor-pointer"
+                >
+                  {updateCategory.isPending ? 'Saving...' : 'Save Topic'}
                 </button>
               </div>
             </form>
