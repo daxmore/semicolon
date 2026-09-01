@@ -220,6 +220,26 @@ export default function PostDetail() {
     );
   }
 
+  const currentReaction = userReactions?.[post.id] || null;
+  const netVotes = (post.upvotes || 0) - (post.downvotes || 0);
+  const author = post.profiles || null;
+  const canManagePost = user && (user.id === post.user_id || isAdmin);
+
+  // Group threaded comments by parent ID
+  const commentsByParent = {};
+  const rootComments = [];
+
+  (comments || []).forEach((c) => {
+    if (!c.parent_id) {
+      rootComments.push(c);
+    } else {
+      if (!commentsByParent[c.parent_id]) {
+        commentsByParent[c.parent_id] = [];
+      }
+      commentsByParent[c.parent_id].push(c);
+    }
+  });
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       {/* Back Link */}
@@ -297,8 +317,8 @@ export default function PostDetail() {
 
             {/* Image */}
             {post.image_url && (
-              <div className="rounded-2xl border border-zinc-200 overflow-hidden max-h-96 bg-zinc-900">
-                <img src={post.image_url} alt="" className="w-full h-full object-contain" />
+              <div className="rounded-xl border border-zinc-200 overflow-hidden max-h-80 bg-zinc-900 flex items-center justify-center">
+                <img src={post.image_url} alt="" className="w-full h-full max-h-80 object-contain" />
               </div>
             )}
 
@@ -528,6 +548,7 @@ function CommentCard({
 
   return (
     <div
+      id={`comment-${comment.id}`}
       className={`p-4 sm:p-5 rounded-2xl border transition space-y-3 ${
         comment.is_accepted
           ? 'bg-emerald-50/40 border-emerald-300 shadow-sm'

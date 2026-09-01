@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosClient } from '../../lib/axiosClient';
-import { Plus, Trash2, X, ChevronDown, ChevronRight, Layers } from 'lucide-react';
+import { Plus, Trash2, X, ChevronDown, ChevronRight, Layers, Edit2 } from 'lucide-react';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 // ── Fixed tier definitions ────────────────────────────────────────────────────
@@ -70,6 +70,7 @@ export default function AdminSkills() {
 
   const [expandedSkill, setExpandedSkill] = useState(null);
   const [showSkillModal, setShowSkillModal] = useState(false);
+  const [editingSkill, setEditingSkill] = useState(null);
   const [skillToDelete, setSkillToDelete] = useState(null);
   const [skillForm, setSkillForm] = useState({ name: '', description: '', icon_svg: '' });
 
@@ -101,6 +102,21 @@ export default function AdminSkills() {
     },
   });
 
+  const updateSkill = useMutation({
+    mutationFn: async ({ id, name, description, icon_svg }) => {
+      const { data } = await axiosClient.patch(`/rest/v1/skills?id=eq.${id}`, {
+        name,
+        description,
+        icon: icon_svg,
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin_skills_full'] });
+      queryClient.invalidateQueries({ queryKey: ['skills'] });
+    },
+  });
+
   const deleteSkill = useMutation({
     mutationFn: async (id) => axiosClient.delete(`/rest/v1/skills?id=eq.${id}`),
     onSuccess: () => {
@@ -110,11 +126,42 @@ export default function AdminSkills() {
   });
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleAddSkill = async (e) => {
-    e.preventDefault();
-    await createSkill.mutateAsync(skillForm);
+  const handleOpenAddModal = () => {
+    setEditingSkill(null);
     setSkillForm({ name: '', description: '', icon_svg: '' });
+    setShowSkillModal(true);
+  };
+
+  const handleOpenEditModal = (skill) => {
+    setEditingSkill(skill);
+    setSkillForm({
+      name: skill.name || '',
+      description: skill.description || '',
+      icon_svg: skill.icon || '',
+    });
+    setShowSkillModal(true);
+  };
+
+  const handleSaveSkill = async (e) => {
+    e.preventDefault();
+    if (editingSkill) {
+      await updateSkill.mutateAsync({
+        id: editingSkill.id,
+        name: skillForm.name,
+        description: skillForm.description,
+        icon_svg: skillForm.icon_svg,
+      });
+    } else {
+      await createSkill.mutateAsync(skillForm);
+    }
+    setSkillForm({ name: '', description: '', icon_svg: '' });
+    setEditingSkill(null);
     setShowSkillModal(false);
+  };
+
+  const confirmDeleteSkill = async () => {
+    if (!skillToDelete) return;
+    await deleteSkill.mutateAsync(skillToDelete.id);
   };
 
   return (
@@ -128,8 +175,8 @@ export default function AdminSkills() {
           </p>
         </div>
         <button
-          onClick={() => setShowSkillModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition"
+          onClick={handleOpenAddModal}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer"
         >
           <Plus className="h-4 w-4" /> Add Skill
         </button>
@@ -154,24 +201,27 @@ export default function AdminSkills() {
               skill={skill}
               expanded={expandedSkill === skill.id}
               onToggle={() => setExpandedSkill(expandedSkill === skill.id ? null : skill.id)}
+              onEdit={() => handleOpenEditModal(skill)}
               onDelete={() => setSkillToDelete(skill)}
             />
           ))
         )}
       </div>
 
-      {/* ── Add Skill Modal ── */}
+      {/* ── Add / Edit Skill Modal ── */}
       {showSkillModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-zinc-200 space-y-5">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
-              <h3 className="font-bold text-base text-zinc-900">Add New Skill</h3>
+              <h3 className="font-bold text-base text-zinc-900">
+                {editingSkill ? `Edit Skill: ${editingSkill.name}` : 'Add New Skill'}
+              </h3>
               <button onClick={() => setShowSkillModal(false)} className="p-1 text-zinc-400 hover:text-zinc-600">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddSkill} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveSkill} className="space-y-4 text-xs">
               {/* SVG input + preview */}
               <div>
                 <label className="block font-semibold text-zinc-700 mb-1">
@@ -225,34 +275,40 @@ export default function AdminSkills() {
               </div>
 
               {/* Tier preview note */}
-              <div className="bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3">
-                <p className="font-semibold text-zinc-700 mb-2">Auto-created tiers:</p>
-                <div className="flex flex-wrap gap-2">
-                  {DEFAULT_TIERS.map((t) => (
-                    <span
-                      key={t.level_name}
-                      className={`px-2.5 py-0.5 rounded-full border text-[10px] font-semibold ${TIER_COLORS[t.level_name]}`}
-                    >
-                      {t.level_name}
-                    </span>
-                  ))}
+              {!editingSkill && (
+                <div className="bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3">
+                  <p className="font-semibold text-zinc-700 mb-2">Auto-created tiers:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {DEFAULT_TIERS.map((t) => (
+                      <span
+                        key={t.level_name}
+                        className={`px-2.5 py-0.5 rounded-full border text-[10px] font-semibold ${TIER_COLORS[t.level_name]}`}
+                      >
+                        {t.level_name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
                 <button
                   type="button"
                   onClick={() => setShowSkillModal(false)}
-                  className="px-4 py-2 border border-zinc-200 rounded-xl text-zinc-600 hover:bg-zinc-50 font-semibold"
+                  className="px-4 py-2 border border-zinc-200 rounded-xl text-zinc-600 hover:bg-zinc-50 font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={createSkill.isPending}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition disabled:opacity-60"
+                  disabled={createSkill.isPending || updateSkill.isPending}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition disabled:opacity-60 cursor-pointer"
                 >
-                  {createSkill.isPending ? 'Creating...' : 'Create Skill'}
+                  {createSkill.isPending || updateSkill.isPending
+                    ? 'Saving...'
+                    : editingSkill
+                    ? 'Update Skill'
+                    : 'Create Skill'}
                 </button>
               </div>
             </form>
@@ -275,7 +331,7 @@ export default function AdminSkills() {
 }
 
 // ── SkillRow ──────────────────────────────────────────────────────────────────
-function SkillRow({ skill, expanded, onToggle, onDelete }) {
+function SkillRow({ skill, expanded, onToggle, onEdit, onDelete }) {
   const { data: tiers, isLoading } = useSkillLevels(expanded ? skill.id : null);
 
   return (
@@ -308,10 +364,17 @@ function SkillRow({ skill, expanded, onToggle, onDelete }) {
             : <ChevronRight className="h-4 w-4 text-zinc-400 ml-2 shrink-0" />
           }
         </div>
-        <div className="ml-4 shrink-0" onClick={(e) => e.stopPropagation()}>
+        <div className="ml-4 shrink-0 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={onEdit}
+            className="p-1.5 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition cursor-pointer"
+            title="Edit Skill"
+          >
+            <Edit2 className="h-3.5 w-3.5" />
+          </button>
           <button
             onClick={onDelete}
-            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
             title="Delete Skill"
           >
             <Trash2 className="h-3.5 w-3.5" />

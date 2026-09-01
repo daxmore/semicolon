@@ -155,6 +155,43 @@ export function useQuizMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quiz_questions'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_questions'] });
+    },
+  });
+
+  const updateQuestion = useMutation({
+    mutationFn: async ({ id, skill_id, level_id, question_text, xp_reward, options, correct_index }) => {
+      // 1. Update question
+      const { data: qData } = await axiosClient.patch(
+        `/rest/v1/questions?id=eq.${id}`,
+        {
+          skill_id,
+          level_id,
+          question_text,
+          xp_reward: xp_reward || 10,
+        },
+        { headers: { Prefer: 'return=representation' } }
+      );
+
+      // 2. Re-insert or update options if provided
+      if (options && options.length > 0) {
+        // Delete previous options for this question
+        await axiosClient.delete(`/rest/v1/options?question_id=eq.${id}`);
+
+        const optionPayloads = options.map((text, idx) => ({
+          question_id: id,
+          option_text: text,
+          is_correct: idx === correct_index,
+        }));
+
+        await axiosClient.post('/rest/v1/options', optionPayloads);
+      }
+
+      return qData?.[0];
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quiz_questions'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_questions'] });
     },
   });
 
@@ -165,8 +202,9 @@ export function useQuizMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quiz_questions'] });
+      queryClient.invalidateQueries({ queryKey: ['admin_questions'] });
     },
   });
 
-  return { createQuestion, deleteQuestion };
+  return { createQuestion, updateQuestion, deleteQuestion };
 }

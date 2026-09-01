@@ -2,16 +2,21 @@ import React, { useState } from 'react';
 import { useSkills, useQuizMutations } from '../../hooks/useAcademy';
 import { axiosClient } from '../../lib/axiosClient';
 import { useQuery } from '@tanstack/react-query';
-import { HelpCircle, Plus, Trash2, X, Search, Check, AlertCircle } from 'lucide-react';
+import { HelpCircle, Plus, Trash2, X, Search, Check, AlertCircle, Edit2, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
 export default function AdminQuizzes() {
   const [selectedSkill, setSelectedSkill] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState(null);
   const [questionToDelete, setQuestionToDelete] = useState(null);
 
+  // Pagination & items per page
+  const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const { data: skills } = useSkills();
-  const { createQuestion, deleteQuestion } = useQuizMutations();
+  const { createQuestion, updateQuestion, deleteQuestion } = useQuizMutations();
 
   // Fetch skill levels for dropdown
   const { data: levels } = useQuery({
@@ -46,9 +51,11 @@ export default function AdminQuizzes() {
     xp_reward: 10,
     options: ['', '', '', ''],
     correct_index: 0,
+    difficulty: 'medium',
   });
 
-  const handleOpenModal = () => {
+  const handleOpenAddModal = () => {
+    setEditingQuestion(null);
     setFormData({
       skill_id: skills?.[0]?.id || '',
       level_id: '',
@@ -56,31 +63,74 @@ export default function AdminQuizzes() {
       xp_reward: 10,
       options: ['', '', '', ''],
       correct_index: 0,
+      difficulty: 'medium',
     });
-    setSelectedSkill(skills?.[0]?.id || '');
+    if (skills?.[0]?.id) {
+      setSelectedSkill(skills[0].id);
+    }
     setShowModal(true);
   };
 
-  const handleOptionChange = (idx, value) => {
-    const updated = [...formData.options];
-    updated[idx] = value;
-    setFormData({ ...formData, options: updated });
+  const handleOpenEditModal = async (q) => {
+    setEditingQuestion(q);
+    setSelectedSkill(q.skill_id);
+
+    // Fetch options for this question
+    let optionsArr = ['', '', '', ''];
+    let correctIdx = 0;
+
+    try {
+      const { data: opts } = await axiosClient.get(
+        `/rest/v1/options?question_id=eq.${q.id}&select=*&order=id.asc`
+      );
+      if (opts && opts.length > 0) {
+        optionsArr = opts.map((o) => o.option_text);
+        const correctOptIdx = opts.findIndex((o) => o.is_correct);
+        if (correctOptIdx !== -1) correctIdx = correctOptIdx;
+      }
+    } catch (err) {
+      console.error('Failed to load options:', err);
+    }
+
+    setFormData({
+      skill_id: q.skill_id,
+      level_id: q.level_id,
+      question_text: q.question_text || '',
+      xp_reward: q.xp_reward || 10,
+      options: optionsArr.length >= 4 ? optionsArr : [...optionsArr, '', '', '', ''].slice(0, 4),
+      correct_index: correctIdx,
+      difficulty: q.difficulty || 'medium',
+    });
+    setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createQuestion.mutateAsync({
-        skill_id: parseInt(formData.skill_id, 10),
-        level_id: parseInt(formData.level_id, 10),
-        question_text: formData.question_text,
-        xp_reward: parseInt(formData.xp_reward, 10),
-        options: formData.options.filter((o) => o.trim().length > 0),
-        correct_index: formData.correct_index,
-      });
+      if (editingQuestion) {
+        await updateQuestion.mutateAsync({
+          id: editingQuestion.id,
+          skill_id: parseInt(formData.skill_id, 10),
+          level_id: parseInt(formData.level_id, 10),
+          question_text: formData.question_text,
+          xp_reward: parseInt(formData.xp_reward, 10),
+          options: formData.options.filter((o) => o.trim().length > 0),
+          correct_index: formData.correct_index,
+        });
+      } else {
+        await createQuestion.mutateAsync({
+          skill_id: parseInt(formData.skill_id, 10),
+          level_id: parseInt(formData.level_id, 10),
+          question_text: formData.question_text,
+          xp_reward: parseInt(formData.xp_reward, 10),
+          options: formData.options.filter((o) => o.trim().length > 0),
+          correct_index: formData.correct_index,
+        });
+      }
       setShowModal(false);
+      setEditingQuestion(null);
     } catch (err) {
-      console.error('Error creating question:', err);
+      console.error('Error saving question:', err);
     }
   };
 
@@ -94,6 +144,13 @@ export default function AdminQuizzes() {
     }
   };
 
+  // Pagination calculation
+  const totalQuestions = questionsList?.length || 0;
+  const totalPages = Math.max(1, Math.ceil(totalQuestions / pageSize));
+  const validCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (validCurrentPage - 1) * pageSize;
+  const paginatedQuestions = (questionsList || []).slice(startIndex, startIndex + pageSize);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -102,28 +159,57 @@ export default function AdminQuizzes() {
           <p className="text-xs text-zinc-500">Configure quiz questions, MCQ options, and custom XP rewards for all skills.</p>
         </div>
         <button
-          onClick={handleOpenModal}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition"
+          onClick={handleOpenAddModal}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer"
         >
           <Plus className="h-4 w-4" /> Add Question
         </button>
       </div>
 
-      {/* Filter by Skill */}
-      <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-3">
-        <span className="text-xs font-semibold text-zinc-700 shrink-0">Filter by Skill:</span>
-        <select
-          value={selectedSkill}
-          onChange={(e) => setSelectedSkill(e.target.value)}
-          className="px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-        >
-          <option value="">All Skills</option>
-          {skills?.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+      {/* Filter Toolbar with Items per page & Skill dropdown */}
+      <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-zinc-700 shrink-0">Filter by Skill:</span>
+            <select
+              value={selectedSkill}
+              onChange={(e) => {
+                setSelectedSkill(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value="">All Skills</option>
+              {skills?.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-zinc-700 shrink-0">Show:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(parseInt(e.target.value, 10));
+                setCurrentPage(1);
+              }}
+              className="px-2.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value={5}>5 per page</option>
+              <option value={10}>10 per page</option>
+              <option value={20}>20 per page</option>
+              <option value={50}>50 per page</option>
+              <option value={100}>100 per page</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="text-xs text-zinc-500">
+          Showing <strong>{totalQuestions === 0 ? 0 : startIndex + 1}</strong> - <strong>{Math.min(startIndex + pageSize, totalQuestions)}</strong> of <strong>{totalQuestions}</strong>
+        </div>
       </div>
 
       {/* Questions Table */}
@@ -146,8 +232,8 @@ export default function AdminQuizzes() {
                     Loading questions...
                   </td>
                 </tr>
-              ) : questionsList && questionsList.length > 0 ? (
-                questionsList.map((q) => (
+              ) : paginatedQuestions && paginatedQuestions.length > 0 ? (
+                paginatedQuestions.map((q) => (
                   <tr key={q.id} className="hover:bg-zinc-50/80 transition">
                     <td className="px-6 py-4 font-semibold text-zinc-900 max-w-sm truncate">
                       {q.question_text}
@@ -161,7 +247,14 @@ export default function AdminQuizzes() {
                       {q.skill_levels?.level_name || `Level #${q.level_id}`}
                     </td>
                     <td className="px-6 py-4 font-bold text-amber-600">+{q.xp_reward} XP</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right space-x-1">
+                      <button
+                        onClick={() => handleOpenEditModal(q)}
+                        className="p-1.5 text-zinc-500 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition cursor-pointer"
+                        title="Edit Question"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
                       <button
                         onClick={() => setQuestionToDelete(q)}
                         className="p-1.5 text-zinc-500 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
@@ -175,21 +268,50 @@ export default function AdminQuizzes() {
               ) : (
                 <tr>
                   <td colSpan="5" className="px-6 py-8 text-center text-zinc-500">
-                    No questions created yet.
+                    No questions found.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Footer */}
+        {totalPages > 1 && (
+          <div className="px-6 py-3 bg-zinc-50/80 border-t border-zinc-200 flex items-center justify-between">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={validCurrentPage === 1}
+              className="inline-flex items-center gap-1 px-3 py-1.5 border border-zinc-200 bg-white rounded-lg text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Previous
+            </button>
+
+            <span className="text-xs font-medium text-zinc-600">
+              Page <strong>{validCurrentPage}</strong> of <strong>{totalPages}</strong>
+            </span>
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={validCurrentPage === totalPages}
+              className="inline-flex items-center gap-1 px-3 py-1.5 border border-zinc-200 bg-white rounded-lg text-xs font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Modal Add Question */}
+      {/* Modal Add / Edit Question */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-zinc-200 space-y-5">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
-              <h3 className="font-bold text-base text-zinc-900">Add New Quiz Question</h3>
+              <h3 className="font-bold text-base text-zinc-900">
+                {editingQuestion ? 'Edit Quiz Question' : 'Add New Quiz Question'}
+              </h3>
               <button onClick={() => setShowModal(false)} className="p-1 text-zinc-400 hover:text-zinc-600">
                 <X className="h-5 w-5" />
               </button>
@@ -218,7 +340,7 @@ export default function AdminQuizzes() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-zinc-700 mb-1">Skill Level</label>
+                  <label className="block font-semibold text-zinc-700 mb-1">Skill Level / Tier</label>
                   <select
                     required
                     value={formData.level_id}
@@ -228,7 +350,7 @@ export default function AdminQuizzes() {
                     <option value="">Select Level</option>
                     {levels?.map((l) => (
                       <option key={l.id} value={l.id}>
-                        {l.level_name} (Order: {l.unlock_order})
+                        {l.level_name} (Tier {l.unlock_order})
                       </option>
                     ))}
                   </select>
@@ -248,7 +370,7 @@ export default function AdminQuizzes() {
               </div>
 
               <div className="space-y-2">
-                <label className="block font-semibold text-zinc-700">Options (Select the correct answer)</label>
+                <label className="block font-semibold text-zinc-700">Options (Select the radio of the correct answer)</label>
                 {formData.options.map((opt, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <input
@@ -276,14 +398,14 @@ export default function AdminQuizzes() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-semibold text-zinc-700 mb-1">XP Reward</label>
+                  <label className="block font-semibold text-zinc-700 mb-1">XP Reward (e.g. 10, 100, 500 XP)</label>
                   <input
                     type="number"
                     min="1"
                     required
                     value={formData.xp_reward}
                     onChange={(e) => setFormData({ ...formData, xp_reward: e.target.value })}
-                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-mono font-bold text-zinc-900"
                   />
                 </div>
                 <div>
@@ -304,16 +426,20 @@ export default function AdminQuizzes() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-zinc-200 rounded-xl text-zinc-600 hover:bg-zinc-50 font-semibold"
+                  className="px-4 py-2 border border-zinc-200 rounded-xl text-zinc-600 hover:bg-zinc-50 font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={createQuestion.isPending}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition"
+                  disabled={createQuestion.isPending || updateQuestion.isPending}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition cursor-pointer"
                 >
-                  Save Question
+                  {createQuestion.isPending || updateQuestion.isPending
+                    ? 'Saving...'
+                    : editingQuestion
+                    ? 'Update Question'
+                    : 'Save Question'}
                 </button>
               </div>
             </form>

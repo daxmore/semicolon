@@ -65,6 +65,7 @@ import AdminRequests from './pages/admin/AdminRequests';
 import AdminBadges from './pages/admin/AdminBadges';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSkills from './pages/admin/AdminSkills';
+import AdminCategories from './pages/admin/AdminCategories';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -145,6 +146,7 @@ export default function App() {
                   <Route path="books" element={<AdminBooks />} />
                   <Route path="papers" element={<AdminPapers />} />
                   <Route path="videos" element={<AdminVideos />} />
+                  <Route path="categories" element={<AdminCategories />} />
                   <Route path="community" element={<CommunityFeed />} />
                   <Route path="reports" element={<AdminReports />} />
                   <Route path="requests" element={<AdminRequests />} />

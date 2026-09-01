@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { usePapers, usePaperMutations } from '../../hooks/usePapers';
-import { SYSTEM_CATEGORIES, generateSlug, generateToken } from '../../lib/utils';
+import { useCommunityCategories } from '../../hooks/useCategories';
+import { generateSlug, generateToken } from '../../lib/utils';
 import { FileText, Plus, Trash2, Edit3, X, Search } from 'lucide-react';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
@@ -10,6 +11,7 @@ export default function AdminPapers() {
   const [editingPaper, setEditingPaper] = useState(null);
   const [paperToDelete, setPaperToDelete] = useState(null);
 
+  const { data: categories } = useCommunityCategories();
   const { data: papers, isLoading } = usePapers({ search: searchTerm });
   const { createPaper, updatePaper, deletePaper } = usePaperMutations();
 
@@ -198,7 +200,7 @@ export default function AdminPapers() {
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
                   >
-                    {SYSTEM_CATEGORIES.map((cat) => (
+                    {(categories || []).map((cat) => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>

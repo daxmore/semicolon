@@ -57,13 +57,44 @@ export function useRequestMutations() {
   });
 
   const updateRequestStatus = useMutation({
-    mutationFn: async ({ id, status }) => {
+    mutationFn: async ({ id, status, note, user_id, title, material_type }) => {
+      // 1. Update status
       await axiosClient.patch(`/rest/v1/material_requests?id=eq.${id}`, { status });
+
+      // 2. Dispatch notification to user with custom or default note
+      if (user_id) {
+        const itemType = material_type ? material_type.toUpperCase() : 'MATERIAL';
+        const defaultTitle =
+          status === 'approved'
+            ? `Request Approved: "${title || itemType}"`
+            : `Request Declined: "${title || itemType}"`;
+
+        const defaultMessage =
+          note?.trim() ||
+          (status === 'approved'
+            ? `Your request for ${itemType} "${title}" was approved! Our team has added or scheduled it for the library.`
+            : `Thank you for submitting a request for "${title}". We are currently unable to add this material to the catalog.`);
+
+        try {
+          await axiosClient.post('/rest/v1/notifications', {
+            user_id: user_id,
+            type: 'system',
+            title: defaultTitle,
+            message: defaultMessage,
+            link: '/history',
+            is_read: false,
+          });
+        } catch (err) {
+          console.warn('Failed to send notification via Supabase:', err);
+        }
+      }
+
       return { id, status };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin_requests'] });
       queryClient.invalidateQueries({ queryKey: ['user_requests'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
 

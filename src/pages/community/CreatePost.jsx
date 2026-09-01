@@ -4,8 +4,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useCommunityMutations } from '../../hooks/useCommunity';
+import { useCommunityCategories } from '../../hooks/useCategories';
 import { useAuth } from '../../contexts/AuthContext';
-import { SYSTEM_CATEGORIES, calculateLevel } from '../../lib/utils';
+import { calculateLevel } from '../../lib/utils';
 import { axiosClient } from '../../lib/axiosClient';
 import { ArrowLeft, Sparkles, Image, AlertCircle, ArrowRight, Flame } from 'lucide-react';
 
@@ -20,6 +21,7 @@ export default function CreatePost() {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const { createPost } = useCommunityMutations();
+  const { data: categories } = useCommunityCategories();
   const [imagePreview, setImagePreview] = useState('');
   const [serverError, setServerError] = useState('');
 
@@ -62,33 +64,36 @@ export default function CreatePost() {
 
     try {
       setServerError('');
-
-      // 1. Create post
       const newPost = await createPost.mutateAsync({
+        user_id: user.id,
+        category: values.category,
         title: values.title,
         description: values.description,
         image_url: values.imageUrl || null,
-        category: values.category,
-        user_id: user.id,
       });
 
-      // 2. Award 10 XP for discussion post
-      const updatedXp = (profile?.xp_total || 0) + 10;
-      const updatedWeeklyXp = (profile?.xp_weekly || 0) + 10;
-      const newLevel = calculateLevel(updatedXp);
+      // Gamification Reward: +10 XP for creating a discussion post
+      try {
+        const curTotal = profile?.xp_total || 0;
+        const curWeekly = profile?.xp_weekly || 0;
+        const newTotal = curTotal + 10;
+        const newWeekly = curWeekly + 10;
+        const newLvl = calculateLevel(newTotal);
 
-      await axiosClient.patch(`/rest/v1/profiles?id=eq.${user.id}`, {
-        xp_total: updatedXp,
-        xp_weekly: updatedWeeklyXp,
-        level: newLevel,
-      });
-
-      await refreshProfile();
+        await axiosClient.patch(`/rest/v1/profiles?id=eq.${user.id}`, {
+          xp_total: newTotal,
+          xp_weekly: newWeekly,
+          level: newLvl,
+        });
+        await refreshProfile();
+      } catch (xpErr) {
+        console.warn('Could not increment post creation XP:', xpErr);
+      }
 
       navigate(`/community/post/${newPost.id}`);
     } catch (err) {
-      console.error('Error creating post:', err);
-      setServerError(err.message || 'Failed to publish discussion.');
+      console.error(err);
+      setServerError(err.message || 'Failed to create post. Please try again.');
     }
   };
 
@@ -128,7 +133,7 @@ export default function CreatePost() {
               {...register('category')}
               className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition"
             >
-              {SYSTEM_CATEGORIES.map((cat) => (
+              {(categories || []).map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>

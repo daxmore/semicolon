@@ -5,8 +5,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserRequests, useRequestMutations } from '../../hooks/useRequests';
-import { SYSTEM_CATEGORIES } from '../../lib/utils';
-import { CheckCircle2, Sparkles, AlertCircle, ArrowRight, BookOpen, FileText, Video, Send } from 'lucide-react';
+import { useCommunityCategories, useCategoryMutations } from '../../hooks/useCategories';
+import { CheckCircle2, Sparkles, AlertCircle, ArrowRight, BookOpen, FileText, Video, Send, PlusCircle, X } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 
 const schema = yup.object({
@@ -21,10 +21,17 @@ export default function Request() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const { createRequest } = useRequestMutations();
+  const { data: categories } = useCommunityCategories();
+  const { submitTopicRequest } = useCategoryMutations();
+
   const [selectedType, setSelectedType] = useState('book');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedTitle, setSubmittedTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Suggest New Community Topic Modal State
+  const [showTopicModal, setShowTopicModal] = useState(false);
+  const [topicForm, setTopicForm] = useState({ topic_name: '', reason: '', purpose: '' });
 
   const {
     register,
@@ -67,21 +74,45 @@ export default function Request() {
     }
   };
 
+  const handleTopicSubmit = async (e) => {
+    e.preventDefault();
+    if (!topicForm.topic_name.trim() || !topicForm.reason.trim() || !topicForm.purpose.trim()) {
+      showToast('Please fill out all fields explaining why and what purpose this community serves.', 'error');
+      return;
+    }
+
+    try {
+      await submitTopicRequest.mutateAsync({
+        topic_name: topicForm.topic_name,
+        reason: topicForm.reason,
+        purpose: topicForm.purpose,
+        user_id: user?.id,
+        username: user?.user_metadata?.username || user?.email?.split('@')[0] || 'User',
+      });
+      showToast('Community topic request sent to admins! You will be notified once reviewed.');
+      setTopicForm({ topic_name: '', reason: '', purpose: '' });
+      setShowTopicModal(false);
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to submit topic request.', 'error');
+    }
+  };
+
   return (
     <div className="antialiased bg-zinc-50 min-h-screen">
       {/* Hero Section with Animated Background */}
       <section className="relative overflow-hidden isolate">
         {/* Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600"></div>
-        
+
         {/* Animated Mesh Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-        
+
         {/* Floating Orbs */}
         <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-float"></div>
         <div className="absolute bottom-10 right-20 w-96 h-96 bg-fuchsia-400/20 rounded-full blur-3xl animate-float-delayed"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-400/10 rounded-full blur-3xl animate-pulse-glow"></div>
-        
+
         {/* Floating Icons */}
         <div className="absolute top-32 right-1/4 text-white/20 animate-float">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
@@ -93,7 +124,7 @@ export default function Request() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center text-white">
           {/* Breadcrumb Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-5 py-2 mb-8 border border-white/20">
@@ -102,7 +133,7 @@ export default function Request() {
             </svg>
             <span className="text-sm font-medium">Can't find what you need?</span>
           </div>
-          
+
           {/* Main Title */}
           <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight font-heading">
             <span className="text-white/90">Request Study Material</span>
@@ -110,7 +141,7 @@ export default function Request() {
           <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
             Let us know what you're looking for and we'll do our best to add it to our library.
           </p>
-          
+
           {/* Steps Indicator */}
           <div className="flex items-center justify-center gap-4 mt-12">
             <div className="flex items-center gap-2">
@@ -129,11 +160,11 @@ export default function Request() {
             </div>
           </div>
         </div>
-        
+
         {/* Bottom Wave */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-            <path d="M0 50L48 45.7C96 41.3 192 32.7 288 35.8C384 39 480 54 576 57.2C672 60.3 768 51.7 864 48.5C960 45.3 1056 47.7 1152 51.8C1248 56 1344 62 1392 65L1440 68V100H1392C1344 100 1248 100 1152 100C1056 100 960 100 864 100C768 100 672 100 576 100C480 100 384 100 288 100C192 100 96 100 48 100H0V50Z" fill="#FAFAFA"/>
+            <path d="M0 50L48 45.7C96 41.3 192 32.7 288 35.8C384 39 480 54 576 57.2C672 60.3 768 51.7 864 48.5C960 45.3 1056 47.7 1152 51.8C1248 56 1344 62 1392 65L1440 68V100H1392C1344 100 1248 100 1152 100C1056 100 960 100 864 100C768 100 672 100 576 100C480 100 384 100 288 100C192 100 96 100 48 100H0V50Z" fill="#FAFAFA" />
           </svg>
         </div>
       </section>
@@ -198,161 +229,171 @@ export default function Request() {
           /* Main Form Card */
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="glass-card rounded-3xl shadow-2xl shadow-purple-500/10 overflow-hidden bg-white border border-zinc-200/80">
-            
-            {/* Material Type Section */}
-            <div className="p-8 md:p-10 border-b border-zinc-100">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-zinc-900 font-heading">What are you looking for?</h2>
-                  <p className="text-sm text-zinc-500">Select the type of material you need</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Book */}
-                <label className="type-card cursor-pointer group" onClick={() => setSelectedType('book')}>
-                  <input type="radio" value="book" checked={selectedType === 'book'} onChange={() => setSelectedType('book')} className="peer sr-only" />
-                  <div className={`p-6 rounded-2xl border-2 transition-all ${selectedType === 'book' ? 'border-indigo-500 bg-indigo-50 shadow-lg shadow-indigo-500/20' : 'border-zinc-200 bg-zinc-50/50 hover:border-indigo-300 hover:bg-indigo-50/50'}`}>
-                    <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition text-white">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                    <h3 className="font-semibold text-zinc-900 mb-1">Book</h3>
-                    <p className="text-xs text-zinc-500">Textbooks & References</p>
+
+              {/* Material Type Section */}
+              <div className="p-8 md:p-10 border-b border-zinc-100">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
                   </div>
-                </label>
-                
-                {/* Paper */}
-                <label className="type-card cursor-pointer group" onClick={() => setSelectedType('paper')}>
-                  <input type="radio" value="paper" checked={selectedType === 'paper'} onChange={() => setSelectedType('paper')} className="peer sr-only" />
-                  <div className={`p-6 rounded-2xl border-2 transition-all ${selectedType === 'paper' ? 'border-teal-500 bg-teal-50 shadow-lg shadow-teal-500/20' : 'border-zinc-200 bg-zinc-50/50 hover:border-teal-300 hover:bg-teal-50/50'}`}>
-                    <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-500/30 group-hover:scale-105 transition text-white">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="font-semibold text-zinc-900 mb-1">Paper</h3>
-                    <p className="text-xs text-zinc-500">Exam Papers & Notes</p>
+                  <div>
+                    <h2 className="text-xl font-bold text-zinc-900 font-heading">What are you looking for?</h2>
+                    <p className="text-sm text-zinc-500">Select the type of material you need</p>
                   </div>
-                </label>
-                
-                {/* Video */}
-                <label className="type-card cursor-pointer group" onClick={() => setSelectedType('video')}>
-                  <input type="radio" value="video" checked={selectedType === 'video'} onChange={() => setSelectedType('video')} className="peer sr-only" />
-                  <div className={`p-6 rounded-2xl border-2 transition-all ${selectedType === 'video' ? 'border-rose-500 bg-rose-50 shadow-lg shadow-rose-500/20' : 'border-zinc-200 bg-zinc-50/50 hover:border-rose-300 hover:bg-rose-50/50'}`}>
-                    <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/30 group-hover:scale-105 transition text-white">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Book */}
+                  <label className="type-card cursor-pointer group" onClick={() => setSelectedType('book')}>
+                    <input type="radio" value="book" checked={selectedType === 'book'} onChange={() => setSelectedType('book')} className="peer sr-only" />
+                    <div className={`p-6 rounded-2xl border-2 transition-all ${selectedType === 'book' ? 'border-indigo-500 bg-indigo-50 shadow-lg shadow-indigo-500/20' : 'border-zinc-200 bg-zinc-50/50 hover:border-indigo-300 hover:bg-indigo-50/50'}`}>
+                      <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-zinc-900 mb-1">Book</h3>
+                      <p className="text-xs text-zinc-500">Textbooks & References</p>
                     </div>
-                    <h3 className="font-semibold text-zinc-900 mb-1">Video</h3>
-                    <p className="text-xs text-zinc-500">Tutorials & Lectures</p>
-                  </div>
-                </label>
-              </div>
-            </div>
-            
-            {/* Form Fields Section */}
-            <div className="p-8 md:p-10 space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+                  </label>
+
+                  {/* Paper */}
+                  <label className="type-card cursor-pointer group" onClick={() => setSelectedType('paper')}>
+                    <input type="radio" value="paper" checked={selectedType === 'paper'} onChange={() => setSelectedType('paper')} className="peer sr-only" />
+                    <div className={`p-6 rounded-2xl border-2 transition-all ${selectedType === 'paper' ? 'border-teal-500 bg-teal-50 shadow-lg shadow-teal-500/20' : 'border-zinc-200 bg-zinc-50/50 hover:border-teal-300 hover:bg-teal-50/50'}`}>
+                      <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-500/30 group-hover:scale-105 transition text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-zinc-900 mb-1">Paper</h3>
+                      <p className="text-xs text-zinc-500">Exam Papers & Notes</p>
+                    </div>
+                  </label>
+
+                  {/* Video */}
+                  <label className="type-card cursor-pointer group" onClick={() => setSelectedType('video')}>
+                    <input type="radio" value="video" checked={selectedType === 'video'} onChange={() => setSelectedType('video')} className="peer sr-only" />
+                    <div className={`p-6 rounded-2xl border-2 transition-all ${selectedType === 'video' ? 'border-rose-500 bg-rose-50 shadow-lg shadow-rose-500/20' : 'border-zinc-200 bg-zinc-50/50 hover:border-rose-300 hover:bg-rose-50/50'}`}>
+                      <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-rose-500/30 group-hover:scale-105 transition text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-zinc-900 mb-1">Video</h3>
+                      <p className="text-xs text-zinc-500">Tutorials & Lectures</p>
+                    </div>
+                  </label>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-zinc-900 font-heading">Tell us more</h2>
-                  <p className="text-sm text-zinc-500">The more details, the better we can help</p>
-                </div>
-              </div>
-              
-              {/* Community Category Field */}
-              <div className="space-y-2">
-                <label htmlFor="community_category" className="block text-sm font-semibold text-zinc-700">
-                  Community Category <span className="text-zinc-400 font-normal">(Optional)</span>
-                </label>
-                <select 
-                  id="community_category" 
-                  {...register('community_category')}
-                  className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 appearance-none cursor-pointer"
-                >
-                  <option value="">Select a community to target...</option>
-                  {SYSTEM_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
               </div>
 
-              {/* Title Field */}
-              <div className="space-y-2">
-                <label htmlFor="title" className="block text-sm font-semibold text-zinc-700">
-                  Title / Topic <span className="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="title" 
-                  {...register('title')}
-                  required 
-                  placeholder="e.g. Introduction to Algorithms, 3rd Edition"
-                  className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400"
-                />
-              </div>
-              
-              {/* Author/Publisher Field */}
-              <div className="space-y-2">
-                <label htmlFor="author_publisher" className="block text-sm font-semibold text-zinc-700">
-                  Author / Publisher <span className="text-zinc-400 font-normal">(Optional)</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="author_publisher" 
-                  {...register('author_publisher')}
-                  placeholder="e.g. Thomas H. Cormen, MIT Press"
-                  className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400"
-                />
-              </div>
-              
-              {/* Details Field */}
-              <div className="space-y-2">
-                <label htmlFor="details" className="block text-sm font-semibold text-zinc-700">
-                  Additional Details <span className="text-zinc-400 font-normal">(Optional)</span>
-                </label>
-                <textarea 
-                  id="details" 
-                  {...register('details')}
-                  rows="4" 
-                  placeholder="Any specific edition, year, chapter, or context that would help us find the right material..."
-                  className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400 resize-none"
-                ></textarea>
-              </div>
-              
-              {/* Submit Button */}
-              <div className="pt-4">
-                <button 
-                  type="submit"
-                  className="w-full relative group bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white px-8 py-5 rounded-2xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 flex justify-center items-center gap-3 overflow-hidden cursor-pointer"
-                >
-                  <span className="relative z-10 flex items-center gap-3 font-heading">
-                    Submit Request
+              {/* Form Fields Section */}
+              <div className="p-8 md:p-10 space-y-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-violet-700 via-purple-700 to-fuchsia-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </button>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-zinc-900 font-heading">Tell us more</h2>
+                    <p className="text-sm text-zinc-500">The more details, the better we can help</p>
+                  </div>
+                </div>
+
+                {/* Community Category Field */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="community_category" className="block text-sm font-semibold text-zinc-700">
+                      Community Category <span className="text-zinc-400 font-normal">(Optional)</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowTopicModal(true)}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-purple-600 hover:text-purple-700 transition cursor-pointer"
+                    >
+                      <PlusCircle className="h-3.5 w-3.5" />
+                      Can't find your community? Request a new topic
+                    </button>
+                  </div>
+                  <select
+                    id="community_category"
+                    {...register('community_category')}
+                    className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 appearance-none cursor-pointer"
+                  >
+                    <option value="">Select a community to target...</option>
+                    {(categories || []).map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Title Field */}
+                <div className="space-y-2">
+                  <label htmlFor="title" className="block text-sm font-semibold text-zinc-700">
+                    Title / Topic <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    {...register('title')}
+                    required
+                    placeholder="e.g. Introduction to Algorithms, 3rd Edition"
+                    className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400"
+                  />
+                </div>
+
+                {/* Author/Publisher Field */}
+                <div className="space-y-2">
+                  <label htmlFor="author_publisher" className="block text-sm font-semibold text-zinc-700">
+                    Author / Publisher <span className="text-zinc-400 font-normal">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="author_publisher"
+                    {...register('author_publisher')}
+                    placeholder="e.g. Thomas H. Cormen, MIT Press"
+                    className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400"
+                  />
+                </div>
+
+                {/* Details Field */}
+                <div className="space-y-2">
+                  <label htmlFor="details" className="block text-sm font-semibold text-zinc-700">
+                    Additional Details <span className="text-zinc-400 font-normal">(Optional)</span>
+                  </label>
+                  <textarea
+                    id="details"
+                    {...register('details')}
+                    rows="4"
+                    placeholder="Any specific edition, year, chapter, or context that would help us find the right material..."
+                    className="form-input w-full px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:bg-white transition text-zinc-900 placeholder:text-zinc-400 resize-none"
+                  ></textarea>
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    className="w-full relative group bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white px-8 py-5 rounded-2xl font-semibold text-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 flex justify-center items-center gap-3 overflow-hidden cursor-pointer"
+                  >
+                    <span className="relative z-10 flex items-center gap-3 font-heading">
+                      Submit Request
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-violet-700 via-purple-700 to-fuchsia-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </form>
-      )}
-        
+          </form>
+        )}
+
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
           <div className="bg-white rounded-2xl p-6 border border-zinc-200/50 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
@@ -385,6 +426,94 @@ export default function Request() {
             <p className="text-sm text-zinc-500 leading-relaxed">We'll alert you when it's available</p>
           </div>
         </div>
+
+        {/* Suggest / Request New Community Topic Modal */}
+        {showTopicModal && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in text-left">
+            <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-zinc-200 space-y-5">
+              <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                    <PlusCircle className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-zinc-900 font-heading">Request a New Community</h3>
+                    <p className="text-xs text-zinc-500">Propose a new discussion topic or tech stack</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowTopicModal(false)}
+                  className="p-1 text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleTopicSubmit} className="space-y-4 text-xs">
+                <div>
+                  <label className="block font-semibold text-zinc-700 mb-1.5">
+                    Proposed Community / Topic Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={topicForm.topic_name}
+                    onChange={(e) => setTopicForm({ ...topicForm, topic_name: e.target.value })}
+                    placeholder="e.g. Rust, Unreal Engine 5, Quantum Computing, Web3"
+                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-xs text-zinc-900 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-zinc-700 mb-1.5">
+                    Why is this community needed? <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={topicForm.reason}
+                    onChange={(e) => setTopicForm({ ...topicForm, reason: e.target.value })}
+                    placeholder="Explain why this topic is important for developers and learners..."
+                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-xs text-zinc-900 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-zinc-700 mb-1.5">
+                    What purpose / content will be shared here? <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={topicForm.purpose}
+                    onChange={(e) => setTopicForm({ ...topicForm, purpose: e.target.value })}
+                    placeholder="e.g. Sharing game dev shaders, architecture questions, C++ bindings..."
+                    className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-xs text-zinc-900 resize-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowTopicModal(false)}
+                    className="px-5 py-2.5 border border-zinc-200 rounded-xl text-zinc-600 font-semibold hover:bg-zinc-50 cursor-pointer transition text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitTopicRequest.isPending}
+                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-md shadow-purple-500/20 transition disabled:opacity-60 cursor-pointer flex items-center gap-2 text-xs"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                    {submitTopicRequest.isPending ? 'Submitting...' : 'Submit Community Request'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );

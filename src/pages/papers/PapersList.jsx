@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { usePapers } from '../../hooks/usePapers';
+import { useCommunityCategories } from '../../hooks/useCategories';
 import { useAuth } from '../../contexts/AuthContext';
-import { SYSTEM_CATEGORIES } from '../../lib/utils';
 import { Search, FileText, Download } from 'lucide-react';
 
 const YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
 
 export default function PapersList() {
+  const navigate = useNavigate();
   const { isPro } = useAuth();
+  const { data: categories } = useCommunityCategories();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,7 +66,7 @@ export default function PapersList() {
                     <span>All Papers</span>
                   </button>
 
-                  {SYSTEM_CATEGORIES.map((cat) => (
+                  {(categories || []).map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}

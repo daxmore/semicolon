@@ -32,6 +32,7 @@ export default function AdminLayout() {
     { label: 'Books', path: '/admin/books', icon: BookOpen, section: 'Content' },
     { label: 'Papers', path: '/admin/papers', icon: FileText, section: 'Content' },
     { label: 'Videos', path: '/admin/videos', icon: Video, section: 'Content' },
+    { label: 'Topics', path: '/admin/categories', icon: Layers, section: 'Content' },
     { label: 'Community', path: '/admin/community', icon: MessageSquare, section: 'Content' },
     { label: 'Reports', path: '/admin/reports', icon: AlertTriangle, section: 'Management' },
     { label: 'Requests', path: '/admin/requests', icon: HelpCircle, section: 'Management' },

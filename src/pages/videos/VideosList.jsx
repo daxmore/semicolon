@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useVideos } from '../../hooks/useVideos';
-import { SYSTEM_CATEGORIES, getYoutubeId } from '../../lib/utils';
+import { useCommunityCategories } from '../../hooks/useCategories';
+import { getYoutubeId } from '../../lib/utils';
 import { Search, Video, Play } from 'lucide-react';
 
 export default function VideosList() {
+  const { data: categories } = useCommunityCategories();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -59,7 +61,7 @@ export default function VideosList() {
                     <span>All Videos</span>
                   </button>
 
-                  {SYSTEM_CATEGORIES.map((cat) => (
+                  {(categories || []).map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}

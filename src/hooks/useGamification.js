@@ -185,6 +185,21 @@ export function useGamificationMutations() {
     },
   });
 
+  const updateUserXp = useMutation({
+    mutationFn: async ({ userId, xpTotal, xpWeekly, level }) => {
+      const { data } = await axiosClient.patch(`/rest/v1/profiles?id=eq.${userId}`, {
+        xp_total: xpTotal,
+        xp_weekly: xpWeekly,
+        level: level,
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin_users'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+    },
+  });
+
   return {
     toggleEquipBadge,
     createBadge,
@@ -194,5 +209,6 @@ export function useGamificationMutations() {
     changeUserRole,
     banUser,
     deleteUser,
+    updateUserXp,
   };
 }

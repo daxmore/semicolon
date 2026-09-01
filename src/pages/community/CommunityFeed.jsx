@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCommunityPosts, useUserReactions, useCommunityMutations } from '../../hooks/useCommunity';
+import { useCommunityCategories } from '../../hooks/useCategories';
 import { useAuth } from '../../contexts/AuthContext';
 import { SYSTEM_CATEGORIES } from '../../lib/utils';
 import { 
@@ -27,6 +28,7 @@ export default function CommunityFeed() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
+  const { data: categories } = useCommunityCategories();
   const { data: posts, isLoading } = useCommunityPosts({
     category: selectedCategory,
     sort,
@@ -62,36 +64,46 @@ export default function CommunityFeed() {
     e.preventDefault();
     e.stopPropagation();
     const url = `${window.location.origin}/community/post/${post.id}`;
-    if (navigator.share) {
-      navigator.share({ title: post.title, url }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(url).then(() => {
-        setCopiedPostId(post.id);
-        setTimeout(() => setCopiedPostId(null), 2000);
-      });
-    }
+    navigator.clipboard.writeText(url);
+    setCopiedPostId(post.id);
+    showToast('Post link copied to clipboard!');
+    setTimeout(() => setCopiedPostId(null), 2000);
   };
 
   return (
     <div className="antialiased bg-[#FAFAFA] min-h-screen">
-      {/* Adjusted Hero Section */}
-      <section className="relative pt-6 pb-4 bg-white border-b border-zinc-200">
+      {/* Search Header Banner */}
+      <section className="bg-white border-b border-zinc-200/80 sticky top-0 z-30 shadow-xs">
         <div className="container mx-auto px-6 max-w-7xl">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                </svg>
-                Community
-              </h1>
-              <p className="text-sm text-zinc-500 mt-1">Connect and share ideas with fellow developers</p>
+          <div className="flex items-center justify-between h-16 gap-4">
+            <div className="flex items-center gap-3 w-full max-w-lg">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 text-indigo-600 font-bold text-xs">
+                {user ? (user.user_metadata?.username || user.email || 'U').charAt(0).toUpperCase() : ';'}
+              </div>
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                <input
+                  type="text"
+                  placeholder="Search community posts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                />
+              </div>
             </div>
+
+            <Link
+              to="/community/new"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full text-xs font-semibold shadow-sm transition flex-shrink-0"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Create Post</span>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <section className="py-8 bg-[#FAFAFA]">
         <div className="container mx-auto px-6 max-w-7xl">
           {/* 3 Column Grid */}
@@ -118,7 +130,7 @@ export default function CommunityFeed() {
                     <span>All Posts</span>
                   </button>
 
-                  {SYSTEM_CATEGORIES.map((cat) => (
+                  {(categories || []).map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
@@ -281,11 +293,14 @@ export default function CommunityFeed() {
 
                           {/* Attached Image (if any) */}
                           {post.image_url && (
-                            <Link to={`/community/post/${post.id}`} className="block mb-3 bg-zinc-50 overflow-hidden sm:rounded-lg border-y sm:border border-zinc-200/60 max-h-[500px] flex items-center justify-center -mx-2 sm:mx-0">
+                            <Link
+                              to={`/community/post/${post.id}`}
+                              className="block mb-3 bg-zinc-900/5 dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200/80 max-h-64 sm:max-h-72 flex items-center justify-center -mx-2 sm:mx-0 group/img"
+                            >
                               <img
                                 src={post.image_url}
                                 alt="Post media"
-                                className="w-full h-full object-contain max-h-[500px]"
+                                className="w-full h-full max-h-64 sm:max-h-72 object-contain group-hover/img:scale-[1.01] transition-transform duration-200"
                               />
                             </Link>
                           )}

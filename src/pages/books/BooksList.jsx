@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useBooks } from '../../hooks/useBooks';
+import { useCommunityCategories } from '../../hooks/useCategories';
 import { useAuth } from '../../contexts/AuthContext';
-import { SYSTEM_CATEGORIES } from '../../lib/utils';
 import { Search, BookOpen, Download } from 'lucide-react';
 
 export default function BooksList() {
+  const navigate = useNavigate();
   const { isPro } = useAuth();
+  const { data: categories } = useCommunityCategories();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -60,7 +62,7 @@ export default function BooksList() {
                     <span>All Books</span>
                   </button>
 
-                  {SYSTEM_CATEGORIES.map((cat) => (
+                  {(categories || []).map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}

@@ -578,26 +578,15 @@ export default function Profile() {
                   />
                 </div>
 
-                {/* Avatar Upload */}
-                <div>
-                  <label className="block text-sm font-semibold text-zinc-700 mb-2">Profile Image (Upload, max 1MB)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                    className="w-full px-4 py-2 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 transition file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                  />
-                </div>
-
                 {/* Avatar URL */}
                 <div>
-                  <label className="block text-sm font-semibold text-zinc-700 mb-2">Or Image URL</label>
+                  <label className="block text-sm font-semibold text-zinc-700 mb-2">Profile Image URL</label>
                   <input
                     type="url"
                     value={avatarUrl}
                     onChange={(e) => setAvatarUrl(e.target.value)}
                     placeholder="https://example.com/avatar.jpg"
-                    className="w-full px-4 py-2 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                    className="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                   />
                 </div>
 

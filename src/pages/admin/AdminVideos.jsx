@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useVideos, useVideoMutations } from '../../hooks/useVideos';
-import { SYSTEM_CATEGORIES, generateSlug, generateToken, getYoutubeId } from '../../lib/utils';
+import { useCommunityCategories } from '../../hooks/useCategories';
+import { generateSlug, generateToken, getYoutubeId } from '../../lib/utils';
 import { Video, Plus, Trash2, Edit3, X, Search, Play } from 'lucide-react';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
@@ -10,6 +11,7 @@ export default function AdminVideos() {
   const [editingVideo, setEditingVideo] = useState(null);
   const [videoToDelete, setVideoToDelete] = useState(null);
 
+  const { data: categories } = useCommunityCategories();
   const { data: videos, isLoading } = useVideos({ search: searchTerm });
   const { createVideo, updateVideo, deleteVideo } = useVideoMutations();
 
@@ -85,7 +87,7 @@ export default function AdminVideos() {
         </div>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer"
         >
           <Plus className="h-4 w-4" /> Add Video
         </button>
@@ -153,7 +155,7 @@ export default function AdminVideos() {
                       <td className="px-6 py-4 text-right space-x-2">
                         <button
                           onClick={() => openEditModal(v)}
-                          className="p-1.5 text-zinc-500 hover:text-indigo-600 rounded-lg hover:bg-zinc-100 transition"
+                          className="p-1.5 text-zinc-500 hover:text-indigo-600 rounded-lg hover:bg-zinc-100 transition cursor-pointer"
                           title="Edit Video"
                         >
                           <Edit3 className="h-4 w-4" />
@@ -188,7 +190,7 @@ export default function AdminVideos() {
               <h3 className="font-bold text-base text-zinc-900">
                 {editingVideo ? 'Edit Video' : 'Add New Video'}
               </h3>
-              <button onClick={() => setShowModal(false)} className="p-1 text-zinc-400 hover:text-zinc-600">
+              <button onClick={() => setShowModal(false)} className="p-1 text-zinc-400 hover:text-zinc-600 cursor-pointer">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -213,7 +215,7 @@ export default function AdminVideos() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
                 >
-                  {SYSTEM_CATEGORIES.map((cat) => (
+                  {(categories || []).map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
                     </option>
@@ -236,11 +238,11 @@ export default function AdminVideos() {
               <div>
                 <label className="block font-semibold text-zinc-700 mb-1">Description (Optional)</label>
                 <textarea
-                  rows="3"
+                  rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Video overview or topic timestamps..."
-                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 resize-none"
                 />
               </div>
 
@@ -248,14 +250,14 @@ export default function AdminVideos() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-zinc-200 rounded-xl text-zinc-600 hover:bg-zinc-50 font-semibold"
+                  className="px-4 py-2 border border-zinc-200 rounded-xl text-zinc-600 hover:bg-zinc-50 font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createVideo.isPending || updateVideo.isPending}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition"
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition cursor-pointer"
                 >
                   {editingVideo ? 'Save Changes' : 'Create Video'}
                 </button>

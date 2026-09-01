@@ -44,7 +44,7 @@ export default function CheckoutSuccess() {
       </div>
 
       <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs text-zinc-500 font-mono">
-        Transaction Reference: {sessionId ? sessionId.slice(0, 24) + '...' : 'Verified by Stripe'}
+        Transaction Reference: {sessionId ? sessionId.slice(0, 24) + '...' : 'Verified Membership'}
       </div>
 
       <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">

@@ -1,25 +1,9 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useStripeCheckout } from '../../hooks/useStripe';
-import { Check, AlertCircle } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 
 export default function Pricing() {
-  const { user, isPro } = useAuth();
-  const navigate = useNavigate();
-  const { mutate: checkout, isPending, error } = useStripeCheckout();
-
-  const handleUpgrade = () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    checkout({
-      userId: user.id,
-      email: user.email,
-    });
-  };
+  const { isPro } = useAuth();
 
   return (
     <div className="antialiased bg-[#FAFAFA]">
@@ -32,9 +16,7 @@ export default function Pricing() {
         
         <div className="container mx-auto px-6 text-center">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full text-sm font-medium text-indigo-600 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Sparkles className="h-4 w-4 text-indigo-600" />
             Simple Pricing
           </span>
           <h1 className="text-5xl md:text-6xl font-bold text-zinc-900 mb-6 tracking-tight">
@@ -45,14 +27,6 @@ export default function Pricing() {
           </p>
         </div>
       </section>
-
-      {/* Error Message */}
-      {error && (
-        <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          <span>{error.message || 'Failed to initiate checkout.'}</span>
-        </div>
-      )}
 
       {/* Pricing Cards */}
       <section className="pb-24">
@@ -164,11 +138,10 @@ export default function Pricing() {
                 </button>
               ) : (
                 <button 
-                  onClick={handleUpgrade}
-                  disabled={isPending}
-                  className="relative z-10 w-full py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors shadow-lg disabled:opacity-50"
+                  disabled
+                  className="relative z-10 w-full py-4 bg-white/80 text-indigo-700/60 font-semibold rounded-xl cursor-not-allowed shadow-md opacity-80 backdrop-blur"
                 >
-                  {isPending ? 'Connecting...' : 'Upgrade to Pro'}
+                  Coming Soon
                 </button>
               )}
             </div>

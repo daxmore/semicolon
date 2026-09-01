@@ -14,16 +14,16 @@ export default function SkillDetail() {
   const userXp = profile?.xp_total || 0;
 
   const isLevelUnlocked = (idx, level) => {
-    if (idx === 0) return true; // Easy is always unlocked
+    if (idx === 0) return true; // First tier is always unlocked
     const prevLevel = skill.levels[idx - 1];
-    const prevCompleted = completedLevels.includes(prevLevel?.level_name);
+    const prevCompleted =
+      completedLevels.includes(prevLevel?.level_name) ||
+      completedLevels.includes(prevLevel?.id) ||
+      completedLevels.includes(`level_${prevLevel?.id}`);
     const xpMet = userXp >= (level.required_xp || 0);
 
-    if (idx === 3) {
-      // Interview requires previous + xp requirement
-      return prevCompleted && xpMet;
-    }
-    return prevCompleted && xpMet;
+    // Unlocked if user has enough XP or has completed the previous tier
+    return xpMet || prevCompleted;
   };
 
   if (isLoading) {

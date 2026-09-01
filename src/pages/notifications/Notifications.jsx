@@ -1,12 +1,64 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useNotifications, useNotificationMutations } from '../../hooks/useNotifications';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Notifications() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: notifications, isLoading } = useNotifications(user?.id);
   const { markAsRead, markAllAsRead } = useNotificationMutations();
+
+  const handleLinkClick = (e, notif) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (!notif.is_read) {
+      markAsRead.mutate(notif.id);
+    }
+
+    let target = (notif.link || '').trim();
+
+    // If target was set to current page or invalid
+    if (target === '/notifications' || !target) {
+      // Check if message or title contains "post #<id>"
+      const postMatch = (notif.message + ' ' + notif.title).match(/post\s*#?(\d+)/i);
+      if (postMatch && postMatch[1]) {
+        target = `/community/post/${postMatch[1]}`;
+      } else if (notif.title?.toLowerCase().includes('request')) {
+        target = '/history';
+      } else {
+        target = '/community';
+      }
+    } else if (
+      target.startsWith('file:') ||
+      target.startsWith('blob:') ||
+      /^[a-zA-Z]:/.test(target) ||
+      target.includes('Daksh_data')
+    ) {
+      // Check for post ID in local link string
+      const postMatch = target.match(/post[\\/](\d+)/i);
+      if (postMatch && postMatch[1]) {
+        target = `/community/post/${postMatch[1]}`;
+      } else {
+        target = '/community';
+      }
+    } else if (
+      !target.startsWith('/') &&
+      !target.startsWith('http://') &&
+      !target.startsWith('https://')
+    ) {
+      target = `/${target}`;
+    }
+
+    if (target.startsWith('http://') || target.startsWith('https://')) {
+      window.open(target, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(target);
+    }
+  };
 
   const unreadCount = (notifications || []).filter((n) => !n.is_read).length;
 
@@ -109,9 +161,13 @@ export default function Notifications() {
                         
                         {notif.link && (
                           <div className="mt-3 flex items-center gap-4 text-sm">
-                            <Link to={notif.link} className="font-medium text-indigo-600 hover:text-indigo-700">
-                              View Detail &rarr;
-                            </Link>
+                            <button
+                              onClick={(e) => handleLinkClick(e, notif)}
+                              className="font-medium text-indigo-600 hover:text-indigo-700 transition cursor-pointer flex items-center gap-1"
+                            >
+                              <span>View Detail</span>
+                              <span>&rarr;</span>
+                            </button>
                           </div>
                         )}
                       </div>

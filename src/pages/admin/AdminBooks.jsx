@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBooks, useBookMutations } from '../../hooks/useBooks';
-import { SYSTEM_CATEGORIES, generateSlug, generateToken } from '../../lib/utils';
+import { useCommunityCategories } from '../../hooks/useCategories';
+import { generateSlug, generateToken } from '../../lib/utils';
 import { BookOpen, Plus, Trash2, Edit3, X, Check, Search, AlertCircle } from 'lucide-react';
 import DeleteConfirmModal from '../../components/common/DeleteConfirmModal';
 
@@ -10,6 +11,7 @@ export default function AdminBooks() {
   const [editingBook, setEditingBook] = useState(null);
   const [bookToDelete, setBookToDelete] = useState(null);
 
+  const { data: categories } = useCommunityCategories();
   const { data: books, isLoading } = useBooks({ search: searchTerm });
   const { createBook, updateBook, deleteBook } = useBookMutations();
 
@@ -240,7 +242,7 @@ export default function AdminBooks() {
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
                 >
-                  {SYSTEM_CATEGORIES.map((cat) => (
+                  {(categories || []).map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
                     </option>
